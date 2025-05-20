@@ -1,16 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+import theme from "../theme";
+import { Suspense } from "react";
+import { NextAppProvider } from "@toolpad/core/nextjs";
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import LinearProgress from "@mui/material/LinearProgress";
+import NAVIGATION from "./_utils/navigation";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -24,10 +21,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <body>
+        <AppRouterCacheProvider>
+          <Suspense fallback={<LinearProgress />}>
+            <NextAppProvider theme={theme} navigation={NAVIGATION}>
+              {children}
+            </NextAppProvider>
+          </Suspense>
+        </AppRouterCacheProvider>
       </body>
     </html>
   );

@@ -1,5 +1,7 @@
 "use client";
+
 import { useState } from "react";
+import Link from "next/link";
 
 import { ThemeSwitcher } from "@toolpad/core";
 
@@ -9,8 +11,6 @@ import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
@@ -39,37 +39,38 @@ export default function DrawerAppBar(props: Props) {
           alignItems: "center",
         }}
       >
-        <Image src="/logo.svg" alt="Logo" width={150} height={150} />
+        <Image
+          src="/logo.svg"
+          alt="Logo"
+          width={150}
+          height={150}
+          className="mt-2"
+        />
         <ThemeSwitcher />
       </Box>
       <Divider />
-      <List>
-        <ListItem>
-          <Typography variant="body1" sx={{ my: 2, color: "textblack.main" }}>
-            MUI
-          </Typography>
-        </ListItem>
-        <ListItem>
-          <Typography variant="body1" sx={{ my: 2, color: "textblack.main" }}>
-            MUI
-          </Typography>
-        </ListItem>
-        <ListItem>
-          <Typography variant="body1" sx={{ my: 2, color: "textblack.main" }}>
-            MUI
-          </Typography>
-        </ListItem>
-        <ListItem>
-          <Button variant="contained">Login</Button>
-        </ListItem>
-        <ListItem>
-          <Button>Sign in</Button>
-        </ListItem>
-      </List>
+      <Typography variant="body1" sx={{ my: 2, color: "textblack.main" }}>
+        About
+      </Typography>
+      <Typography variant="body1" sx={{ my: 2, color: "textblack.main" }}>
+        Features
+      </Typography>
+      <Typography variant="body1" sx={{ my: 2, color: "textblack.main" }}>
+        Contact
+      </Typography>
+      <Box sx={{ display: "flex", gap: 1, justifyContent: "space-around" }}>
+        <Button variant="contained" disableElevation disableRipple>
+          <Typography>Login</Typography>
+        </Button>
+        <Button variant="outlined">
+          <Typography>Sign in</Typography>
+        </Button>
+      </Box>
     </Box>
   );
 
-  const container = window !== undefined ? () => window().document.body : undefined;
+  const container =
+    window !== undefined ? () => window().document.body : undefined;
 
   return (
     <>
@@ -89,32 +90,45 @@ export default function DrawerAppBar(props: Props) {
               flexGrow: 1,
               display: { xs: "none", sm: "block" },
               alignItems: "center",
+              mx: 0,
+              px: 0,
             }}
           >
-            <Image src="/logo.svg" alt="Logo" width={100} height={100} />
+            <Image
+              src="/logo.svg"
+              alt="Logo"
+              width={110}
+              height={100}
+              className="mt-2"
+               
+            />
           </Box>
           <Box
             sx={{
               display: { xs: "none", sm: "flex" },
-              gap:2,
+              gap: { sm: 1, md: 2 },
               alignItems: "center",
             }}
           >
             <ThemeSwitcher />
             <Typography variant="body1" sx={{ my: 2, color: "textblack.main" }}>
-              About
+              <Link href="#about">About Us</Link>
             </Typography>
             <Typography variant="body1" sx={{ my: 2, color: "textblack.main" }}>
-              Features
+              <Link href="#features">Features</Link>
             </Typography>
             <Typography variant="body1" sx={{ my: 2, color: "textblack.main" }}>
-              Contact 
+              <Link href="#contact">Contact</Link>
             </Typography>
             <Button variant="contained" disableElevation disableRipple>
-              <Typography>Login</Typography>
+              <Typography>
+                <Link href="/login">Login</Link>
+              </Typography>
             </Button>
             <Button variant="outlined">
-              <Typography>Sign in</Typography>
+              <Typography>
+                <Link href="/signup">Sign Up</Link>
+              </Typography>
             </Button>
           </Box>
         </Toolbar>

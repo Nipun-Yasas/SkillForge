@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { Box, Typography, Button, Container, Grid, Card, CardContent } from '@mui/material';
-
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 type Feature = {
   icon: string;
   title: string;
@@ -55,30 +55,26 @@ export default function Features() {
       <Box
         id="features"
         sx={{
-          backgroundColor: 'rgba(207, 250, 254, 0.4)', // cyan-100 with opacity
-          py: { xs: 10, md: 20 },
-          mt: { xs: 10, md: 12 },
+          backgroundColor: 'rgba(207, 250, 254, 0.4)', 
+          py: { xs: 5, md: 5 },
         }}
       >
-        <Container>
           <Typography
             variant="h4"
             textAlign="center"
             fontWeight="bold"
-            color="primary.dark"
-            mb={10}
+            sx={{mb:3}}
           >
             Check out educate features
           </Typography>
 
-          <Grid container spacing={5}>
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 2, justifyContent: 'space-evenly' }}>
             {features.map((feature, index) => (
               
                 <FeatureCard {...feature} />
               
             ))}
-          </Grid>
-        </Container>
+          </Box>
       </Box>
     </>
   );
@@ -90,14 +86,13 @@ const FeatureCard: React.FC<Feature> = ({ icon, title, description }) => {
       className="feature-card"
       elevation={3}
       sx={{
-        p: 4,
+        p: 2,
         borderRadius: 4,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         height: '100%',
-        textAlign: 'center',
-        backgroundColor: 'white',
+        textAlign: 'center'
       }}
     >
       <Box
@@ -105,8 +100,8 @@ const FeatureCard: React.FC<Feature> = ({ icon, title, description }) => {
         src={icon}
         alt={title}
         sx={{
-          width: 108,
-          height: 108,
+          maxwidth: 100,
+          maxheight: 100,
           borderRadius: '45px',
           objectFit: 'contain',
           mb: 3,
@@ -121,24 +116,17 @@ const FeatureCard: React.FC<Feature> = ({ icon, title, description }) => {
       <Button
         variant="contained"
         sx={{
-          px: 3,
+          px: 2,
           py: 1.5,
           borderRadius: 20,
           backgroundColor: 'cyan.500',
           color: 'white',
           textTransform: 'none',
-          '&:hover': {
-            backgroundColor: 'cyan.700',
-          },
+          
         }}
-        endIcon={
-          <Box
-            component="img"
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/5fa84eddbccfb8e58a2c48fc7fbe7610e214c7dd?placeholderIfAbsent=true"
-            alt="Arrow"
-            sx={{ width: 17 }}
-          />
-        }
+        endIcon=
+          {<ArrowForwardIcon/>}
+        
       >
         View Details
       </Button>

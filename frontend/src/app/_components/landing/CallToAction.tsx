@@ -1,41 +1,36 @@
-"use client";
-
-import React from "react";
 import Link from "next/link";
-import {
-  Box,
-  Typography,
-  Button,
-  Grid,
-  useTheme,
-  useMediaQuery,
-} from "@mui/material";
+import Image from "next/image";
+import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
 
-const CallToAction: React.FC = () => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-
+export default function Hero() {
   return (
     <Box
-      id="cta"
+      width="100%"
       sx={{
-        px: { xs: 2, md: 5 },
-        pt: { xs: 12, md: 16 },
-        pb: 1,
-        width: "100%",
-        bgcolor: "#CAF0F8",
+        display: "flex",
+        flexDirection: { xs: "column-reverse", md: "row" },
+        alignItems: "center",
+        justifyContent: "space-between",
+        position: "relative",
+        py: 10,
+        mt:2,
       }}
     >
-      <Grid
-        container
-        spacing={5}
-        direction={isMobile ? "column" : "row"}
-        alignItems="center"
+      
+      <Box
+        sx={{
+          width: { xs: "100%", md: "50%" },
+          textAlign: { xs: "center", md: "left" },
+          position: "relative",
+          zIndex: 2,
+          p: 2.5,
+        }}
       >
-        
-          <Box>
-            <Typography
-              variant={isMobile ? "h4" : "h3"}
+        <Typography
+              variant='h3'
               fontWeight="bold"
               color="primary.dark"
               sx={{ lineHeight: { xs: "58px", md: "59px" } }}
@@ -43,8 +38,7 @@ const CallToAction: React.FC = () => {
               Start Learning Today with SkillForge!
             </Typography>
 
-            <Box mt={5} pl={1.5}>
-              <Typography
+       <Typography
                 variant="h6"
                 component="strong"
                 sx={{ display: "block", mb: 2 }}
@@ -57,41 +51,53 @@ const CallToAction: React.FC = () => {
                 easy, fun, and accessible.
               </Typography>
 
-              <Button
-                variant="contained"
-                color="primary"
-                component={Link}
-                href="/signUp"
-                sx={{
-                  mt: 5,
-                  px: 6,
-                  py: 2,
-                  textTransform: "uppercase",
-                  fontWeight: "bold",
-                  boxShadow: "0px 4px 4px rgba(0,0,0,0.25)",
-                }}
-              >
-                Join Now
-              </Button>
-            </Box>
-          </Box>
-        </Grid>
+        <Box sx={{ mt: 4 }}>
+          <Link href="/signUp" passHref>
+            <Button variant="contained" size="large">
+              Join Now
+            </Button>
+          </Link>
+        </Box>
+      </Box>
+      <Box
+        sx={{
+          width: { xs: "100%", md: "50%" },
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          position: "relative",
+          zIndex: 1,
+          mt: { xs: 4, md: 0 },
+        }}
+      >
+        
 
-       
-          <Box mt={isMobile ? 5 : 10}>
-            <Box
-              component="img"
-              src="https://cdn.builder.io/api/v1/image/assets/TEMP/8b7a1f4bd68cf10835a9b73db713d144936d39e7?placeholderIfAbsent=true"
-              alt="Call to action illustration"
-              sx={{
-                width: "100%",
-                objectFit: "contain",
-                aspectRatio: "0.83",
-              }}
-            />
-          </Box>
+        <Box
+          sx={{
+            position: "absolute",
+            width: 400,
+            height: 500,
+            backgroundColor: "shapeColor.main",
+            borderRadius: "70% 10% 80% 20% / 20% 10% 90% 100%",
+            top: "45%",
+            left: "70%",
+            transform: "translate(-50%, -50%)",
+            zIndex: 1,
+          }}
+        />
+
+        <Image
+          src="/Footer.svg"
+          alt="Hero illustration"
+          width={300}
+          height={300}
+          priority
+          style={{
+            position: "relative",
+            zIndex: 2,
+          }}
+        />
+      </Box>
     </Box>
   );
-};
-
-export default CallToAction;
+}

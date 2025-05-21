@@ -58,9 +58,8 @@ const Testimonials: React.FC = () => {
   return (
     <Box
       id="testimonials"
-      py={12}
+      py={2}
       px={3}
-      bgcolor="white"
       position="relative"
       display="flex"
       justifyContent="center"
@@ -119,20 +118,18 @@ export const TestimonialHeader: React.FC = () => {
         sx={{
           px: 2,
           py: 0.5,
-          bgcolor: "white",
-          color: "cyan.500",
           fontSize: "0.875rem",
           borderRadius: 1,
           textTransform: "uppercase",
           display: "inline-block",
         }}
       >
-        Testimonial
+        <Typography  variant="body1">Testimonial</Typography>
       </Box>
       <Typography
         variant="h4"
         fontWeight="bold"
-        color="primary.dark"
+        color="primary.main"
         mt={4}
         maxWidth="578px"
         mx="auto"
@@ -163,7 +160,6 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
         p: 4,
         borderRadius: 4,
         width: 350,
-        bgcolor: "blue.50",
         position: "relative",
       }}
     >

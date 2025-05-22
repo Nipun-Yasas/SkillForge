@@ -1,7 +1,13 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Box from "@mui/material/Box";
 import StatItem from "./StatItem";
+
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const trained = 30;
 const classes = 150;
@@ -9,8 +15,72 @@ const satisfaction = 100;
 const community = 150;
 
 export default function Stats() {
+  const statsRef = useRef(null);
+
+  useEffect(() => {
+    if (!statsRef.current) return;
+
+    const element = statsRef.current;
+
+    const ctx = gsap.context(() => {
+      const anim = gsap.fromTo(
+        element,
+        { opacity: 0, y: 100 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          ease: "power3.out",
+        }
+      );
+
+      ScrollTrigger.create({
+        trigger: element,
+        start: "top 80%",
+        end: "bottom 20%",
+        toggleActions: "play reverse play reverse",
+        animation: anim,
+        onEnter: () => {
+          gsap.to(element, {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: "power3.out",
+          });
+        },
+        onLeaveBack: () => {
+          gsap.to(element, {
+            opacity: 0,
+            y: -100,
+            duration: 1,
+            ease: "power3.out",
+          });
+        },
+        onLeave: () => {
+          gsap.to(element, {
+            opacity: 0,
+            y: 100,
+            duration: 1,
+            ease: "power3.out",
+          });
+        },
+        onEnterBack: () => {
+          gsap.to(element, {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: "power3.out",
+          });
+        },
+      });
+    }, statsRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
     <Box
+      ref={statsRef}
       width="100%"
       id="stats"
       sx={{
@@ -25,6 +95,7 @@ export default function Stats() {
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-evenly",
+          flexWrap: "wrap",
         }}
       >
         <StatItem

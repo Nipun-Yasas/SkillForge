@@ -16,6 +16,10 @@ export default function Home() {
       <Hero />
       <Stats />
       <About />
+      <Features />
+      <Testimonials />
+      <CallToAction />
+      <Footer />
     </>
   );
 }

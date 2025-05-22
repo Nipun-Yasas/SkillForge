@@ -9,7 +9,7 @@ export default function Hero() {
     <Box
       sx={{
         display: "flex",
-        overflowX: 'hidden',
+        overflowX: "hidden",
         flexDirection: { xs: "column-reverse", md: "row" },
         alignItems: "center",
         justifyContent: "space-between",
@@ -83,7 +83,7 @@ export default function Hero() {
             borderRadius: "50% 60% 10% 90% / 20% 30% 60% 80%",
             height: 300,
             width: { xs: 300, md: 500 },
-left: { xs: '-20%', md: '40%' },
+            left: { xs: "-20%", md: "40%" },
             top: "60%",
             transform: "translate(-50%, -50%)",
             zIndex: 0,
@@ -117,7 +117,7 @@ left: { xs: '-20%', md: '40%' },
             zIndex: 2,
             height: "auto",
             width: "100%",
-            maxWidth: "400px"
+            maxWidth: "400px",
           }}
         />
       </Box>

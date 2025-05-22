@@ -127,8 +127,8 @@ const theme = createTheme({
     MuiTextField: {
       styleOverrides: {
         root: {
-          '--TextField-borderColor': '#E0E3E7',
-          '--TextField-borderHoverColor': '#E90A4D',
+          '--TextField-borderColor': '#0077B6',
+          '--TextField-borderHoverColor': '#00B4D8',
         }
       }
     },

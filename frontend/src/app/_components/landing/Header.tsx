@@ -50,13 +50,13 @@ export default function DrawerAppBar(props: Props) {
       </Box>
       <Divider />
       <Typography variant="body1" sx={{ my: 2, color: "textblack.main" }}>
-        About
+        <Link href="#about">About Us</Link>
       </Typography>
       <Typography variant="body1" sx={{ my: 2, color: "textblack.main" }}>
-        Features
+        <Link href="#features">Features</Link>
       </Typography>
       <Typography variant="body1" sx={{ my: 2, color: "textblack.main" }}>
-        Contact
+        <Link href="#contact">Contact</Link>
       </Typography>
       <Box sx={{ display: "flex", gap: 1, justifyContent: "space-around" }}>
         <Button variant="contained" disableElevation disableRipple>
@@ -100,7 +100,6 @@ export default function DrawerAppBar(props: Props) {
               width={110}
               height={100}
               className="mt-2"
-               
             />
           </Box>
           <Box

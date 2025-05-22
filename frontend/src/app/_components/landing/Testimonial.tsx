@@ -1,33 +1,24 @@
 "use client";
 
-import React from "react";
-import {
-  Box,
-  Typography,
-  Grid,
-  Paper,
-  useTheme,
-  useMediaQuery,
-} from "@mui/material";
+import { useTheme, useMediaQuery } from "@mui/material";
+import { useRef, useEffect } from "react";
 
-// Testimonial type
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Grid from "@mui/material/Grid";
+
+import TestimonialCard from "../cards/TestimonialCard";
+import BackgroundShape from "../background/BackgroundShape";
+
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
+
 interface Testimonial {
   quote: string;
   author: string;
   role: string;
-}
-
-// BackgroundShape props
-interface BackgroundShapeProps {
-  className?: string;
-  color: string;
-  opacity: number | string;
-  width: number;
-  height: number;
-  cx: number;
-  cy: number;
-  rx: number;
-  ry: number;
 }
 
 const testimonialData: Testimonial[] = [
@@ -55,8 +46,72 @@ const Testimonials: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const testimonialsRef = useRef(null);
+
+  useEffect(() => {
+    if (!testimonialsRef.current) return;
+
+    const ctx = gsap.context(() => {
+      const element = testimonialsRef.current;
+
+      const anim = gsap.fromTo(
+        element,
+        { opacity: 0, y: 100 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          ease: "power3.out",
+        }
+      );
+
+      ScrollTrigger.create({
+        trigger: element,
+        start: "top 80%",
+        end: "bottom 20%",
+        toggleActions: "play reverse play reverse",
+        animation: anim,
+        onEnter: () => {
+          gsap.to(element, {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: "power3.out",
+          });
+        },
+        onLeave: () => {
+          gsap.to(element, {
+            opacity: 0,
+            y: 100,
+            duration: 1,
+            ease: "power3.out",
+          });
+        },
+        onLeaveBack: () => {
+          gsap.to(element, {
+            opacity: 0,
+            y: -100,
+            duration: 1,
+            ease: "power3.out",
+          });
+        },
+        onEnterBack: () => {
+          gsap.to(element, {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: "power3.out",
+          });
+        },
+      });
+    }, testimonialsRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
     <Box
+      ref={testimonialsRef}
       id="testimonials"
       py={2}
       px={3}
@@ -65,7 +120,18 @@ const Testimonials: React.FC = () => {
       justifyContent="center"
     >
       <Box maxWidth="1350px" width="100%">
-        <TestimonialHeader />
+        <Typography variant="body1" textAlign="center">
+          Testimonial
+        </Typography>
+
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+          color="primary.main"
+          mt={4}
+          maxWidth="578px"
+          mx="auto"
+        ></Typography>
 
         <Grid
           container
@@ -75,9 +141,7 @@ const Testimonials: React.FC = () => {
           flexWrap={isMobile ? "wrap" : "nowrap"}
         >
           {testimonialData.map((testimonial, index) => (
-            
-              <TestimonialCard {...testimonial} />
-            
+            <TestimonialCard {...testimonial} />
           ))}
         </Grid>
 
@@ -109,131 +173,3 @@ const Testimonials: React.FC = () => {
 };
 
 export default Testimonials;
-
-
-export const TestimonialHeader: React.FC = () => {
-  return (
-    <Box textAlign="center">
-      <Box
-        sx={{
-          px: 2,
-          py: 0.5,
-          fontSize: "0.875rem",
-          borderRadius: 1,
-          textTransform: "uppercase",
-          display: "inline-block",
-        }}
-      >
-        <Typography  variant="body1">Testimonial</Typography>
-      </Box>
-      <Typography
-        variant="h4"
-        fontWeight="bold"
-        color="primary.main"
-        mt={4}
-        maxWidth="578px"
-        mx="auto"
-      >
-        Creating A Community Of Life Long Learners.
-      </Typography>
-    </Box>
-  );
-};
-
-
-
-interface TestimonialCardProps {
-  quote: string;
-  author: string;
-  role: string;
-}
-
-export const TestimonialCard: React.FC<TestimonialCardProps> = ({
-  quote,
-  author,
-  role,
-}) => {
-  return (
-    <Paper
-      elevation={3}
-      sx={{
-        p: 4,
-        borderRadius: 4,
-        width: 350,
-        position: "relative",
-      }}
-    >
-      <Box
-        component="img"
-        src="https://cdn.builder.io/api/v1/image/assets/TEMP/b613640e22bf34bbbee18e0ecf20e976c22f9909"
-        alt="Quote icon"
-        sx={{
-          width: 70,
-          height: 46,
-          position: "absolute",
-          top: -29,
-          left: -19,
-        }}
-      />
-      <Typography variant="body1" color="text.secondary" mb={2}>
-        “{quote}”
-      </Typography>
-      <Typography variant="h6" fontWeight="bold" color="primary.dark" mt={2}>
-        {author}
-      </Typography>
-      <Typography variant="body2" color="text.secondary" mt={1}>
-        {role}
-      </Typography>
-    </Paper>
-  );
-};
-
-
-interface BackgroundShapeProps {
-  className?: string;
-  color: string;
-  opacity: number | string;
-  width: number;
-  height: number;
-  cx: number;
-  cy: number;
-  rx: number;
-  ry: number;
-}
-
-export const BackgroundShape: React.FC<BackgroundShapeProps> = ({
-  className,
-  color,
-  opacity,
-  width,
-  height,
-  cx,
-  cy,
-  rx,
-  ry,
-}) => {
-  return (
-    <svg
-      width={width}
-      height={height}
-      viewBox={`0 0 ${width} ${height}`}
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      style={{
-        position: "absolute",
-        zIndex: 0,
-        pointerEvents: "none",
-      }}
-    >
-      <ellipse
-        cx={cx}
-        cy={cy}
-        rx={rx}
-        ry={ry}
-        fill={color}
-        fillOpacity={+opacity}
-      />
-    </svg>
-  );
-};

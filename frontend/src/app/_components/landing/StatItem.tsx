@@ -1,15 +1,15 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
-import CountUp from 'react-countup';
+import CountUp from "react-countup";
 
 interface StatItemProps {
   icon: string;
-   number: number;
+  number: number;
   text: string;
 }
 
-const StatItem: React.FC<StatItemProps> = ({ icon, number, text }) =>(
+const StatItem: React.FC<StatItemProps> = ({ icon, number, text }) => (
   <Box
     textAlign="center"
     display="flex"

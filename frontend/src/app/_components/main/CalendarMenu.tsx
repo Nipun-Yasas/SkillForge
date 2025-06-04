@@ -1,25 +1,34 @@
 "use client";
 
-import React, { useState } from "react";
-
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Divider from "@mui/material/Divider";
-import Menu from "@mui/material/Menu";
-import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
-import Paper from "@mui/material/Paper";
-import IconButton from "@mui/material/IconButton";
-
+import React, { useState, MouseEvent } from "react";
+import {
+  Box,
+  Button,
+  Divider,
+  Menu,
+  Stack,
+  Typography,
+  Paper,
+  IconButton,
+} from "@mui/material";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import EventIcon from "@mui/icons-material/Event";
 import Link from "next/link";
 
-const CalendarMenu = () => {
-  const [anchorEl, setAnchorEl] = useState(null);
+// Define the type for an event
+interface EventItem {
+  id: number;
+  title: string;
+  date: string;
+  time: string;
+  location: string;
+}
+
+const CalendarMenu: React.FC = () => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
-  const upcomingEvents = [
+  const upcomingEvents: EventItem[] = [
     {
       id: 1,
       title: "Team Standup",
@@ -43,7 +52,7 @@ const CalendarMenu = () => {
     },
   ];
 
-  const handleOpenMenu = (event) => {
+  const handleOpenMenu = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -83,7 +92,7 @@ const CalendarMenu = () => {
             alignItems: "center",
           }}
         >
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+          <Typography variant="h6" fontWeight={600}>
             Calendar
           </Typography>
         </Box>
@@ -114,7 +123,7 @@ const CalendarMenu = () => {
                   <Stack direction="row" spacing={1.5} alignItems="flex-start">
                     <EventIcon sx={{ color: "#e80a4d", mt: 0.5 }} />
                     <Box>
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      <Typography variant="body2" fontWeight={600}>
                         {event.title}
                       </Typography>
                       <Typography
@@ -143,12 +152,19 @@ const CalendarMenu = () => {
 
         <Divider />
 
-        <Box sx={{ p: 1.5, display: "flex", justifyContent: "space-between" }}>
+        <Box
+          sx={{
+            p: 1.5,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Button
             size="small"
             component={Link}
             href="/calendar"
-            sx={{ color: "#e80a4d" }}
+            sx={{ color: "#e80a4d", textTransform: "none" }}
             onClick={handleCloseMenu}
           >
             View Calendar
@@ -158,7 +174,8 @@ const CalendarMenu = () => {
             component="a"
             href="https://calendar.google.com/calendar/u/0/r?tab=rc"
             target="_blank"
-            sx={{ color: "text.secondary" }}
+            rel="noopener noreferrer"
+            sx={{ color: "text.secondary", textTransform: "none" }}
             onClick={handleCloseMenu}
           >
             Open Google Calendar

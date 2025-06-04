@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, MouseEvent } from "react";
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -18,7 +18,17 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import ClearIcon from "@mui/icons-material/Clear";
 import Link from "next/link";
 
-const initialNotifications = [
+// Type for a notification
+interface NotificationItem {
+  id: number;
+  message: string;
+  time: string;
+  read: boolean;
+  link: string;
+}
+
+// Initial data
+const initialNotifications: NotificationItem[] = [
   {
     id: 1,
     message: "John Smith requested approval for leave",
@@ -49,56 +59,44 @@ const initialNotifications = [
   },
 ];
 
-const NotificationMenu = () => {
-  // State for notifications
-  const [notifications, setNotifications] = useState(initialNotifications);
-  
-  // State for managing the dropdown menu
-  const [anchorEl, setAnchorEl] = useState(null);
+const NotificationMenu: React.FC = () => {
+  const [notifications, setNotifications] = useState<NotificationItem[]>(initialNotifications);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
-  // Get count of unread notifications
-  const unreadCount = notifications.filter(notification => !notification.read).length;
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
-  // Open notifications dropdown
-  const handleOpenMenu = (event) => {
+  const handleOpenMenu = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
-  // Close notifications dropdown
   const handleCloseMenu = () => {
     setAnchorEl(null);
   };
 
-  // Mark all notifications as read
   const handleMarkAllAsRead = () => {
-    setNotifications(notifications.map(notification => ({
-      ...notification,
-      read: true
-    })));
+    setNotifications(notifications.map((n) => ({ ...n, read: true })));
   };
 
-  // Clear all notifications
   const handleClearAll = () => {
     setNotifications([]);
   };
 
-  // Remove a single notification
-  const handleRemoveNotification = (id) => (event) => {
-    event.preventDefault(); // Prevent default behavior
-    event.stopPropagation(); // Prevent event from bubbling up to parent elements
-    setNotifications(notifications.filter(notification => notification.id !== id));
+  const handleRemoveNotification = (id: number) => (event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setNotifications(notifications.filter((n) => n.id !== id));
   };
 
-  // Navigate to notification destination and mark as read
-  const handleNotificationClick = (id) => {
-    setNotifications(notifications.map(notification => 
-      notification.id === id ? { ...notification, read: true } : notification
-    ));
+  const handleNotificationClick = (id: number) => {
+    setNotifications(
+      notifications.map((n) =>
+        n.id === id ? { ...n, read: true } : n
+      )
+    );
     handleCloseMenu();
   };
 
-  // Generate menu content based on notifications state
   const getMenuContent = () => {
     if (notifications.length === 0) {
       return [
@@ -112,13 +110,11 @@ const NotificationMenu = () => {
           <Typography variant="body1" color="text.secondary">
             No notifications
           </Typography>
-        </Box>
+        </Box>,
       ];
     }
 
-    // Create an array of elements for the menu
     return [
-      // Header
       <Box key="header" sx={{ p: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Typography variant="h6" sx={{ fontWeight: 600 }}>
           Notifications
@@ -129,31 +125,29 @@ const NotificationMenu = () => {
           </Typography>
         )}
       </Box>,
-      
-      // Divider
+
       <Divider key="divider-1" />,
-      
-      // Notification List
+
       <List key="notification-list" sx={{ p: 0, maxHeight: 320, overflow: "auto" }}>
         {notifications.map((notification) => (
-          <ListItem 
+          <ListItem
             key={notification.id}
             component={Link}
             href={notification.link}
             onClick={() => handleNotificationClick(notification.id)}
-            sx={{ 
-              px: 2, 
+            sx={{
+              px: 2,
               py: 1.5,
               bgcolor: notification.read ? "transparent" : "rgba(232, 10, 77, 0.05)",
               borderLeft: notification.read ? "none" : "3px solid #e80a4d",
               "&:hover": { bgcolor: "rgba(0, 0, 0, 0.04)" },
-              textDecoration: "none", 
-              color: "inherit"
+              textDecoration: "none",
+              color: "inherit",
             }}
             secondaryAction={
-              <IconButton 
-                edge="end" 
-                size="small" 
+              <IconButton
+                edge="end"
+                size="small"
                 onClick={handleRemoveNotification(notification.id)}
               >
                 <ClearIcon fontSize="small" />
@@ -176,33 +170,27 @@ const NotificationMenu = () => {
           </ListItem>
         ))}
       </List>,
-      
-      // Divider
+
       <Divider key="divider-2" />,
-      
-      // Footer with Buttons
+
       <Box key="footer" sx={{ p: 1.5, display: "flex", justifyContent: "space-between" }}>
-        <Button 
-          size="small" 
+        <Button
+          size="small"
           onClick={handleMarkAllAsRead}
           disabled={unreadCount === 0}
-          sx={{ 
+          sx={{
             color: "#e80a4d",
             "&.Mui-disabled": {
-              color: "rgba(0, 0, 0, 0.26)"
-            }
+              color: "rgba(0, 0, 0, 0.26)",
+            },
           }}
         >
           Mark all as read
         </Button>
-        <Button 
-          size="small" 
-          onClick={handleClearAll}
-          sx={{ color: "text.secondary" }}
-        >
+        <Button size="small" onClick={handleClearAll} sx={{ color: "text.secondary" }}>
           Clear all
         </Button>
-      </Box>
+      </Box>,
     ];
   };
 
@@ -216,7 +204,6 @@ const NotificationMenu = () => {
         </IconButton>
       </Tooltip>
 
-      {/* Notifications Dropdown */}
       <Menu
         anchorEl={anchorEl}
         open={open}

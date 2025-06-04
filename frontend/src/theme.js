@@ -63,6 +63,7 @@ const theme = createTheme({
         footerColor: {
           main:'#2196f3',
         }
+        
       }
     },
     dark: {

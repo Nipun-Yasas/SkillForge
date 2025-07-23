@@ -142,10 +142,10 @@ export default function ChatInterface({
               </Avatar>
             </Badge>
             <Box>
-              <Typography variant="h6" fontWeight="bold">
+              <Typography variant="h6" fontWeight="bold" component="div">
                 {recipientName}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="text.secondary" component="div">
                 {isOnline ? (
                   <span style={{ color: '#4caf50' }}>● Online</span>
                 ) : (

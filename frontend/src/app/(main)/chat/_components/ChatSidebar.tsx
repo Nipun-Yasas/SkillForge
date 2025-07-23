@@ -241,46 +241,48 @@ export default function ChatSidebar({
                     </Badge>
                   </ListItemAvatar>
                   <ListItemText
-                    primary={
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Typography variant="subtitle2" fontWeight="medium">
-                          {conversation.user.name}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {conversation.timestamp}
-                        </Typography>
-                      </Box>
-                    }
-                    secondary={
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 0.5 }}>
-                        <Typography 
-                          variant="body2" 
-                          color="text.secondary"
-                          sx={{ 
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                            maxWidth: '200px'
-                          }}
-                        >
-                          {conversation.lastMessage}
-                        </Typography>
-                        {conversation.unreadCount > 0 && (
-                          <Chip
-                            label={conversation.unreadCount}
-                            size="small"
-                            color="primary"
-                            sx={{ 
-                              minWidth: 20, 
-                              height: 20, 
-                              fontSize: '0.75rem',
-                              '& .MuiChip-label': { px: 1 }
-                            }}
-                          />
-                        )}
-                      </Box>
-                    }
+                    primary={conversation.user.name}
+                    secondary={conversation.lastMessage}
+                    primaryTypographyProps={{
+                      variant: 'subtitle2',
+                      fontWeight: 'medium'
+                    }}
+                    secondaryTypographyProps={{
+                      variant: 'body2',
+                      sx: { 
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        maxWidth: '200px'
+                      }
+                    }}
                   />
+                  
+                  {/* Timestamp and unread badge */}
+                  <Box sx={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    alignItems: 'flex-end',
+                    gap: 0.5,
+                    minWidth: 'fit-content'
+                  }}>
+                    <Typography variant="caption" color="text.secondary" component="span">
+                      {conversation.timestamp}
+                    </Typography>
+                    {conversation.unreadCount > 0 && (
+                      <Chip
+                        label={conversation.unreadCount}
+                        size="small"
+                        color="primary"
+                        sx={{ 
+                          minWidth: 20, 
+                          height: 20, 
+                          fontSize: '0.75rem',
+                          '& .MuiChip-label': { px: 1 }
+                        }}
+                      />
+                    )}
+                  </Box>
                 </ListItem>
               ))
             ) : (
@@ -332,20 +334,16 @@ export default function ChatSidebar({
                     </Badge>
                   </ListItemAvatar>
                   <ListItemText
-                    primary={
-                      <Typography variant="subtitle2" fontWeight="medium">
-                        {user.name}
-                      </Typography>
-                    }
-                    secondary={
-                      <Typography variant="body2" color="text.secondary">
-                        {user.isOnline ? (
-                          <span style={{ color: '#4caf50' }}>● Online</span>
-                        ) : (
-                          `Last seen ${user.lastSeen || 'recently'}`
-                        )}
-                      </Typography>
-                    }
+                    primary={user.name}
+                    secondary={user.isOnline ? '● Online' : `Last seen ${user.lastSeen || 'recently'}`}
+                    primaryTypographyProps={{
+                      variant: 'subtitle2',
+                      fontWeight: 'medium'
+                    }}
+                    secondaryTypographyProps={{
+                      variant: 'body2',
+                      sx: { color: user.isOnline ? '#4caf50' : 'text.secondary' }
+                    }}
                   />
                 </ListItem>
               ))

@@ -140,8 +140,8 @@ const Testimonials: React.FC = () => {
           mt={6}
           flexWrap={isMobile ? "wrap" : "nowrap"}
         >
-          {testimonialData.map((testimonial, index) => (
-            <TestimonialCard {...testimonial} />
+          {testimonialData.map((testimonial) => (
+            <TestimonialCard key={testimonial.author} {...testimonial} />
           ))}
         </Grid>
 

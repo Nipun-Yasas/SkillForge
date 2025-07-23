@@ -131,8 +131,8 @@ export default function Features() {
             gap: 2,
           }}
         >
-          {features.map((feature, index) => (
-            <FeatureCard {...feature} />
+          {features.map((feature) => (
+            <FeatureCard key={feature.title} {...feature} />
           ))}
         </Box>
       </Box>

@@ -72,7 +72,7 @@ export default function MentorsCards() {
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Grid container spacing={3}>
           {[...Array(6)].map((_, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
               <Card sx={{ height: '100%' }}>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -99,7 +99,7 @@ export default function MentorsCards() {
     <>
       <Grid container spacing={3}>
         {visibleMentors.map((mentor) => (
-          <Grid item xs={12} sm={6} md={4} key={mentor.id}>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }} key={mentor.id}>
             <Card 
               sx={{ 
                 height: '100%',

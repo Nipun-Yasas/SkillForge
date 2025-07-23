@@ -144,6 +144,47 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Create AI prompt for mentor matching (only if OpenAI is available)
+    if (!openai) {
+      // Fallback to enhanced keyword matching if OpenAI is not available
+      const fallbackMatches = MENTORS_DATA
+        .map(mentor => {
+          let score = 0;
+          const queryLower = query.toLowerCase();
+          
+          // Check skills match
+          mentor.skills.forEach(skill => {
+            if (queryLower.includes(skill.toLowerCase()) || skill.toLowerCase().includes(queryLower)) {
+              score += 3; // High weight for skill matches
+            }
+          });
+          
+          // Check bio/name match
+          if (mentor.bio.toLowerCase().includes(queryLower) || mentor.name.toLowerCase().includes(queryLower)) {
+            score += 1;
+          }
+          
+          // Boost based on rating
+          score += mentor.rating * 0.5;
+          
+          return { mentor, score };
+        })
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3)
+        .map(match => match.mentor);
+
+      // If no matches found, return top-rated mentors
+      const finalMatches = fallbackMatches.length > 0 ? fallbackMatches : 
+        MENTORS_DATA.sort((a, b) => b.rating - a.rating).slice(0, 3);
+
+      return NextResponse.json({
+        recommendations: finalMatches,
+        query,
+        aiGenerated: false,
+        message: `Found ${finalMatches.length} great mentors matching your skills! (Smart matching active)`
+      });
+    }
+
     // Create AI prompt for mentor matching
     const systemPrompt = `You are an intelligent mentor-matching AI assistant for SkillForge, a peer-to-peer learning platform. Your job is to analyze a student's learning request and recommend the top 3 most suitable mentors from the available list.
 
@@ -164,7 +205,7 @@ ${MENTORS_DATA.map(mentor =>
 
 Please recommend the top 3 mentor IDs that best match this student's needs.`;
 
-    const response = await openai.chat.completions.create({
+    const response = await openai!.chat.completions.create({
       model: "gpt-4o-mini", // Using cost-effective model
       messages: [
         {

@@ -1,0 +1,74 @@
+[
+  {
+    "id": "1",
+    "name": "Nipun Yasas",
+    "skills": ["React", "MongoDB", "Node.js", "TypeScript"],
+    "bio": "Expert in web development with 5+ years of experience building scalable applications.",
+    "image": "/nipun.png",
+    "rating": 4.9,
+    "students": 127,
+    "experience": "5+ years",
+    "hourlyRate": "$45",
+    "availability": "Weekends"
+  },
+  {
+    "id": "2",
+    "name": "Dinithi Dewmini",
+    "skills": ["UI/UX", "Figma", "Adobe XD", "Prototyping"],
+    "bio": "UI design enthusiast specializing in user-centered design and modern interfaces.",
+    "image": "/dinithi.png",
+    "rating": 4.8,
+    "students": 89,
+    "experience": "3+ years",
+    "hourlyRate": "$35",
+    "availability": "Evenings"
+  },
+  {
+    "id": "3",
+    "name": "Alex Chen",
+    "skills": ["Python", "Machine Learning", "Data Science", "TensorFlow"],
+    "bio": "Data scientist with expertise in ML algorithms and AI model development.",
+    "image": "/alex.png",
+    "rating": 4.7,
+    "students": 156,
+    "experience": "6+ years",
+    "hourlyRate": "$60",
+    "availability": "Flexible"
+  },
+  {
+    "id": "4",
+    "name": "Sarah Johnson",
+    "skills": ["Digital Marketing", "SEO", "Content Strategy", "Analytics"],
+    "bio": "Marketing strategist helping businesses grow their online presence.",
+    "image": "/sarah.png",
+    "rating": 4.9,
+    "students": 203,
+    "experience": "4+ years",
+    "hourlyRate": "$50",
+    "availability": "Mornings"
+  },
+  {
+    "id": "5",
+    "name": "Mike Rodriguez",
+    "skills": ["Flutter", "Dart", "Mobile Development", "Firebase"],
+    "bio": "Mobile app developer creating cross-platform solutions with Flutter.",
+    "image": "/mike.png",
+    "rating": 4.6,
+    "students": 94,
+    "experience": "3+ years",
+    "hourlyRate": "$40",
+    "availability": "Weekdays"
+  },
+  {
+    "id": "6",
+    "name": "Emily Davis",
+    "skills": ["Graphic Design", "Branding", "Illustrator", "Photoshop"],
+    "bio": "Creative designer specializing in brand identity and visual storytelling.",
+    "image": "/emily.png",
+    "rating": 4.8,
+    "students": 112,
+    "experience": "4+ years",
+    "hourlyRate": "$38",
+    "availability": "Afternoons"
+  }
+]

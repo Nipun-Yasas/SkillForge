@@ -1,26 +1,26 @@
-import { NextRequest, NextResponse } from 'next/server';
-import connectDB from '@/lib/mongodb';
-import User from '@/models/User';
-import { hashPassword, validateEmail, validatePassword } from '@/lib/auth';
+import { hashPassword, validateEmail, validatePassword } from "@/lib/auth";
+import connectDB from "@/lib/mongodb";
+import User from "@/models/User";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
 
     const body = await request.json();
-    const { name, email, password, role = 'learner' } = body;
+    const { name, email, password, role = "learner" } = body;
 
     // Validation
     if (!name || !email || !password) {
       return NextResponse.json(
-        { error: 'Name, email, and password are required' },
+        { error: "Name, email, and password are required" },
         { status: 400 }
       );
     }
 
     if (!validateEmail(email)) {
       return NextResponse.json(
-        { error: 'Please enter a valid email address' },
+        { error: "Please enter a valid email address" },
         { status: 400 }
       );
     }
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
       return NextResponse.json(
-        { error: 'User with this email already exists' },
+        { error: "User with this email already exists" },
         { status: 409 }
       );
     }
@@ -72,23 +72,23 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       {
-        message: 'User created successfully',
+        message: "User created successfully",
         user: userResponse,
       },
       { status: 201 }
     );
   } catch (error: any) {
-    console.error('Signup error:', error);
-    
+    console.error("Signup error:", error);
+
     if (error.code === 11000) {
       return NextResponse.json(
-        { error: 'User with this email already exists' },
+        { error: "User with this email already exists" },
         { status: 409 }
       );
     }
 
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }

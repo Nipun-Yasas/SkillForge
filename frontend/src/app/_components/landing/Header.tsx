@@ -1,25 +1,25 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
+import { useState } from "react";
 
 import { ThemeSwitcher } from "@toolpad/core";
 
+import { useAuth } from "@/contexts/AuthContext";
+import MenuIcon from "@mui/icons-material/Menu";
 import AppBar from "@mui/material/AppBar";
+import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import Avatar from "@mui/material/Avatar";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
 import { motion } from "framer-motion";
-import { BookOpen, Users, User, LogOut, Settings } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { BookOpen, LogOut, Settings, User, Users } from "lucide-react";
 
 const drawerWidth = 240;
 
@@ -52,14 +52,14 @@ export default function DrawerAppBar() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          p: 2
+          p: 2,
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <BookOpen size={32} color="#007BFF" />
-          <Typography 
-            variant="h5" 
-            sx={{ 
+          <Typography
+            variant="h5"
+            sx={{
               fontWeight: 700,
               background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
               backgroundClip: "text",
@@ -75,29 +75,41 @@ export default function DrawerAppBar() {
       <Divider />
       <Box sx={{ py: 2, display: "flex", flexDirection: "column", gap: 2 }}>
         <Typography variant="body1" sx={{ color: "textblack.main" }}>
-          <Link href="#about" style={{ textDecoration: "none", color: "inherit" }}>
+          <Link
+            href="#about"
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
             About Us
           </Link>
         </Typography>
         <Typography variant="body1" sx={{ color: "textblack.main" }}>
-          <Link href="#features" style={{ textDecoration: "none", color: "inherit" }}>
+          <Link
+            href="#features"
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
             Features
           </Link>
         </Typography>
         <Typography variant="body1" sx={{ color: "textblack.main" }}>
-          <Link href="/findmentor" style={{ textDecoration: "none", color: "inherit" }}>
+          <Link
+            href="/findmentor"
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
             Find Mentors
           </Link>
         </Typography>
         {user && (
           <Typography variant="body1" sx={{ color: "textblack.main" }}>
-            <Link href="/dashboard" style={{ textDecoration: "none", color: "inherit" }}>
+            <Link
+              href="/dashboard"
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
               Dashboard
             </Link>
           </Typography>
         )}
       </Box>
-      
+
       {/* Mobile Auth Buttons */}
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1, p: 2 }}>
         {user ? (
@@ -105,9 +117,9 @@ export default function DrawerAppBar() {
             <Typography variant="body2" sx={{ color: "textblack.main", mb: 1 }}>
               Welcome, {user.name}!
             </Typography>
-            <Button 
-              onClick={handleLogout} 
-              variant="outlined" 
+            <Button
+              onClick={handleLogout}
+              variant="outlined"
               size="small"
               sx={{ color: "error.main", borderColor: "error.main" }}
             >
@@ -134,13 +146,13 @@ export default function DrawerAppBar() {
 
   return (
     <>
-      <AppBar 
-        component="nav" 
-        sx={{ 
+      <AppBar
+        component="nav"
+        sx={{
           bgcolor: "rgba(255, 255, 255, 0.95)",
           backdropFilter: "blur(10px)",
-          borderBottom: "1px solid rgba(0, 123, 255, 0.1)"
-        }} 
+          borderBottom: "1px solid rgba(0, 123, 255, 0.1)",
+        }}
         elevation={0}
       >
         <Toolbar>
@@ -153,27 +165,33 @@ export default function DrawerAppBar() {
           >
             <MenuIcon />
           </IconButton>
-          
+
           {/* Logo and Brand */}
           <Box
             sx={{
               flexGrow: 1,
               display: { xs: "none", sm: "flex" },
               alignItems: "center",
-              gap: 1
+              gap: 1,
             }}
           >
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 1 }}>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link
+                href="/"
+                style={{
+                  textDecoration: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                }}
+              >
                 <BookOpen size={32} color="#007BFF" />
-                <Typography 
-                  variant="h5" 
-                  sx={{ 
+                <Typography
+                  variant="h5"
+                  sx={{
                     fontWeight: 700,
-                    background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                    background:
+                      "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
                     backgroundClip: "text",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
@@ -191,13 +209,13 @@ export default function DrawerAppBar() {
               flexGrow: 1,
               display: { xs: "flex", sm: "none" },
               alignItems: "center",
-              gap: 1
+              gap: 1,
             }}
           >
             <BookOpen size={28} color="#007BFF" />
-            <Typography 
-              variant="h6" 
-              sx={{ 
+            <Typography
+              variant="h6"
+              sx={{
                 fontWeight: 700,
                 background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
                 backgroundClip: "text",
@@ -208,7 +226,7 @@ export default function DrawerAppBar() {
               SkillForge
             </Typography>
           </Box>
-          
+
           {/* Navigation */}
           <Box
             sx={{
@@ -218,97 +236,113 @@ export default function DrawerAppBar() {
             }}
           >
             <ThemeSwitcher />
-            
+
             <Link href="#about" style={{ textDecoration: "none" }}>
-              <Typography 
-                variant="body1" 
-                sx={{ 
+              <Typography
+                variant="body1"
+                sx={{
                   color: "textblack.main",
                   "&:hover": { color: "primary.main" },
-                  transition: "color 0.3s ease"
+                  transition: "color 0.3s ease",
                 }}
               >
                 About
               </Typography>
             </Link>
-            
+
             <Link href="#features" style={{ textDecoration: "none" }}>
-              <Typography 
-                variant="body1" 
-                sx={{ 
+              <Typography
+                variant="body1"
+                sx={{
                   color: "textblack.main",
                   "&:hover": { color: "primary.main" },
-                  transition: "color 0.3s ease"
+                  transition: "color 0.3s ease",
                 }}
               >
                 Features
               </Typography>
             </Link>
-            
+
             <Link href="/findmentor" style={{ textDecoration: "none" }}>
-              <Typography 
-                variant="body1" 
-                sx={{ 
+              <Typography
+                variant="body1"
+                sx={{
                   color: "textblack.main",
                   "&:hover": { color: "primary.main" },
                   transition: "color 0.3s ease",
                   display: "flex",
                   alignItems: "center",
-                  gap: 0.5
+                  gap: 0.5,
                 }}
               >
                 <Users size={16} />
                 Find Mentors
               </Typography>
             </Link>
-            
+
             {/* Authentication Buttons */}
             {user ? (
               <>
-                <IconButton
-                  onClick={handleUserMenuOpen}
-                  sx={{ p: 0, ml: 1 }}
-                >
+                <IconButton onClick={handleUserMenuOpen} sx={{ p: 0, ml: 1 }}>
                   <Avatar
                     sx={{
                       width: 40,
                       height: 40,
-                      background: 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
-                      fontSize: '1rem',
+                      background:
+                        "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                      fontSize: "1rem",
                       fontWeight: 600,
                     }}
                   >
                     {user.name.charAt(0).toUpperCase()}
                   </Avatar>
                 </IconButton>
-                
+
                 <Menu
                   anchorEl={anchorEl}
                   open={Boolean(anchorEl)}
                   onClose={handleUserMenuClose}
                   anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'right',
+                    vertical: "bottom",
+                    horizontal: "right",
                   }}
                   transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
+                    vertical: "top",
+                    horizontal: "right",
                   }}
                 >
                   <MenuItem onClick={handleUserMenuClose}>
-                    <Link href="/dashboard" style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Link
+                      href="/dashboard"
+                      style={{
+                        textDecoration: "none",
+                        color: "inherit",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                      }}
+                    >
                       <User size={16} />
                       Dashboard
                     </Link>
                   </MenuItem>
                   <MenuItem onClick={handleUserMenuClose}>
-                    <Link href="/profile" style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Link
+                      href="/profile"
+                      style={{
+                        textDecoration: "none",
+                        color: "inherit",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                      }}
+                    >
                       <Settings size={16} />
                       Profile
                     </Link>
                   </MenuItem>
                   <Divider />
-                  <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
+                  <MenuItem onClick={handleLogout} sx={{ color: "error.main" }}>
                     <LogOut size={16} />
                     <Box sx={{ ml: 1 }}>Logout</Box>
                   </MenuItem>
@@ -317,31 +351,37 @@ export default function DrawerAppBar() {
             ) : (
               <>
                 <Link href="/login" passHref style={{ textDecoration: "none" }}>
-                  <Button 
-                    variant="outlined" 
+                  <Button
+                    variant="outlined"
                     sx={{
                       borderColor: "primary.main",
                       color: "primary.main",
                       "&:hover": {
                         borderColor: "secondary.main",
-                        color: "secondary.main"
-                      }
+                        color: "secondary.main",
+                      },
                     }}
                   >
                     Login
                   </Button>
                 </Link>
-                
-                <Link href="/signup" passHref style={{ textDecoration: "none" }}>
-                  <Button 
+
+                <Link
+                  href="/signup"
+                  passHref
+                  style={{ textDecoration: "none" }}
+                >
+                  <Button
                     variant="contained"
                     sx={{
-                      background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                      background:
+                        "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
                       "&:hover": {
-                        background: "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
-                        transform: "translateY(-1px)"
+                        background:
+                          "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
+                        transform: "translateY(-1px)",
                       },
-                      transition: "all 0.3s ease"
+                      transition: "all 0.3s ease",
                     }}
                   >
                     Sign Up

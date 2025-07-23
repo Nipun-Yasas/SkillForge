@@ -1,7 +1,7 @@
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || "fallback-secret-key";
 
 export const hashPassword = async (password: string): Promise<string> => {
   const saltRounds = 12;
@@ -16,7 +16,7 @@ export const comparePassword = async (
 };
 
 export const generateToken = (userId: string): string => {
-  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '7d' });
+  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: "7d" });
 };
 
 export const verifyToken = (token: string): { userId: string } | null => {
@@ -33,22 +33,36 @@ export const validateEmail = (email: string): boolean => {
   return emailRegex.test(email);
 };
 
-export const validatePassword = (password: string): { isValid: boolean; message?: string } => {
+export const validatePassword = (
+  password: string
+): { isValid: boolean; message?: string } => {
   if (password.length < 6) {
-    return { isValid: false, message: 'Password must be at least 6 characters long' };
+    return {
+      isValid: false,
+      message: "Password must be at least 6 characters long",
+    };
   }
-  
+
   if (!/(?=.*[a-z])/.test(password)) {
-    return { isValid: false, message: 'Password must contain at least one lowercase letter' };
+    return {
+      isValid: false,
+      message: "Password must contain at least one lowercase letter",
+    };
   }
-  
+
   if (!/(?=.*[A-Z])/.test(password)) {
-    return { isValid: false, message: 'Password must contain at least one uppercase letter' };
+    return {
+      isValid: false,
+      message: "Password must contain at least one uppercase letter",
+    };
   }
-  
+
   if (!/(?=.*\d)/.test(password)) {
-    return { isValid: false, message: 'Password must contain at least one number' };
+    return {
+      isValid: false,
+      message: "Password must contain at least one number",
+    };
   }
-  
+
   return { isValid: true };
 };

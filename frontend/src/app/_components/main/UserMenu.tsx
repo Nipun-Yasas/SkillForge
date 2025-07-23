@@ -16,14 +16,10 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Link from "next/link";
-
-interface User {
-  id: number;
-  name: string;
-  email: string;
-}
+import { useAuth } from "@/contexts/AuthContext";
 
 const UserMenu: React.FC = () => {
+  const { user, logout } = useAuth();
   
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -36,6 +32,15 @@ const UserMenu: React.FC = () => {
     setAnchorEl(null);
   };
 
+  const handleLogout = async () => {
+    await logout();
+    handleCloseMenu();
+  };
+
+  if (!user) {
+    return null;
+  }
+
 
   return (
     <Stack direction="row" spacing={2} alignItems="center">
@@ -47,17 +52,23 @@ const UserMenu: React.FC = () => {
       >
         <Stack direction="row" spacing={1} alignItems="center">
           <Avatar
-            src="/profilePic.jpg"
-            alt="User Avatar"
-            sx={{ width: 44, height: 44 }}
-          />
+            sx={{ 
+              width: 44, 
+              height: 44,
+              background: 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
+              fontSize: '1.2rem',
+              fontWeight: 700,
+            }}
+          >
+            {user.name.charAt(0).toUpperCase()}
+          </Avatar>
           <Typography
             variant="body1"
             color="#737791"
             fontFamily="'Poppins-Medium', Helvetica"
             fontWeight={500}
           >
-            Nuraj
+            {user.name.split(' ')[0]}
           </Typography>
           <KeyboardArrowDownIcon
             sx={{
@@ -98,7 +109,7 @@ const UserMenu: React.FC = () => {
               <PersonOutlineIcon fontSize="small" sx={{ color: "#737791" }} />
             </ListItemIcon>
             <Typography variant="body2" color="text.primary">
-              Profile
+              My Profile
             </Typography>
           </MenuItem>
         </Link>
@@ -116,7 +127,7 @@ const UserMenu: React.FC = () => {
 
         <Divider sx={{ my: 1 }} />
 
-        <MenuItem  sx={{ color: "#e80a4d" }}>
+        <MenuItem onClick={handleLogout} sx={{ color: "#e80a4d" }}>
           <ListItemIcon>
             <LogoutIcon fontSize="small" sx={{ color: "#e80a4d" }} />
           </ListItemIcon>

@@ -1,10 +1,10 @@
-import Link from "next/link";
-import Image from "next/image";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { motion } from "framer-motion";
-import { Users, BookOpen, Zap } from "lucide-react";
+import { BookOpen, Users, Zap } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function Hero() {
   return (
@@ -52,32 +52,38 @@ export default function Hero() {
           <Typography
             variant="h1"
             fontWeight="bold"
-            sx={{ 
+            sx={{
               fontSize: { xs: "2.5rem", md: "3.5rem" },
               background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
               backgroundClip: "text",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               lineHeight: 1.2,
-              mb: 2
+              mb: 2,
             }}
           >
-            Master Skills.<br />
-            Teach Others.<br />
-            <Box component="span" sx={{ color: "#FF7A00" }}>Forge Your Future.</Box>
+            Master Skills.
+            <br />
+            Teach Others.
+            <br />
+            <Box component="span" sx={{ color: "#FF7A00" }}>
+              Forge Your Future.
+            </Box>
           </Typography>
 
-          <Typography 
-            variant="h5" 
-            color="text.secondary" 
-            sx={{ 
-              mt: 3, 
+          <Typography
+            variant="h5"
+            color="text.secondary"
+            sx={{
+              mt: 3,
               mb: 4,
               fontWeight: 400,
-              maxWidth: "500px"
+              maxWidth: "500px",
             }}
           >
-            Connect with peer mentors, exchange skills, and accelerate your learning journey through AI-powered matching and hands-on experience.
+            Connect with peer mentors, exchange skills, and accelerate your
+            learning journey through AI-powered matching and hands-on
+            experience.
           </Typography>
 
           {/* Feature highlights */}
@@ -102,33 +108,41 @@ export default function Hero() {
             </Box>
           </Box>
 
-          <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              flexDirection: { xs: "column", sm: "row" },
+            }}
+          >
             <Link href="/signup" passHref>
-              <Button 
-                variant="contained" 
+              <Button
+                variant="contained"
                 size="large"
-                sx={{ 
-                  background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                sx={{
+                  background:
+                    "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
                   px: 4,
                   py: 1.5,
                   borderRadius: 2,
                   fontSize: "1.1rem",
                   "&:hover": {
-                    background: "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
+                    background:
+                      "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
                     transform: "translateY(-2px)",
-                    boxShadow: "0 8px 25px rgba(0, 123, 255, 0.3)"
+                    boxShadow: "0 8px 25px rgba(0, 123, 255, 0.3)",
                   },
-                  transition: "all 0.3s ease"
+                  transition: "all 0.3s ease",
                 }}
               >
                 Start Learning Today
               </Button>
             </Link>
             <Link href="/findmentor" passHref>
-              <Button 
-                variant="outlined" 
+              <Button
+                variant="outlined"
                 size="large"
-                sx={{ 
+                sx={{
                   borderColor: "#007BFF",
                   color: "#007BFF",
                   px: 4,
@@ -138,8 +152,8 @@ export default function Hero() {
                   "&:hover": {
                     borderColor: "#6A0DAD",
                     color: "#6A0DAD",
-                    backgroundColor: "rgba(106, 13, 173, 0.05)"
-                  }
+                    backgroundColor: "rgba(106, 13, 173, 0.05)",
+                  },
                 }}
               >
                 Find a Mentor
@@ -162,13 +176,13 @@ export default function Hero() {
       >
         {/* Animated background shapes */}
         <motion.div
-          animate={{ 
+          animate={{
             rotate: 360,
-            scale: [1, 1.1, 1]
+            scale: [1, 1.1, 1],
           }}
-          transition={{ 
+          transition={{
             rotate: { duration: 20, repeat: Infinity, ease: "linear" },
-            scale: { duration: 4, repeat: Infinity, ease: "easeInOut" }
+            scale: { duration: 4, repeat: Infinity, ease: "easeInOut" },
           }}
           style={{
             position: "absolute",
@@ -185,13 +199,13 @@ export default function Hero() {
         />
 
         <motion.div
-          animate={{ 
+          animate={{
             rotate: -360,
-            y: [0, -20, 0]
+            y: [0, -20, 0],
           }}
-          transition={{ 
+          transition={{
             rotate: { duration: 25, repeat: Infinity, ease: "linear" },
-            y: { duration: 3, repeat: Infinity, ease: "easeInOut" }
+            y: { duration: 3, repeat: Infinity, ease: "easeInOut" },
           }}
           style={{
             position: "absolute",
@@ -226,7 +240,7 @@ export default function Hero() {
               height: "auto",
               width: "100%",
               maxWidth: "450px",
-              filter: "drop-shadow(0 10px 30px rgba(0, 123, 255, 0.2))"
+              filter: "drop-shadow(0 10px 30px rgba(0, 123, 255, 0.2))",
             }}
           />
         </motion.div>

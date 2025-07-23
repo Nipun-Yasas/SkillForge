@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import connectDB from '@/lib/mongodb';
-import User from '@/models/User';
-import { comparePassword, generateToken, validateEmail } from '@/lib/auth';
+import { comparePassword, generateToken, validateEmail } from "@/lib/auth";
+import connectDB from "@/lib/mongodb";
+import User from "@/models/User";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,14 +13,14 @@ export async function POST(request: NextRequest) {
     // Validation
     if (!email || !password) {
       return NextResponse.json(
-        { error: 'Email and password are required' },
+        { error: "Email and password are required" },
         { status: 400 }
       );
     }
 
     if (!validateEmail(email)) {
       return NextResponse.json(
-        { error: 'Please enter a valid email address' },
+        { error: "Please enter a valid email address" },
         { status: 400 }
       );
     }
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
       return NextResponse.json(
-        { error: 'Invalid email or password' },
+        { error: "Invalid email or password" },
         { status: 401 }
       );
     }
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     const isValidPassword = await comparePassword(password, user.password);
     if (!isValidPassword) {
       return NextResponse.json(
-        { error: 'Invalid email or password' },
+        { error: "Invalid email or password" },
         { status: 401 }
       );
     }
@@ -69,25 +69,25 @@ export async function POST(request: NextRequest) {
     // Set HTTP-only cookie
     const response = NextResponse.json(
       {
-        message: 'Login successful',
+        message: "Login successful",
         user: userResponse,
         token,
       },
       { status: 200 }
     );
 
-    response.cookies.set('token', token, {
+    response.cookies.set("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60, // 7 days
     });
 
     return response;
   } catch (error) {
-    console.error('Login error:', error);
+    console.error("Login error:", error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }

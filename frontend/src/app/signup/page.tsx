@@ -1,81 +1,87 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Box,
   Button,
-  TextField,
-  Typography,
-  Paper,
+  CircularProgress,
+  Container,
   FormControl,
   InputLabel,
-  Select,
   MenuItem,
-  Container,
-  CircularProgress,
-  Alert,
-} from '@mui/material';
-import { motion } from 'framer-motion';
-import { UserPlus, BookOpen, Eye, EyeOff } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+  Paper,
+  Select,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { motion } from "framer-motion";
+import { Eye, EyeOff, UserPlus } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function SignupPage() {
   const router = useRouter();
   const { signup } = useAuth();
-  
+
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    role: 'learner' as 'learner' | 'mentor' | 'both',
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    role: "learner" as "learner" | "mentor" | "both",
   });
-  
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
   const handleRoleChange = (value: string) => {
-    setFormData(prev => ({ ...prev, role: value as 'learner' | 'mentor' | 'both' }));
+    setFormData((prev) => ({
+      ...prev,
+      role: value as "learner" | "mentor" | "both",
+    }));
   };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = "Name is required";
     } else if (formData.name.trim().length < 2) {
-      newErrors.name = 'Name must be at least 2 characters';
+      newErrors.name = "Name must be at least 2 characters";
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = "Email is required";
+    } else if (
+      !/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(formData.email)
+    ) {
+      newErrors.email = "Please enter a valid email address";
     }
 
     if (!formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = "Password is required";
     } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = "Password must be at least 6 characters";
     }
 
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
+      newErrors.confirmPassword = "Please confirm your password";
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+      newErrors.confirmPassword = "Passwords do not match";
     }
 
     setErrors(newErrors);
@@ -84,11 +90,11 @@ export default function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setIsLoading(true);
-    
+
     try {
       const success = await signup({
         name: formData.name.trim(),
@@ -98,10 +104,10 @@ export default function SignupPage() {
       });
 
       if (success) {
-        router.push('/login');
+        router.push("/login");
       }
     } catch (error) {
-      console.error('Signup error:', error);
+      console.error("Signup error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -119,49 +125,50 @@ export default function SignupPage() {
           sx={{
             p: 4,
             borderRadius: 3,
-            background: 'rgba(255, 255, 255, 0.9)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(0, 123, 255, 0.1)',
+            background: "rgba(255, 255, 255, 0.9)",
+            backdropFilter: "blur(10px)",
+            border: "1px solid rgba(0, 123, 255, 0.1)",
           }}
         >
           {/* Header */}
-          <Box sx={{ textAlign: 'center', mb: 4 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+          <Box sx={{ textAlign: "center", mb: 4 }}>
+            <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
               <Box
                 sx={{
                   p: 2,
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  borderRadius: "50%",
+                  background:
+                    "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
                 <UserPlus size={32} color="white" />
               </Box>
             </Box>
-            
+
             <Typography
               variant="h4"
               fontWeight="bold"
               sx={{
-                background: 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
+                background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
                 mb: 1,
               }}
             >
               Join SkillForge
             </Typography>
-            
+
             <Typography variant="body1" color="text.secondary">
               Start your journey of learning and teaching
             </Typography>
           </Box>
 
           {/* Form */}
-          <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
+          <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
             <TextField
               fullWidth
               label="Full Name"
@@ -205,7 +212,7 @@ export default function SignupPage() {
               fullWidth
               label="Password"
               name="password"
-              type={showPassword ? 'text' : 'password'}
+              type={showPassword ? "text" : "password"}
               value={formData.password}
               onChange={handleChange}
               error={!!errors.password}
@@ -216,7 +223,7 @@ export default function SignupPage() {
                 endAdornment: (
                   <Button
                     onClick={() => setShowPassword(!showPassword)}
-                    sx={{ minWidth: 'auto', p: 1 }}
+                    sx={{ minWidth: "auto", p: 1 }}
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </Button>
@@ -228,7 +235,7 @@ export default function SignupPage() {
               fullWidth
               label="Confirm Password"
               name="confirmPassword"
-              type={showConfirmPassword ? 'text' : 'password'}
+              type={showConfirmPassword ? "text" : "password"}
               value={formData.confirmPassword}
               onChange={handleChange}
               error={!!errors.confirmPassword}
@@ -239,9 +246,13 @@ export default function SignupPage() {
                 endAdornment: (
                   <Button
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    sx={{ minWidth: 'auto', p: 1 }}
+                    sx={{ minWidth: "auto", p: 1 }}
                   >
-                    {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    {showConfirmPassword ? (
+                      <EyeOff size={20} />
+                    ) : (
+                      <Eye size={20} />
+                    )}
                   </Button>
                 ),
               }}
@@ -254,33 +265,37 @@ export default function SignupPage() {
               size="large"
               disabled={isLoading}
               sx={{
-                background: 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
+                background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
                 py: 1.5,
                 borderRadius: 2,
-                fontSize: '1.1rem',
+                fontSize: "1.1rem",
                 mb: 3,
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #0056CC 0%, #4A0080 100%)',
-                  transform: 'translateY(-1px)',
-                  boxShadow: '0 8px 25px rgba(0, 123, 255, 0.3)',
+                "&:hover": {
+                  background:
+                    "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
+                  transform: "translateY(-1px)",
+                  boxShadow: "0 8px 25px rgba(0, 123, 255, 0.3)",
                 },
-                '&:disabled': {
-                  background: 'rgba(0, 123, 255, 0.3)',
+                "&:disabled": {
+                  background: "rgba(0, 123, 255, 0.3)",
                 },
-                transition: 'all 0.3s ease',
+                transition: "all 0.3s ease",
               }}
             >
               {isLoading ? (
                 <CircularProgress size={24} color="inherit" />
               ) : (
-                'Create Account'
+                "Create Account"
               )}
             </Button>
 
-            <Box sx={{ textAlign: 'center' }}>
+            <Box sx={{ textAlign: "center" }}>
               <Typography variant="body2" color="text.secondary">
-                Already have an account?{' '}
-                <Link href="/login" style={{ color: '#007BFF', textDecoration: 'none' }}>
+                Already have an account?{" "}
+                <Link
+                  href="/login"
+                  style={{ color: "#007BFF", textDecoration: "none" }}
+                >
                   Sign in here
                 </Link>
               </Typography>

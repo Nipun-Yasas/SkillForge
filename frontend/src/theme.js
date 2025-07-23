@@ -7,6 +7,7 @@ const theme = createTheme({
   cssVariables: {
     colorSchemeSelector: "data-toolpad-color-scheme",
   },
+  defaultColorScheme: 'light',
   colorSchemes: {
     light: {
       palette: {
@@ -244,5 +245,83 @@ const theme = createTheme({
     },
   },
 });
+
+// Enhance theme with beautiful sidebar styling
+theme.components = {
+  ...theme.components,
+  // Toolpad Core DashboardLayout sidebar styling
+  MuiDrawer: {
+    styleOverrides: {
+      paper: {
+        background: 'linear-gradient(180deg, #f8fbff 0%, #e3f2fd 100%)',
+        borderRight: '1px solid rgba(0, 123, 255, 0.1)',
+        boxShadow: '4px 0 20px rgba(0, 123, 255, 0.08)',
+        '& .MuiListItemButton-root': {
+          margin: '4px 12px',
+          borderRadius: '12px',
+          padding: '12px 16px',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            background: 'linear-gradient(135deg, rgba(0, 123, 255, 0.1) 0%, rgba(106, 13, 173, 0.05) 100%)',
+            transform: 'translateX(4px)',
+            boxShadow: '0 4px 12px rgba(0, 123, 255, 0.15)',
+          },
+          '&.Mui-selected': {
+            background: 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
+            color: '#fff',
+            boxShadow: '0 4px 16px rgba(0, 123, 255, 0.3)',
+            '&:hover': {
+              background: 'linear-gradient(135deg, #0056CC 0%, #4A0080 100%)',
+            },
+            '& .MuiListItemIcon-root': {
+              color: '#fff',
+            },
+            '& .MuiListItemText-primary': {
+              color: '#fff',
+              fontWeight: 600,
+            },
+          },
+        },
+        '& .MuiListItemIcon-root': {
+          minWidth: '40px',
+          color: '#007BFF',
+          transition: 'all 0.3s ease',
+        },
+        '& .MuiListItemText-primary': {
+          fontFamily: 'Poppins, sans-serif',
+          fontWeight: 500,
+          fontSize: '0.95rem',
+          color: '#2c3e50',
+        },
+        '& .MuiListSubheader-root': {
+          background: 'transparent',
+          fontFamily: 'Poppins, sans-serif',
+          fontWeight: 700,
+          fontSize: '0.75rem',
+          color: '#6A0DAD',
+          textTransform: 'uppercase',
+          letterSpacing: '0.5px',
+          padding: '16px 16px 8px 16px',
+          lineHeight: 1.2,
+        },
+        '& .MuiDivider-root': {
+          margin: '8px 16px',
+          borderColor: 'rgba(0, 123, 255, 0.1)',
+        },
+      },
+    },
+  },
+  // App bar styling
+  MuiAppBar: {
+    styleOverrides: {
+      root: {
+        background: 'linear-gradient(135deg, #fff 0%, #f8fbff 100%)',
+        color: '#2c3e50',
+        boxShadow: '0 2px 20px rgba(0, 123, 255, 0.08)',
+        borderBottom: '1px solid rgba(0, 123, 255, 0.1)',
+      },
+    },
+  },
+};
 
 export default theme;

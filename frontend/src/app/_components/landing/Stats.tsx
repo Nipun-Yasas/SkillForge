@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import { useEffect, useRef } from "react";
 import CountUp from "react-countup";
 
+import { motion } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Users, BookOpen, Star, MessageCircle } from "lucide-react";
-import { motion } from "framer-motion";
+import { BookOpen, MessageCircle, Star, Users } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -24,7 +24,12 @@ interface StatItemProps {
   suffix?: string;
 }
 
-const StatItem: React.FC<StatItemProps> = ({ icon, number, text, suffix = "+" }) => (
+const StatItem: React.FC<StatItemProps> = ({
+  icon,
+  number,
+  text,
+  suffix = "+",
+}) => (
   <motion.div
     initial={{ opacity: 0, y: 30 }}
     whileInView={{ opacity: 1, y: 0 }}
@@ -46,8 +51,8 @@ const StatItem: React.FC<StatItemProps> = ({ icon, number, text, suffix = "+" })
         "&:hover": {
           transform: "translateY(-5px)",
           boxShadow: "0 10px 30px rgba(0, 123, 255, 0.2)",
-          background: "rgba(255, 255, 255, 0.95)"
-        }
+          background: "rgba(255, 255, 255, 0.95)",
+        },
       }}
     >
       <Box
@@ -58,7 +63,7 @@ const StatItem: React.FC<StatItemProps> = ({ icon, number, text, suffix = "+" })
           mb: 2,
           display: "flex",
           alignItems: "center",
-          justifyContent: "center"
+          justifyContent: "center",
         }}
       >
         {icon}
@@ -66,23 +71,24 @@ const StatItem: React.FC<StatItemProps> = ({ icon, number, text, suffix = "+" })
       <Typography
         variant="h4"
         fontWeight="bold"
-        sx={{ 
+        sx={{
           fontSize: { xs: "2rem", md: "2.5rem" },
           background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
           backgroundClip: "text",
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
-          mb: 1
+          mb: 1,
         }}
       >
-        <CountUp end={number} duration={2.5} separator="," />{suffix}
+        <CountUp end={number} duration={2.5} separator="," />
+        {suffix}
       </Typography>
       <Typography
         variant="body1"
-        sx={{ 
+        sx={{
           fontSize: { xs: "0.9rem", md: "1rem" },
           color: "text.secondary",
-          fontWeight: 500
+          fontWeight: 500,
         }}
       >
         {text}
@@ -165,7 +171,7 @@ export default function Stats() {
         px: { xs: 2, md: 4 },
         py: { xs: 6, md: 8 },
         position: "relative",
-        overflow: "hidden"
+        overflow: "hidden",
       }}
     >
       {/* Background decoration */}
@@ -179,10 +185,10 @@ export default function Stats() {
           background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
           borderRadius: "50%",
           opacity: 0.05,
-          zIndex: 0
+          zIndex: 0,
         }}
       />
-      
+
       <Box
         sx={{
           position: "absolute",
@@ -193,7 +199,7 @@ export default function Stats() {
           background: "linear-gradient(135deg, #FF7A00 0%, #6A0DAD 100%)",
           borderRadius: "50%",
           opacity: 0.05,
-          zIndex: 0
+          zIndex: 0,
         }}
       />
 
@@ -209,7 +215,7 @@ export default function Stats() {
               backgroundClip: "text",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
-              mb: 2
+              mb: 2,
             }}
           >
             Growing Together
@@ -219,7 +225,8 @@ export default function Stats() {
             color="text.secondary"
             sx={{ maxWidth: 600, mx: "auto" }}
           >
-            Join thousands of learners and mentors who are already transforming their skills through SkillForge
+            Join thousands of learners and mentors who are already transforming
+            their skills through SkillForge
           </Typography>
         </Box>
 
@@ -227,14 +234,14 @@ export default function Stats() {
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: { 
-              xs: "1fr", 
-              sm: "repeat(2, 1fr)", 
-              md: "repeat(4, 1fr)" 
+            gridTemplateColumns: {
+              xs: "1fr",
+              sm: "repeat(2, 1fr)",
+              md: "repeat(4, 1fr)",
             },
             gap: 4,
             maxWidth: 1200,
-            mx: "auto"
+            mx: "auto",
           }}
         >
           <StatItem

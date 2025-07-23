@@ -1,15 +1,15 @@
 "use client";
 
-import { useRef, useEffect } from "react";
-import Link from "next/link";
-import Image from "next/image";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import { motion } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { motion } from "framer-motion";
-import { Target, Users, Zap, Award } from "lucide-react";
+import { Target, Users, Zap } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useRef } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -40,16 +40,36 @@ export default function About() {
         toggleActions: "play reverse play reverse",
         animation: anim,
         onEnter: () => {
-          gsap.to(element, { opacity: 1, y: 0, duration: 1, ease: "power3.out" });
+          gsap.to(element, {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: "power3.out",
+          });
         },
         onLeave: () => {
-          gsap.to(element, { opacity: 0, y: 100, duration: 1, ease: "power3.out" });
+          gsap.to(element, {
+            opacity: 0,
+            y: 100,
+            duration: 1,
+            ease: "power3.out",
+          });
         },
         onLeaveBack: () => {
-          gsap.to(element, { opacity: 0, y: -100, duration: 1, ease: "power3.out" });
+          gsap.to(element, {
+            opacity: 0,
+            y: -100,
+            duration: 1,
+            ease: "power3.out",
+          });
         },
         onEnterBack: () => {
-          gsap.to(element, { opacity: 1, y: 0, duration: 1, ease: "power3.out" });
+          gsap.to(element, {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: "power3.out",
+          });
         },
       });
     }, aboutRef);
@@ -86,13 +106,13 @@ export default function About() {
       >
         {/* Animated background shapes */}
         <motion.div
-          animate={{ 
+          animate={{
             rotate: 360,
-            scale: [1, 1.1, 1]
+            scale: [1, 1.1, 1],
           }}
-          transition={{ 
+          transition={{
             rotate: { duration: 20, repeat: Infinity, ease: "linear" },
-            scale: { duration: 4, repeat: Infinity, ease: "easeInOut" }
+            scale: { duration: 4, repeat: Infinity, ease: "easeInOut" },
           }}
           style={{
             position: "absolute",
@@ -107,15 +127,15 @@ export default function About() {
             opacity: 0.1,
           }}
         />
-        
+
         <motion.div
-          animate={{ 
+          animate={{
             rotate: -360,
-            y: [0, -20, 0]
+            y: [0, -20, 0],
           }}
-          transition={{ 
+          transition={{
             rotate: { duration: 25, repeat: Infinity, ease: "linear" },
-            y: { duration: 3, repeat: Infinity, ease: "easeInOut" }
+            y: { duration: 3, repeat: Infinity, ease: "easeInOut" },
           }}
           style={{
             position: "absolute",
@@ -147,11 +167,11 @@ export default function About() {
             width={400}
             height={400}
             priority
-            style={{ 
-              height: "auto", 
-              width: "100%", 
+            style={{
+              height: "auto",
+              width: "100%",
               maxWidth: "450px",
-              filter: "drop-shadow(0 10px 30px rgba(106, 13, 173, 0.2))"
+              filter: "drop-shadow(0 10px 30px rgba(106, 13, 173, 0.2))",
             }}
           />
         </motion.div>
@@ -189,22 +209,22 @@ export default function About() {
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <Typography 
-              variant="overline" 
-              sx={{ 
+            <Typography
+              variant="overline"
+              sx={{
                 color: "primary.main",
                 fontWeight: 700,
                 fontSize: "0.9rem",
-                letterSpacing: 2
+                letterSpacing: 2,
               }}
             >
               ABOUT SKILLFORGE
             </Typography>
-            
+
             <Typography
               variant="h2"
               fontWeight="bold"
-              sx={{ 
+              sx={{
                 fontSize: { xs: "2.5rem", md: "3rem" },
                 mt: 2,
                 mb: 3,
@@ -212,38 +232,45 @@ export default function About() {
                 backgroundClip: "text",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
-                lineHeight: 1.2
+                lineHeight: 1.2,
               }}
             >
               Empowering Learning Through Peer Connection
             </Typography>
-            
-            <Typography 
-              variant="h6" 
-              sx={{ 
+
+            <Typography
+              variant="h6"
+              sx={{
                 color: "text.secondary",
                 lineHeight: 1.6,
                 mb: 4,
-                fontWeight: 400
+                fontWeight: 400,
               }}
             >
-              SkillForge revolutionizes education by connecting learners with peer mentors through 
-              AI-powered matching. Whether you&apos;re mastering coding, learning design, or exploring new 
-              languages, our platform creates meaningful connections that accelerate growth.
+              SkillForge revolutionizes education by connecting learners with
+              peer mentors through AI-powered matching. Whether you&apos;re
+              mastering coding, learning design, or exploring new languages, our
+              platform creates meaningful connections that accelerate growth.
             </Typography>
 
             {/* Key Features */}
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 3, mb: 4 }}>
+            <Box
+              sx={{ display: "flex", flexDirection: "column", gap: 3, mb: 4 }}
+            >
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <Box sx={{ 
-                  p: 1, 
-                  borderRadius: "50%", 
-                  backgroundColor: "rgba(0, 123, 255, 0.1)" 
-                }}>
+                <Box
+                  sx={{
+                    p: 1,
+                    borderRadius: "50%",
+                    backgroundColor: "rgba(0, 123, 255, 0.1)",
+                  }}
+                >
                   <Target size={24} color="#007BFF" />
                 </Box>
                 <Box>
-                  <Typography variant="h6" fontWeight={600}>Smart Matching</Typography>
+                  <Typography variant="h6" fontWeight={600}>
+                    Smart Matching
+                  </Typography>
                   <Typography variant="body2" color="text.secondary">
                     AI-powered algorithm matches you with perfect mentors
                   </Typography>
@@ -251,15 +278,19 @@ export default function About() {
               </Box>
 
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <Box sx={{ 
-                  p: 1, 
-                  borderRadius: "50%", 
-                  backgroundColor: "rgba(106, 13, 173, 0.1)" 
-                }}>
+                <Box
+                  sx={{
+                    p: 1,
+                    borderRadius: "50%",
+                    backgroundColor: "rgba(106, 13, 173, 0.1)",
+                  }}
+                >
                   <Users size={24} color="#6A0DAD" />
                 </Box>
                 <Box>
-                  <Typography variant="h6" fontWeight={600}>Peer-to-Peer Learning</Typography>
+                  <Typography variant="h6" fontWeight={600}>
+                    Peer-to-Peer Learning
+                  </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Learn from students who understand your journey
                   </Typography>
@@ -267,15 +298,19 @@ export default function About() {
               </Box>
 
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <Box sx={{ 
-                  p: 1, 
-                  borderRadius: "50%", 
-                  backgroundColor: "rgba(255, 122, 0, 0.1)" 
-                }}>
+                <Box
+                  sx={{
+                    p: 1,
+                    borderRadius: "50%",
+                    backgroundColor: "rgba(255, 122, 0, 0.1)",
+                  }}
+                >
                   <Zap size={24} color="#FF7A00" />
                 </Box>
                 <Box>
-                  <Typography variant="h6" fontWeight={600}>Skill Exchange</Typography>
+                  <Typography variant="h6" fontWeight={600}>
+                    Skill Exchange
+                  </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Teach what you know, learn what you need
                   </Typography>
@@ -284,21 +319,23 @@ export default function About() {
             </Box>
 
             <Link href="/signup" passHref style={{ textDecoration: "none" }}>
-              <Button 
-                variant="contained" 
+              <Button
+                variant="contained"
                 size="large"
                 sx={{
-                  background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                  background:
+                    "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
                   px: 4,
                   py: 1.5,
                   borderRadius: 2,
                   fontSize: "1.1rem",
                   "&:hover": {
-                    background: "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
+                    background:
+                      "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
                     transform: "translateY(-2px)",
-                    boxShadow: "0 8px 25px rgba(0, 123, 255, 0.3)"
+                    boxShadow: "0 8px 25px rgba(0, 123, 255, 0.3)",
                   },
-                  transition: "all 0.3s ease"
+                  transition: "all 0.3s ease",
                 }}
               >
                 Start Your Journey

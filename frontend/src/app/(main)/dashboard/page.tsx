@@ -1,26 +1,26 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useAuth } from "@/contexts/AuthContext";
 import {
-  Box,
-  Container,
-  Typography,
-  Paper,
-  Button,
   Avatar,
+  Box,
+  Button,
   Chip,
+  Container,
   LinearProgress,
-} from '@mui/material';
-import { motion } from 'framer-motion';
-import { 
-  BookOpen, 
-  Users, 
-  MessageCircle, 
+  Paper,
+  Typography,
+} from "@mui/material";
+import { motion } from "framer-motion";
+import {
+  Award,
+  BookOpen,
+  MessageCircle,
   TrendingUp,
-  Award
-} from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+  Users,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Dashboard() {
   const { user, isLoading } = useAuth();
@@ -28,9 +28,32 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!isLoading && !user) {
-      router.push('/login');
+      router.push("/login");
     }
   }, [user, isLoading, router]);
+
+  const handleQuickAction = (action: string) => {
+    switch (action) {
+      case 'courses':
+        // TODO: Navigate to courses page
+        break;
+      case 'mentors':
+        router.push('/findmentor');
+        break;
+      case 'messages':
+        router.push('/chat');
+        break;
+      case 'progress':
+        // TODO: Navigate to progress page
+        break;
+      default:
+        break;
+    }
+  };
+
+  const handleGetStarted = () => {
+    router.push('/profile');
+  };
 
   if (isLoading) {
     return (
@@ -53,18 +76,18 @@ export default function Dashboard() {
       >
         {/* Welcome Section */}
         <Box sx={{ mb: 4 }}>
-          <Typography 
-            variant="h3" 
+          <Typography
+            variant="h3"
             fontWeight="bold"
             sx={{
-              background: 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
               mb: 1,
             }}
           >
-            Welcome back, {user.name.split(' ')[0]}! 👋
+            Welcome back, {user.name.split(" ")[0]}! 👋
           </Typography>
           <Typography variant="h6" color="text.secondary">
             Ready to continue your learning journey?
@@ -72,58 +95,79 @@ export default function Dashboard() {
         </Box>
 
         {/* Profile Summary */}
-        <Paper 
-          sx={{ 
-            p: 3, 
-            mb: 4, 
+        <Paper
+          sx={{
+            p: 3,
+            mb: 4,
             borderRadius: 3,
-            background: 'linear-gradient(135deg, #f8fbff 0%, #e3f2fd 100%)',
-            border: '1px solid rgba(0, 123, 255, 0.1)',
+            background: "linear-gradient(135deg, #f8fbff 0%, #e3f2fd 100%)",
+            border: "1px solid rgba(0, 123, 255, 0.1)",
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mb: 3 }}>
-            <Avatar
-              sx={{
-                width: 80,
-                height: 80,
-                background: 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
-                fontSize: '2rem',
-                fontWeight: 700,
-              }}
-            >
-              {user.name.charAt(0).toUpperCase()}
-            </Avatar>
-            <Box>
-              <Typography variant="h5" fontWeight="bold">
-                {user.name}
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
-                {user.email}
-              </Typography>
-              <Chip 
-                label={user.role === 'both' ? 'Learner & Mentor' : user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 3 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
+              <Avatar
                 sx={{
-                  background: 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
-                  color: 'white',
-                  fontWeight: 600,
+                  width: 80,
+                  height: 80,
+                  background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                  fontSize: "2rem",
+                  fontWeight: 700,
                 }}
-              />
+              >
+                {user.name.charAt(0).toUpperCase()}
+              </Avatar>
+              <Box>
+                <Typography variant="h5" fontWeight="bold">
+                  {user.name}
+                </Typography>
+                <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
+                  {user.email}
+                </Typography>
+                <Chip
+                  label={
+                    user.role === "both"
+                      ? "Learner & Mentor"
+                      : user.role.charAt(0).toUpperCase() + user.role.slice(1)
+                  }
+                  sx={{
+                    background:
+                      "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                    color: "white",
+                    fontWeight: 600,
+                  }}
+                />
+              </Box>
             </Box>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => router.push('/profile')}
+              sx={{ mt: 1 }}
+            >
+              Edit Profile
+            </Button>
           </Box>
-          
+
           {/* Skills Summary */}
-          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "column", md: "row" },
+              gap: 3,
+            }}
+          >
             <Box sx={{ flex: 1 }}>
               <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
                 Skills I&apos;m Learning
               </Typography>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                 {user.skills.learning.length > 0 ? (
                   user.skills.learning.map((skill, index) => (
-                    <Chip 
-                      key={index} 
-                      label={skill} 
-                      variant="outlined" 
+                    <Chip
+                      key={index}
+                      label={skill}
+                      variant="outlined"
                       color="primary"
                       size="small"
                     />
@@ -139,13 +183,13 @@ export default function Dashboard() {
               <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
                 Skills I Can Teach
               </Typography>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                 {user.skills.teaching.length > 0 ? (
                   user.skills.teaching.map((skill, index) => (
-                    <Chip 
-                      key={index} 
-                      label={skill} 
-                      variant="outlined" 
+                    <Chip
+                      key={index}
+                      label={skill}
+                      variant="outlined"
                       color="secondary"
                       size="small"
                     />
@@ -161,29 +205,38 @@ export default function Dashboard() {
         </Paper>
 
         {/* Quick Actions */}
-        <Box 
-          sx={{ 
-            display: 'grid',
-            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              sm: "repeat(2, 1fr)",
+              md: "repeat(4, 1fr)",
+            },
             gap: 3,
-            mb: 4 
+            mb: 4,
           }}
         >
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Paper 
-              sx={{ 
-                p: 3, 
-                textAlign: 'center',
-                cursor: 'pointer',
+            <Paper
+              onClick={() => handleQuickAction('courses')}
+              sx={{
+                p: 3,
+                textAlign: "center",
+                cursor: "pointer",
                 borderRadius: 3,
-                '&:hover': {
-                  boxShadow: '0 8px 25px rgba(0, 123, 255, 0.2)',
+                "&:hover": {
+                  boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
                 },
-                transition: 'all 0.3s ease',
+                transition: "all 0.3s ease",
               }}
             >
               <BookOpen size={40} color="#007BFF" />
-              <Typography variant="h6" fontWeight="bold" sx={{ mt: 1, mb: 0.5 }}>
+              <Typography
+                variant="h6"
+                fontWeight="bold"
+                sx={{ mt: 1, mb: 0.5 }}
+              >
                 Find Courses
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -193,20 +246,25 @@ export default function Dashboard() {
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Paper 
-              sx={{ 
-                p: 3, 
-                textAlign: 'center',
-                cursor: 'pointer',
+            <Paper
+              onClick={() => handleQuickAction('mentors')}
+              sx={{
+                p: 3,
+                textAlign: "center",
+                cursor: "pointer",
                 borderRadius: 3,
-                '&:hover': {
-                  boxShadow: '0 8px 25px rgba(106, 13, 173, 0.2)',
+                "&:hover": {
+                  boxShadow: "0 8px 25px rgba(106, 13, 173, 0.2)",
                 },
-                transition: 'all 0.3s ease',
+                transition: "all 0.3s ease",
               }}
             >
               <Users size={40} color="#6A0DAD" />
-              <Typography variant="h6" fontWeight="bold" sx={{ mt: 1, mb: 0.5 }}>
+              <Typography
+                variant="h6"
+                fontWeight="bold"
+                sx={{ mt: 1, mb: 0.5 }}
+              >
                 Find Mentors
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -216,20 +274,25 @@ export default function Dashboard() {
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Paper 
-              sx={{ 
-                p: 3, 
-                textAlign: 'center',
-                cursor: 'pointer',
+            <Paper
+              onClick={() => handleQuickAction('messages')}
+              sx={{
+                p: 3,
+                textAlign: "center",
+                cursor: "pointer",
                 borderRadius: 3,
-                '&:hover': {
-                  boxShadow: '0 8px 25px rgba(255, 122, 0, 0.2)',
+                "&:hover": {
+                  boxShadow: "0 8px 25px rgba(255, 122, 0, 0.2)",
                 },
-                transition: 'all 0.3s ease',
+                transition: "all 0.3s ease",
               }}
             >
               <MessageCircle size={40} color="#FF7A00" />
-              <Typography variant="h6" fontWeight="bold" sx={{ mt: 1, mb: 0.5 }}>
+              <Typography
+                variant="h6"
+                fontWeight="bold"
+                sx={{ mt: 1, mb: 0.5 }}
+              >
                 Messages
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -239,20 +302,25 @@ export default function Dashboard() {
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Paper 
-              sx={{ 
-                p: 3, 
-                textAlign: 'center',
-                cursor: 'pointer',
+            <Paper
+              onClick={() => handleQuickAction('progress')}
+              sx={{
+                p: 3,
+                textAlign: "center",
+                cursor: "pointer",
                 borderRadius: 3,
-                '&:hover': {
-                  boxShadow: '0 8px 25px rgba(40, 167, 69, 0.2)',
+                "&:hover": {
+                  boxShadow: "0 8px 25px rgba(40, 167, 69, 0.2)",
                 },
-                transition: 'all 0.3s ease',
+                transition: "all 0.3s ease",
               }}
             >
               <Award size={40} color="#28a745" />
-              <Typography variant="h6" fontWeight="bold" sx={{ mt: 1, mb: 0.5 }}>
+              <Typography
+                variant="h6"
+                fontWeight="bold"
+                sx={{ mt: 1, mb: 0.5 }}
+              >
                 Progress
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -263,31 +331,38 @@ export default function Dashboard() {
         </Box>
 
         {/* Recent Activity */}
-        <Paper 
-          sx={{ 
-            p: 3, 
+        <Paper
+          sx={{
+            p: 3,
             borderRadius: 3,
-            border: '1px solid rgba(0, 123, 255, 0.1)',
+            border: "1px solid rgba(0, 123, 255, 0.1)",
           }}
         >
           <Typography variant="h5" fontWeight="bold" sx={{ mb: 3 }}>
             Recent Activity
           </Typography>
-          
-          <Box sx={{ textAlign: 'center', py: 4 }}>
+
+          <Box sx={{ textAlign: "center", py: 4 }}>
             <TrendingUp size={60} color="#ccc" />
-            <Typography variant="h6" color="text.secondary" sx={{ mt: 2, mb: 1 }}>
+            <Typography
+              variant="h6"
+              color="text.secondary"
+              sx={{ mt: 2, mb: 1 }}
+            >
               No recent activity
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              Start connecting with mentors and learners to see your activity here
+              Start connecting with mentors and learners to see your activity
+              here
             </Typography>
             <Button
               variant="contained"
+              onClick={handleGetStarted}
               sx={{
-                background: 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #0056CC 0%, #4A0080 100%)',
+                background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                "&:hover": {
+                  background:
+                    "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
                 },
               }}
             >

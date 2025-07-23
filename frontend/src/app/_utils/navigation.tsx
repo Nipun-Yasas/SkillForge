@@ -1,47 +1,72 @@
 import { type Navigation } from '@toolpad/core/AppProvider';
-import DashboardIcon from '@mui/icons-material/Dashboard'
+import DashboardIcon from '@mui/icons-material/Dashboard';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import ForumIcon from '@mui/icons-material/Forum';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import BookIcon from '@mui/icons-material/Book';
 
-const NAVIGATION: Navigation  = [
+const NAVIGATION: Navigation = [
   {
     kind: 'header',
-    title: 'Main items',
+    title: ' Learning Hub',
   },
   {
     segment: 'dashboard',
-    title: 'Dashboard',
+    title: 'Home Dashboard',
     icon: <DashboardIcon />,
   },
   {
+    segment: 'profile',
+    title: 'Profile Settings',
+    icon: <AccountCircleIcon />,
+  },
+  {
+    kind: 'divider',
+  },
+  {
+    kind: 'header',
+    title: ' Connect & Learn',
+  },
+  {
     segment: 'findmentor',
-    title: 'Find a Mentor',
+    title: 'Discover Mentors',
     icon: <PersonSearchIcon />,
   },
   {
+    segment: 'courses',
+    title: 'Learning Courses',
+    icon: <BookIcon />,
+  },
+  {
+    segment: 'progress',
+    title: 'My Progress',
+    icon: <TrendingUpIcon />,
+  },
+  {
+    kind: 'divider',
+  },
+  {
+    kind: 'header',
+    title: 'Community',
+  },
+  {
     segment: 'discussion',
-    title: 'Discussion',
+    title: 'Forum Discussions',
     icon: <ForumIcon />,
   },
   {
     segment: 'questions',
-    title: 'Questions',
+    title: 'Help & Q&A',
     icon: <HelpOutlineIcon />,
   },
   {
     segment: 'chat',
-    title: 'Chat',
+    title: 'Direct Messages',
     icon: <ChatBubbleOutlineIcon />,
   },
-  {
-    segment: 'likesvotes',
-    title: 'Likes and Votes',
-    icon: <FavoriteBorderIcon />,
-  },
-  
 ];
 
 export default NAVIGATION;

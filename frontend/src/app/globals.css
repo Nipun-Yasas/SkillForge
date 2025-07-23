@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --font-poppins: 'Poppins', sans-serif;
-  --font-inter: 'Inter', sans-serif;
-  --font-roboto: 'Roboto', sans-serif;
-  --font-lexend: 'Lexend', sans-serif;
+  --font-poppins: "Poppins", sans-serif;
+  --font-inter: "Inter", sans-serif;
+  --font-roboto: "Roboto", sans-serif;
+  --font-lexend: "Lexend", sans-serif;
 }
 
 * {
@@ -30,7 +30,11 @@ body {
 
 /* Smooth transitions for all elements */
 * {
-  transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+  transition:
+    color 0.3s ease,
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    transform 0.3s ease;
 }
 
 /* Custom scrollbar */
@@ -43,12 +47,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%);
+  background: linear-gradient(135deg, #007bff 0%, #6a0dad 100%);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #0056CC 0%, #4A0080 100%);
+  background: linear-gradient(135deg, #0056cc 0%, #4a0080 100%);
 }
 
 /* Link styles */
@@ -59,7 +63,7 @@ a {
 
 /* Focus styles for accessibility */
 :focus-visible {
-  outline: 2px solid #007BFF;
+  outline: 2px solid #007bff;
   outline-offset: 2px;
   border-radius: 4px;
 }

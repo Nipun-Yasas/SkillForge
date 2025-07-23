@@ -1,173 +1,284 @@
 "use client";
 
-import React from "react";
-import {
-  Box,
+import React, { useState, useEffect } from 'react';
+import { 
+  Box, 
+  Card, 
+  CardContent, 
+  Typography, 
+  Chip, 
+  Button, 
+  Avatar, 
+  Rating,
+  Stack,
   Grid,
-  Paper,
-  Typography,
-  Chip,
-  Avatar,
-  Button,
-} from "@mui/material";
-import StarBorderIcon from "@mui/icons-material/StarBorder";
+  Skeleton,
+  Container
+} from '@mui/material';
+import { 
+  Person as PersonIcon,
+  School as SchoolIcon,
+  AccessTime as TimeIcon,
+  AttachMoney as MoneyIcon
+} from '@mui/icons-material';
+import { useRouter } from 'next/navigation';
 
 interface Mentor {
+  id: string;
   name: string;
-  location: string;
-  rating: string;
   skills: string[];
+  bio: string;
   image: string;
+  rating: number;
+  students: number;
+  experience: string;
+  hourlyRate: string;
+  availability: string;
 }
 
-const mentors: Mentor[] = Array(6).fill({
-  name: "Alex Jhons",
-  location: "Moratuwa, Sri Lanka",
-  rating: "4.5/5",
-  skills: ["Web Development", "Java", "Python", "Node.Js", "Video Editing"],
-  image: "/profile-pic.png",
-});
+export default function MentorsCards() {
+  const [mentors, setMentors] = useState<Mentor[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(6);
+  const router = useRouter();
 
-const MentorsCards: React.FC = () => {
+  useEffect(() => {
+    // Fetch mentor data
+    const fetchMentors = async () => {
+      try {
+        const response = await fetch('/data/mentors.json');
+        const data = await response.json();
+        setMentors(data);
+      } catch (error) {
+        console.error('Error fetching mentors:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMentors();
+  }, []);
+
+  const handleViewProfile = (mentorId: string) => {
+    router.push(`/mentor/${mentorId}`);
+  };
+
+  const handleLoadMore = () => {
+    setVisibleCount(prev => prev + 6);
+  };
+
+  if (loading) {
+    return (
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Grid container spacing={3}>
+          {[...Array(6)].map((_, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <Card sx={{ height: '100%' }}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Skeleton variant="circular" width={60} height={60} />
+                    <Box sx={{ ml: 2, flex: 1 }}>
+                      <Skeleton variant="text" width="80%" height={28} />
+                      <Skeleton variant="text" width="60%" height={20} />
+                    </Box>
+                  </Box>
+                  <Skeleton variant="text" height={60} />
+                  <Skeleton variant="rectangular" height={40} sx={{ mt: 2 }} />
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
+    );
+  }
+
+  const visibleMentors = mentors.slice(0, visibleCount);
+
   return (
     <>
-      <Grid container spacing={4}>
-        {mentors.map((mentor, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
-            <Paper elevation={3} sx={{ borderRadius: 3, overflow: "hidden", position: "relative" }}>
-              {/* Top Gradient Section */}
-              <Box
-                sx={{
-                  background: "linear-gradient(to right, #4D9ECA, #34377F)",
-                  px: 2,
-                  pt: 2,
-                  pb: 6,
-                  color: "white",
-                  position: "relative",
-                  borderTopLeftRadius: 12,
-                  borderTopRightRadius: 12,
-                }}
-              >
-                <Typography variant="h6" fontWeight="bold">
-                  {mentor.name}
-                </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                  {mentor.location}
-                </Typography>
+      <Grid container spacing={3}>
+        {visibleMentors.map((mentor) => (
+          <Grid item xs={12} sm={6} md={4} key={mentor.id}>
+            <Card 
+              sx={{ 
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                transition: 'all 0.3s ease-in-out',
+                cursor: 'pointer',
+                '&:hover': {
+                  transform: 'translateY(-8px)',
+                  boxShadow: '0 12px 24px rgba(0, 123, 255, 0.15)',
+                  '& .mentor-avatar': {
+                    transform: 'scale(1.1)',
+                  }
+                },
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: 3,
+                overflow: 'hidden'
+              }}
+            >
+              <CardContent sx={{ flexGrow: 1, p: 3 }}>
+                {/* Mentor Header */}
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Avatar
+                    src={mentor.image}
+                    alt={mentor.name}
+                    className="mentor-avatar"
+                    sx={{ 
+                      width: 60, 
+                      height: 60,
+                      transition: 'transform 0.3s ease-in-out',
+                      border: '3px solid',
+                      borderColor: 'primary.main',
+                      bgcolor: 'primary.light'
+                    }}
+                  >
+                    <PersonIcon />
+                  </Avatar>
+                  <Box sx={{ ml: 2, flex: 1 }}>
+                    <Typography variant="h6" fontWeight="bold" gutterBottom>
+                      {mentor.name}
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Rating value={mentor.rating} readOnly size="small" precision={0.1} />
+                      <Typography variant="body2" color="text.secondary">
+                        ({mentor.rating})
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
 
-                {/* Rating Badge */}
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: 8,
-                    right: 8,
-                    backgroundColor: "white",
-                    color: "black",
-                    px: 1,
-                    py: 0.5,
-                    fontSize: "0.75rem",
-                    borderRadius: "999px",
-                    display: "flex",
-                    alignItems: "center",
-                    boxShadow: 1,
-                  }}
+                {/* Bio */}
+                <Typography 
+                  variant="body2" 
+                  color="text.secondary" 
+                  sx={{ mb: 2, lineHeight: 1.5 }}
                 >
-                  <StarBorderIcon sx={{ fontSize: 16, color: "#facc15", mr: 0.5 }} />
-                  {mentor.rating}
-                </Box>
-
-                {/* Profile Image */}
-                <Avatar
-                  src={mentor.image}
-                  alt={mentor.name}
-                  sx={{
-                    width: 64,
-                    height: 64,
-                    position: "absolute",
-                    bottom: -32,
-                    left: 16,
-                    border: "4px solid white",
-                    boxShadow: 2,
-                  }}
-                />
-              </Box>
-
-              {/* Card Content */}
-              <Box sx={{ px: 2, pt: 6, pb: 2 }}>
-                <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
-                  CAN TEACH
+                  {mentor.bio}
                 </Typography>
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 3 }}>
-                  {mentor.skills.map((skill, i) => (
-                    <Chip
-                      key={`skill-top-${i}`}
-                      label={skill}
-                      size="small"
-                      sx={{ backgroundColor: "#e3f2fd", color: "#1565c0", fontSize: "0.75rem" }}
-                    />
-                  ))}
+
+                {/* Skills */}
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="subtitle2" fontWeight="medium" gutterBottom>
+                    Skills:
+                  </Typography>
+                  <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
+                    {mentor.skills.slice(0, 3).map((skill) => (
+                      <Chip
+                        key={skill}
+                        label={skill}
+                        size="small"
+                        variant="outlined"
+                        color="primary"
+                        sx={{
+                          fontSize: '0.75rem',
+                          height: 24,
+                          '&:hover': {
+                            backgroundColor: 'primary.main',
+                            color: 'white'
+                          }
+                        }}
+                      />
+                    ))}
+                    {mentor.skills.length > 3 && (
+                      <Chip
+                        label={`+${mentor.skills.length - 3}`}
+                        size="small"
+                        variant="filled"
+                        color="secondary"
+                        sx={{ fontSize: '0.75rem', height: 24 }}
+                      />
+                    )}
+                  </Stack>
                 </Box>
 
-                <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
-                  CAN TEACH
-                </Typography>
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 3 }}>
-                  {mentor.skills.map((skill, i) => (
-                    <Chip
-                      key={`skill-bottom-${i}`}
-                      label={skill}
-                      size="small"
-                      sx={{ backgroundColor: "#e3f2fd", color: "#1565c0", fontSize: "0.75rem" }}
-                    />
-                  ))}
+                {/* Stats */}
+                <Box sx={{ mb: 3 }}>
+                  <Stack spacing={1}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <SchoolIcon fontSize="small" color="action" />
+                      <Typography variant="body2" color="text.secondary">
+                        {mentor.students} students
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <TimeIcon fontSize="small" color="action" />
+                      <Typography variant="body2" color="text.secondary">
+                        {mentor.experience} experience
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <MoneyIcon fontSize="small" color="action" />
+                      <Typography variant="body2" color="text.secondary">
+                        {mentor.hourlyRate}/hour
+                      </Typography>
+                    </Box>
+                  </Stack>
                 </Box>
 
+                {/* Availability Badge */}
+                <Box sx={{ mb: 2 }}>
+                  <Chip
+                    label={`Available: ${mentor.availability}`}
+                    size="small"
+                    color="success"
+                    variant="outlined"
+                    sx={{ fontSize: '0.75rem' }}
+                  />
+                </Box>
+
+                {/* View Profile Button */}
                 <Button
-                  fullWidth
                   variant="contained"
+                  fullWidth
+                  onClick={() => handleViewProfile(mentor.id)}
                   sx={{
-                    background: "linear-gradient(to right, #4D9ECA, #34377F)",
-                    color: "white",
-                    textTransform: "none",
-                    fontWeight: "bold",
-                    fontSize: "0.9rem",
+                    mt: 'auto',
+                    py: 1.5,
                     borderRadius: 2,
-                    boxShadow: 2,
-                    ":hover": {
-                      opacity: 0.9,
-                      background: "linear-gradient(to right, #4D9ECA, #34377F)",
-                    },
+                    textTransform: 'none',
+                    fontWeight: 'medium',
+                    background: 'linear-gradient(45deg, #007BFF 30%, #0056CC 90%)',
+                    '&:hover': {
+                      background: 'linear-gradient(45deg, #0056CC 30%, #003D99 90%)',
+                      transform: 'translateY(-1px)',
+                      boxShadow: '0 4px 8px rgba(0, 123, 255, 0.3)'
+                    }
                   }}
                 >
-                  Request mentorship
+                  View Profile
                 </Button>
-              </Box>
-            </Paper>
+              </CardContent>
+            </Card>
           </Grid>
         ))}
       </Grid>
 
       {/* Load More Button */}
-      <Box display="flex" justifyContent="center" mt={5}>
-        <Button
-          variant="contained"
-          sx={{
-            backgroundColor: "#4C98C6",
-            color: "white",
-            textTransform: "none",
-            px: 4,
-            py: 1.5,
-            borderRadius: 2,
-            ":hover": {
-              backgroundColor: "#2563eb",
-            },
-          }}
-        >
-          Load More
-        </Button>
-      </Box>
+      {visibleCount < mentors.length && (
+        <Box display="flex" justifyContent="center" mt={5}>
+          <Button
+            variant="contained"
+            onClick={handleLoadMore}
+            sx={{
+              backgroundColor: "#4C98C6",
+              color: "white",
+              textTransform: "none",
+              px: 4,
+              py: 1.5,
+              borderRadius: 2,
+              ":hover": {
+                backgroundColor: "#2563eb",
+              },
+            }}
+          >
+            Load More Mentors
+          </Button>
+        </Box>
+      )}
     </>
   );
-};
-
-export default MentorsCards;
+}

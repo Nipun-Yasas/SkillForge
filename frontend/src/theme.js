@@ -1,126 +1,137 @@
-'use client';
-import { createTheme } from '@mui/material/styles';
+"use client";
+import { createTheme } from "@mui/material/styles";
 
-import { outlinedInputClasses } from '@mui/material/OutlinedInput';
+import { outlinedInputClasses } from "@mui/material/OutlinedInput";
 
 const theme = createTheme({
   cssVariables: {
-    colorSchemeSelector: 'data-toolpad-color-scheme',
+    colorSchemeSelector: "data-toolpad-color-scheme",
   },
   colorSchemes: {
     light: {
       palette: {
         primary: {
-          main: "#0077B6",
-          light: "#33A1E0",
-          dark: "#004D80",
+          main: "#007BFF",
+          light: "#4DA3FF",
+          dark: "#0056CC",
           contrastText: "#fff",
         },
         secondary: {
-          main: "#00B4D8",
-          light: "#4CD9FF",
-          dark: "#007A94",
-          contrastText: "#000000",
+          main: "#6A0DAD",
+          light: "#8B3DCC",
+          dark: "#4A0080",
+          contrastText: "#fff",
         },
         error: {
           main: "#F44336",
           light: "#ef5350",
           dark: "#c62828",
-          contrastText: "#fff"
+          contrastText: "#fff",
         },
         warning: {
-          main: "#ed6c02",
-          light: "#ff9800",
-          dark: "#e65100",
-          contrastText: "#fff"
+          main: "#FF7A00",
+          light: "#FF9F40",
+          dark: "#CC5500",
+          contrastText: "#fff",
         },
         info: {
-          main: "#0288d1",
-          light: "#03a9f4",
-          dark: "#01579b",
-          contrastText: "#fff"
+          main: "#007BFF",
+          light: "#4DA3FF",
+          dark: "#0056CC",
+          contrastText: "#fff",
         },
         success: {
-          main: "#2e7d32",
-          light: "#4caf50",
-          dark: "#1b5e20",
-          contrastText: "#fff"
+          main: "#28a745",
+          light: "#5CBF70",
+          dark: "#1C7A32",
+          contrastText: "#fff",
+        },
+        accent: {
+          main: "#FF7A00",
+          light: "#FF9F40",
+          dark: "#CC5500",
+          contrastText: "#fff",
         },
         landHeader: {
-          main: '#ffffff',
-          contrastText: '#000000',
+          main: "#ffffff",
+          contrastText: "#000000",
         },
         textblack: {
-          main: '#000000',
-          contrastText: '#ffffff',
+          main: "#000000",
+          contrastText: "#ffffff",
         },
         shapeColor: {
-          main: '#00B4D8',
+          main: "#6A0DAD",
         },
         featureColor: {
-          main: '#e3f2fd',
+          main: "#f8fbff",
         },
         footerColor: {
-          main:'#2196f3',
-        }
-        
-      }
+          main: "#007BFF",
+        },
+      },
     },
     dark: {
       palette: {
         primary: {
-          main: "#0077B6",
-          light: "#33A1E0",
-          dark: "#004D80",
+          main: "#007BFF",
+          light: "#4DA3FF",
+          dark: "#0056CC",
           contrastText: "#fff",
         },
         secondary: {
-          main: "#00B4D8",
-          light: "#4CD9FF",
-          dark: "#007A94",
-          contrastText: "#000000",
+          main: "#6A0DAD",
+          light: "#8B3DCC",
+          dark: "#4A0080",
+          contrastText: "#fff",
         },
         error: {
           main: "#F44336",
           light: "#ef5350",
           dark: "#c62828",
-          contrastText: "#fff"
+          contrastText: "#fff",
         },
         warning: {
-          main: "#ffa726",
-          light: "#ffb74d",
-          dark: "#f57c00",
-          contrastText: "rgba(0, 0, 0, 0.87)"
+          main: "#FF7A00",
+          light: "#FF9F40",
+          dark: "#CC5500",
+          contrastText: "#fff",
         },
         info: {
-          main: "#29b6f6",
-          light: "#4fc3f7",
-          dark: "#0288d1",
-          contrastText: "rgba(0, 0, 0, 0.87)"
+          main: "#007BFF",
+          light: "#4DA3FF",
+          dark: "#0056CC",
+          contrastText: "#fff",
         },
         success: {
-          main: "#66bb6a",
-          light: "#81c784",
-          dark: "#388e3c",
-          contrastText: "rgba(0, 0, 0, 0.87)"
+          main: "#28a745",
+          light: "#5CBF70",
+          dark: "#1C7A32",
+          contrastText: "#fff",
+        },
+        accent: {
+          main: "#FF7A00",
+          light: "#FF9F40",
+          dark: "#CC5500",
+          contrastText: "#fff",
         },
         landHeader: {
-          main: '#ffffff',
-          contrastText: '#000000',
+          main: "#1a1a1a",
+          contrastText: "#ffffff",
         },
         textblack: {
-          main: '#ffffff',
-          contrastText: '#000000',
+          main: "#ffffff",
+          contrastText: "#000000",
         },
         shapeColor: {
-          main: '#0d47a1',
+          main: "#4A0080",
         },
         featureColor: {
-          main: '#1976d2',
+          main: "#2a2a2a",
         },
         footerColor: {
-          main:'#0d47a1',
-        }
+          main: "#0056CC",
+        },
       },
     },
   },
@@ -128,90 +139,108 @@ const theme = createTheme({
     MuiTextField: {
       styleOverrides: {
         root: {
-          '--TextField-borderColor': '#0077B6',
-          '--TextField-borderHoverColor': '#00B4D8',
-        }
-      }
+          "--TextField-borderColor": "#007BFF",
+          "--TextField-borderHoverColor": "#6A0DAD",
+        },
+      },
     },
     MuiOutlinedInput: {
       styleOverrides: {
         notchedOutline: {
-          borderColor: 'var(--TextField-borderColor)',
+          borderColor: "var(--TextField-borderColor)",
         },
         root: {
           [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
-            borderColor: 'var(--TextField-borderHoverColor)',
+            borderColor: "var(--TextField-borderHoverColor)",
           },
-
-        }
-      }
+        },
+      },
     },
     MuiFilledInput: {
       styleOverrides: {
         root: {
-          '&::before, &::after': {
-            borderBottom: '2px solid var(--TextField-borderColor)',
+          "&::before, &::after": {
+            borderBottom: "2px solid var(--TextField-borderColor)",
           },
-          '&:hover:not(.Mui-disabled, .Mui-error):before': {
-            borderBottom: '2px solid var(--TextField-borderHoverColor)',
-          }
-        }
-      }
+          "&:hover:not(.Mui-disabled, .Mui-error):before": {
+            borderBottom: "2px solid var(--TextField-borderHoverColor)",
+          },
+        },
+      },
     },
     MuiInput: {
       styleOverrides: {
         root: {
-          '&::before': {
-            borderBottom: '2px solid var(--TextField-borderColor)',
+          "&::before": {
+            borderBottom: "2px solid var(--TextField-borderColor)",
           },
-          '&:hover:not(.Mui-disabled, .Mui-error):before': {
-            borderBottom: '2px solid var(--TextField-borderHoverColor)',
-          }
-        }
-      }
-    }
+          "&:hover:not(.Mui-disabled, .Mui-error):before": {
+            borderBottom: "2px solid var(--TextField-borderHoverColor)",
+          },
+        },
+      },
+    },
   },
   typography: {
-    fontFamily: 'Lexend, sans-serif',
+    fontFamily:
+      'Inter, Poppins, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     fontSize: 14,
     h1: {
-      fontSize: '2.5rem',
+      fontSize: "3rem",
       fontWeight: 700,
-      fontFamily: 'Poppins, sans-serif',
-      color: '#0077B6',
+      fontFamily: "Poppins, sans-serif",
+      color: "#007BFF",
+      lineHeight: 1.2,
     },
     h2: {
-      fontSize: '2rem',
+      fontSize: "2.5rem",
       fontWeight: 700,
-      fontFamily: 'Poppins, sans-serif',
-      color: '#0077B6',
+      fontFamily: "Poppins, sans-serif",
+      color: "#007BFF",
+      lineHeight: 1.3,
     },
     h3: {
-      fontSize: '1.75rem',
-      fontWeight: 700,
-      fontFamily: 'Poppins, sans-serif',
-      color: '#0077B6',
+      fontSize: "2rem",
+      fontWeight: 600,
+      fontFamily: "Poppins, sans-serif",
+      color: "#6A0DAD",
+      lineHeight: 1.4,
     },
     h4: {
-      fontSize: '1.5rem',
-      fontWeight: 700,
-      fontFamily: 'Poppins, sans-serif',
-      color: '#0077B6',
+      fontSize: "1.5rem",
+      fontWeight: 600,
+      fontFamily: "Poppins, sans-serif",
+      color: "#6A0DAD",
+      lineHeight: 1.4,
     },
     h5: {
-      fontSize: '1.25rem',
-      fontWeight: 700,
-      fontFamily: 'Poppins, sans-serif',
+      fontSize: "1.25rem",
+      fontWeight: 600,
+      fontFamily: "Poppins, sans-serif",
+      lineHeight: 1.5,
     },
     h6: {
-      fontSize: '1rem',
-      fontWeight: 700,
-      fontFamily: 'Poppins, sans-serif',
-    },
-    h7: {
-      fontSize: '1rem',
+      fontSize: "1rem",
       fontWeight: 600,
-      fontFamily: 'Poppins, sans-serif',
+      fontFamily: "Poppins, sans-serif",
+      lineHeight: 1.5,
+    },
+    body1: {
+      fontFamily: "Inter, sans-serif",
+      fontSize: "1rem",
+      lineHeight: 1.6,
+      color: "#333333",
+    },
+    body2: {
+      fontFamily: "Inter, sans-serif",
+      fontSize: "0.875rem",
+      lineHeight: 1.6,
+      color: "#666666",
+    },
+    button: {
+      fontFamily: "Poppins, sans-serif",
+      fontWeight: 600,
+      textTransform: "none",
     },
   },
 });

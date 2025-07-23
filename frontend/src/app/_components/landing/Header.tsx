@@ -5,7 +5,6 @@ import Link from "next/link";
 
 import { ThemeSwitcher } from "@toolpad/core";
 
-import Image from "next/image";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
@@ -15,19 +14,35 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-
-interface Props {
-  window?: () => Window;
-}
+import Avatar from "@mui/material/Avatar";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import { motion } from "framer-motion";
+import { BookOpen, Users, User, LogOut, Settings } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const drawerWidth = 240;
 
-export default function DrawerAppBar(props: Props) {
-  const { window } = props;
+export default function DrawerAppBar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const { user, logout } = useAuth();
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
+  };
+
+  const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleUserMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    handleUserMenuClose();
   };
 
   const drawer = (
@@ -37,44 +52,97 @@ export default function DrawerAppBar(props: Props) {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          p: 2
         }}
       >
-        <Image
-          src="/logo.svg"
-          alt="Logo"
-          width={150}
-          height={150}
-          className="mt-2"
-        />
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <BookOpen size={32} color="#007BFF" />
+          <Typography 
+            variant="h5" 
+            sx={{ 
+              fontWeight: 700,
+              background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            SkillForge
+          </Typography>
+        </Box>
         <ThemeSwitcher />
       </Box>
       <Divider />
-      <Typography variant="body1" sx={{ my: 2, color: "textblack.main" }}>
-        <Link href="#about">About Us</Link>
-      </Typography>
-      <Typography variant="body1" sx={{ my: 2, color: "textblack.main" }}>
-        <Link href="#features">Features</Link>
-      </Typography>
-      <Typography variant="body1" sx={{ my: 2, color: "textblack.main" }}>
-        <Link href="#contact">Contact</Link>
-      </Typography>
-      <Box sx={{ display: "flex", gap: 1, justifyContent: "space-around" }}>
-        <Button variant="contained" disableElevation disableRipple>
-          <Typography>Login</Typography>
-        </Button>
-        <Button variant="outlined">
-          <Typography>Sign in</Typography>
-        </Button>
+      <Box sx={{ py: 2, display: "flex", flexDirection: "column", gap: 2 }}>
+        <Typography variant="body1" sx={{ color: "textblack.main" }}>
+          <Link href="#about" style={{ textDecoration: "none", color: "inherit" }}>
+            About Us
+          </Link>
+        </Typography>
+        <Typography variant="body1" sx={{ color: "textblack.main" }}>
+          <Link href="#features" style={{ textDecoration: "none", color: "inherit" }}>
+            Features
+          </Link>
+        </Typography>
+        <Typography variant="body1" sx={{ color: "textblack.main" }}>
+          <Link href="/findmentor" style={{ textDecoration: "none", color: "inherit" }}>
+            Find Mentors
+          </Link>
+        </Typography>
+        {user && (
+          <Typography variant="body1" sx={{ color: "textblack.main" }}>
+            <Link href="/dashboard" style={{ textDecoration: "none", color: "inherit" }}>
+              Dashboard
+            </Link>
+          </Typography>
+        )}
+      </Box>
+      
+      {/* Mobile Auth Buttons */}
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 1, p: 2 }}>
+        {user ? (
+          <>
+            <Typography variant="body2" sx={{ color: "textblack.main", mb: 1 }}>
+              Welcome, {user.name}!
+            </Typography>
+            <Button 
+              onClick={handleLogout} 
+              variant="outlined" 
+              size="small"
+              sx={{ color: "error.main", borderColor: "error.main" }}
+            >
+              Logout
+            </Button>
+          </>
+        ) : (
+          <>
+            <Link href="/login" passHref style={{ textDecoration: "none" }}>
+              <Button variant="outlined" size="small">
+                Login
+              </Button>
+            </Link>
+            <Link href="/signup" passHref style={{ textDecoration: "none" }}>
+              <Button variant="contained" size="small">
+                Sign Up
+              </Button>
+            </Link>
+          </>
+        )}
       </Box>
     </Box>
   );
 
-  const container =
-    window !== undefined ? () => window().document.body : undefined;
-
   return (
     <>
-      <AppBar component="nav" sx={{ bgcolor: "landHeader.main" }} elevation={1}>
+      <AppBar 
+        component="nav" 
+        sx={{ 
+          bgcolor: "rgba(255, 255, 255, 0.95)",
+          backdropFilter: "blur(10px)",
+          borderBottom: "1px solid rgba(0, 123, 255, 0.1)"
+        }} 
+        elevation={0}
+      >
         <Toolbar>
           <IconButton
             color="inherit"
@@ -85,50 +153,202 @@ export default function DrawerAppBar(props: Props) {
           >
             <MenuIcon />
           </IconButton>
+          
+          {/* Logo and Brand */}
           <Box
             sx={{
               flexGrow: 1,
-              display: { xs: "none", sm: "block" },
+              display: { xs: "none", sm: "flex" },
               alignItems: "center",
-              mx: 0,
-              px: 0,
+              gap: 1
             }}
           >
-            <Image
-              src="/logo.svg"
-              alt="Logo"
-              width={110}
-              height={100}
-              className="mt-2"
-            />
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 1 }}>
+                <BookOpen size={32} color="#007BFF" />
+                <Typography 
+                  variant="h5" 
+                  sx={{ 
+                    fontWeight: 700,
+                    background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                    backgroundClip: "text",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                  }}
+                >
+                  SkillForge
+                </Typography>
+              </Link>
+            </motion.div>
           </Box>
+
+          {/* Mobile Logo */}
+          <Box
+            sx={{
+              flexGrow: 1,
+              display: { xs: "flex", sm: "none" },
+              alignItems: "center",
+              gap: 1
+            }}
+          >
+            <BookOpen size={28} color="#007BFF" />
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                fontWeight: 700,
+                background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              SkillForge
+            </Typography>
+          </Box>
+          
+          {/* Navigation */}
           <Box
             sx={{
               display: { xs: "none", sm: "flex" },
-              gap: { sm: 1, md: 2 },
+              gap: { sm: 2, md: 3 },
               alignItems: "center",
             }}
           >
             <ThemeSwitcher />
-            <Typography variant="body1" sx={{ my: 2, color: "textblack.main" }}>
-              <Link href="#about">About Us</Link>
-            </Typography>
-            <Typography variant="body1" sx={{ my: 2, color: "textblack.main" }}>
-              <Link href="#features">Features</Link>
-            </Typography>
-            <Typography variant="body1" sx={{ my: 2, color: "textblack.main" }}>
-              <Link href="#contact">Contact</Link>
-            </Typography>
-            <Button variant="contained" disableElevation disableRipple>
-              <Typography>
-                <Link href="/login">Login</Link>
+            
+            <Link href="#about" style={{ textDecoration: "none" }}>
+              <Typography 
+                variant="body1" 
+                sx={{ 
+                  color: "textblack.main",
+                  "&:hover": { color: "primary.main" },
+                  transition: "color 0.3s ease"
+                }}
+              >
+                About
               </Typography>
-            </Button>
-            <Button variant="outlined">
-              <Typography>
-                <Link href="/signup">Sign Up</Link>
+            </Link>
+            
+            <Link href="#features" style={{ textDecoration: "none" }}>
+              <Typography 
+                variant="body1" 
+                sx={{ 
+                  color: "textblack.main",
+                  "&:hover": { color: "primary.main" },
+                  transition: "color 0.3s ease"
+                }}
+              >
+                Features
               </Typography>
-            </Button>
+            </Link>
+            
+            <Link href="/findmentor" style={{ textDecoration: "none" }}>
+              <Typography 
+                variant="body1" 
+                sx={{ 
+                  color: "textblack.main",
+                  "&:hover": { color: "primary.main" },
+                  transition: "color 0.3s ease",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5
+                }}
+              >
+                <Users size={16} />
+                Find Mentors
+              </Typography>
+            </Link>
+            
+            {/* Authentication Buttons */}
+            {user ? (
+              <>
+                <IconButton
+                  onClick={handleUserMenuOpen}
+                  sx={{ p: 0, ml: 1 }}
+                >
+                  <Avatar
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      background: 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {user.name.charAt(0).toUpperCase()}
+                  </Avatar>
+                </IconButton>
+                
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleUserMenuClose}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                  }}
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                >
+                  <MenuItem onClick={handleUserMenuClose}>
+                    <Link href="/dashboard" style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <User size={16} />
+                      Dashboard
+                    </Link>
+                  </MenuItem>
+                  <MenuItem onClick={handleUserMenuClose}>
+                    <Link href="/profile" style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Settings size={16} />
+                      Profile
+                    </Link>
+                  </MenuItem>
+                  <Divider />
+                  <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
+                    <LogOut size={16} />
+                    <Box sx={{ ml: 1 }}>Logout</Box>
+                  </MenuItem>
+                </Menu>
+              </>
+            ) : (
+              <>
+                <Link href="/login" passHref style={{ textDecoration: "none" }}>
+                  <Button 
+                    variant="outlined" 
+                    sx={{
+                      borderColor: "primary.main",
+                      color: "primary.main",
+                      "&:hover": {
+                        borderColor: "secondary.main",
+                        color: "secondary.main"
+                      }
+                    }}
+                  >
+                    Login
+                  </Button>
+                </Link>
+                
+                <Link href="/signup" passHref style={{ textDecoration: "none" }}>
+                  <Button 
+                    variant="contained"
+                    sx={{
+                      background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                      "&:hover": {
+                        background: "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
+                        transform: "translateY(-1px)"
+                      },
+                      transition: "all 0.3s ease"
+                    }}
+                  >
+                    Sign Up
+                  </Button>
+                </Link>
+              </>
+            )}
           </Box>
         </Toolbar>
       </AppBar>

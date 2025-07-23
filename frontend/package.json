@@ -15,11 +15,20 @@
     "@mui/material": "^7.1.0",
     "@mui/material-nextjs": "^7.1.0",
     "@toolpad/core": "^0.15.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "bcryptjs": "^3.0.2",
+    "framer-motion": "^12.23.6",
     "gsap": "^3.13.0",
+    "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.525.0",
+    "mongoose": "^8.16.4",
     "next": "15.3.2",
+    "next-auth": "^4.24.11",
     "react": "^19.0.0",
     "react-countup": "^6.5.3",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-hot-toast": "^2.5.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

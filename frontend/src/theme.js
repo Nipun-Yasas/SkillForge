@@ -256,6 +256,23 @@ theme.components = {
         background: 'linear-gradient(180deg, #f8fbff 0%, #e3f2fd 100%)',
         borderRight: '1px solid rgba(0, 123, 255, 0.1)',
         boxShadow: '4px 0 20px rgba(0, 123, 255, 0.08)',
+        // Ensure solid background for mobile and small screens
+        '@media (max-width: 900px)': {
+          background: '#ffffff',
+          backdropFilter: 'none',
+          boxShadow: '2px 0 10px rgba(0, 0, 0, 0.1)',
+        },
+        // Fix for temporary drawer (mobile)
+        '&.MuiDrawer-paperAnchorLeft': {
+          background: '#ffffff',
+        },
+        // Fix for permanent drawer on mobile
+        '&.MuiPaper-root': {
+          background: 'linear-gradient(180deg, #f8fbff 0%, #e3f2fd 100%)',
+          '@media (max-width: 900px)': {
+            background: '#ffffff',
+          },
+        },
         '& .MuiListItemButton-root': {
           margin: '4px 12px',
           borderRadius: '12px',
@@ -311,6 +328,20 @@ theme.components = {
       },
     },
   },
+  // Fix for mobile drawer backdrop
+  MuiBackdrop: {
+    styleOverrides: {
+      root: {
+        '&.MuiBackdrop-invisible': {
+          backgroundColor: 'transparent',
+        },
+        // Ensure proper backdrop for mobile drawer
+        '&.MuiDrawer-backdrop': {
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        },
+      },
+    },
+  },
   // App bar styling
   MuiAppBar: {
     styleOverrides: {
@@ -319,6 +350,22 @@ theme.components = {
         color: '#2c3e50',
         boxShadow: '0 2px 20px rgba(0, 123, 255, 0.08)',
         borderBottom: '1px solid rgba(0, 123, 255, 0.1)',
+        // Ensure proper z-index and background for mobile
+        '@media (max-width: 900px)': {
+          background: '#ffffff',
+          zIndex: 1200,
+        },
+      },
+    },
+  },
+  // Additional styling for mobile layout
+  MuiContainer: {
+    styleOverrides: {
+      root: {
+        '@media (max-width: 900px)': {
+          paddingLeft: '16px',
+          paddingRight: '16px',
+        },
       },
     },
   },

@@ -6,6 +6,7 @@ import {
   Button,
   CircularProgress,
   Container,
+  Divider,
   FormControl,
   InputLabel,
   MenuItem,
@@ -13,16 +14,42 @@ import {
   Select,
   TextField,
   Typography,
+  IconButton,
+  InputAdornment,
+  Chip,
+  Avatar,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, UserPlus } from "lucide-react";
+import { 
+  BookOpen, 
+  Eye, 
+  EyeOff, 
+  UserPlus, 
+  Mail, 
+  Lock, 
+  User,
+  ArrowRight, 
+  Sparkles,
+  Users,
+  
+  Award,
+  GraduationCap,
+  Target,
+  Star,
+  Rocket
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import BackgroundShape from "../_components/background/BackgroundShape";
 
 export default function SignupPage() {
   const router = useRouter();
   const { signup } = useAuth();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const [formData, setFormData] = useState({
     name: "",
@@ -113,196 +140,676 @@ export default function SignupPage() {
     }
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  };
+
+  const stats = [
+    { icon: Users, value: "10K+", label: "Learners" },
+    { icon: GraduationCap, value: "500+", label: "Mentors" },
+    { icon: Award, value: "1000+", label: "Skills" }
+  ];
+
+  const features = [
+    { icon: Target, text: "Personalized Learning Paths" },
+    { icon: Sparkles, text: "AI-Powered Skill Matching" },
+    { icon: Star, text: "Expert Mentor Network" }
+  ];
+
   return (
-    <Container maxWidth="sm" sx={{ py: 8 }}>
+    <Box 
+      sx={{ 
+        minHeight: '100vh',
+        position: 'relative',
+        overflow: 'hidden',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        py: 4
+      }}
+    >
+      {/* Animated Background Shapes */}
+      <BackgroundShape
+        className="shape1"
+        color="#28A745"
+        opacity="0.1"
+        width={450}
+        height={450}
+        cx={225}
+        cy={225}
+        rx={200}
+        ry={220}
+      />
+      <BackgroundShape
+        className="shape2"
+        color="#FF6B6B"
+        opacity="0.15"
+        width={350}
+        height={400}
+        cx={175}
+        cy={200}
+        rx={150}
+        ry={180}
+      />
+      <BackgroundShape
+        className="shape3"
+        color="#FFD700"
+        opacity="0.08"
+        width={300}
+        height={300}
+        cx={150}
+        cy={150}
+        rx={120}
+        ry={140}
+      />
+      
+      {/* Floating Elements */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        animate={{
+          y: [-20, 20, -20],
+          rotate: [0, 10, 0],
+        }}
+        transition={{
+          duration: 7,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        style={{
+          position: 'absolute',
+          top: '15%',
+          right: '10%',
+          zIndex: 1
+        }}
       >
-        <Paper
-          elevation={0}
+        <Box
           sx={{
-            p: 4,
-            borderRadius: 3,
-            background: "rgba(255, 255, 255, 0.9)",
-            backdropFilter: "blur(10px)",
-            border: "1px solid rgba(0, 123, 255, 0.1)",
+            width: 70,
+            height: 70,
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #28A745 0%, #20C997 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 20px 40px rgba(40, 167, 69, 0.3)',
+            backdropFilter: 'blur(10px)'
           }}
         >
-          {/* Header */}
-          <Box sx={{ textAlign: "center", mb: 4 }}>
-            <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
-              <Box
+          <Rocket size={28} color="white" />
+        </Box>
+      </motion.div>
+
+      <motion.div
+        animate={{
+          y: [15, -15, 15],
+          rotate: [0, -8, 0],
+        }}
+        transition={{
+          duration: 9,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        style={{
+          position: 'absolute',
+          bottom: '25%',
+          left: '8%',
+          zIndex: 1
+        }}
+      >
+        <Box
+          sx={{
+            width: 50,
+            height: 50,
+            borderRadius: '12px',
+            background: 'rgba(255, 255, 255, 0.15)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          <GraduationCap size={20} color="white" />
+        </Box>
+      </motion.div>
+
+      <Container maxWidth="lg">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+              gap: 6,
+              alignItems: 'center',
+              minHeight: '80vh'
+            }}
+          >
+            {/* Left Side - Welcome Content */}
+            {!isMobile && (
+              <motion.div variants={itemVariants}>
+                <Box sx={{ color: 'white', pr: 4 }}>
+                  {/* Logo */}
+                  <Link href="/" style={{ textDecoration: "none" }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                        mb: 4,
+                      }}
+                    >
+                      <Avatar
+                        sx={{
+                          bgcolor: 'rgba(255, 255, 255, 0.1)',
+                          backdropFilter: 'blur(10px)',
+                          width: 48,
+                          height: 48
+                        }}
+                      >
+                        <BookOpen size={24} color="white" />
+                      </Avatar>
+                      <Typography
+                        variant="h4"
+                        sx={{
+                          fontWeight: 700,
+                          color: 'white'
+                        }}
+                      >
+                        SkillForge
+                      </Typography>
+                    </Box>
+                  </Link>
+
+                  {/* Hero Content */}
+                  <Typography 
+                    variant="h2" 
+                    sx={{ 
+                      fontWeight: 800, 
+                      mb: 3,
+                      fontSize: { xs: '2rem', md: '3rem' }
+                    }}
+                  >
+                    Begin Your
+                    <Box component="span" sx={{ display: 'block', color: '#FFD700' }}>
+                      Learning Adventure
+                    </Box>
+                  </Typography>
+
+                  <Typography 
+                    variant="h6" 
+                    sx={{ 
+                      mb: 4, 
+                      opacity: 0.9,
+                      lineHeight: 1.6,
+                      maxWidth: '500px'
+                    }}
+                  >
+                    Join thousands of learners and mentors building skills together. Start your journey with AI-powered personalized learning.
+                  </Typography>
+
+                  {/* Stats */}
+                  <Box sx={{ display: 'flex', gap: 4, mb: 4 }}>
+                    {stats.map((stat, index) => (
+                      <motion.div
+                        key={index}
+                        variants={itemVariants}
+                        whileHover={{ scale: 1.05 }}
+                      >
+                        <Box
+                          sx={{
+                            textAlign: 'center',
+                            p: 2,
+                            borderRadius: 2,
+                            background: 'rgba(255, 255, 255, 0.1)',
+                            backdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(255, 255, 255, 0.2)'
+                          }}
+                        >
+                          <stat.icon size={24} color="white" style={{ marginBottom: '8px' }} />
+                          <Typography variant="h6" fontWeight="bold">
+                            {stat.value}
+                          </Typography>
+                          <Typography variant="caption" sx={{ opacity: 0.8 }}>
+                            {stat.label}
+                          </Typography>
+                        </Box>
+                      </motion.div>
+                    ))}
+                  </Box>
+
+                  {/* Features */}
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {features.map((feature, index) => (
+                      <motion.div
+                        key={index}
+                        variants={itemVariants}
+                        whileHover={{ x: 10 }}
+                      >
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <Box
+                            sx={{
+                              p: 1,
+                              borderRadius: '50%',
+                              background: 'rgba(255, 215, 0, 0.2)',
+                              backdropFilter: 'blur(10px)'
+                            }}
+                          >
+                            <feature.icon size={16} color="#FFD700" />
+                          </Box>
+                          <Typography variant="body1" sx={{ opacity: 0.9 }}>
+                            {feature.text}
+                          </Typography>
+                        </Box>
+                      </motion.div>
+                    ))}
+                  </Box>
+                </Box>
+              </motion.div>
+            )}
+
+            {/* Right Side - Signup Form */}
+            <motion.div variants={itemVariants}>
+              <Paper
+                elevation={0}
                 sx={{
-                  p: 2,
-                  borderRadius: "50%",
-                  background:
-                    "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  p: isMobile ? 3 : 4,
+                  borderRadius: 4,
+                  background: 'rgba(255, 255, 255, 0.95)',
+                  backdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  boxShadow: '0 25px 50px rgba(0, 0, 0, 0.15)',
+                  position: 'relative',
+                  overflow: 'hidden'
                 }}
               >
-                <UserPlus size={32} color="white" />
-              </Box>
-            </Box>
+                {/* Form Header */}
+                <Box sx={{ textAlign: "center", mb: 4 }}>
+                  {isMobile && (
+                    <Link href="/" style={{ textDecoration: "none" }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          gap: 1,
+                          mb: 3,
+                        }}
+                      >
+                        <BookOpen size={28} color="#007BFF" />
+                        <Typography
+                          variant="h5"
+                          sx={{
+                            fontWeight: 700,
+                            background:
+                              "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                            backgroundClip: "text",
+                            WebkitBackgroundClip: "text",
+                            WebkitTextFillColor: "transparent",
+                          }}
+                        >
+                          SkillForge
+                        </Typography>
+                      </Box>
+                    </Link>
+                  )}
 
-            <Typography
-              variant="h4"
-              fontWeight="bold"
-              sx={{
-                background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
-                backgroundClip: "text",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                mb: 1,
-              }}
-            >
-              Join SkillForge
-            </Typography>
-
-            <Typography variant="body1" color="text.secondary">
-              Start your journey of learning and teaching
-            </Typography>
-          </Box>
-
-          {/* Form */}
-          <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
-            <TextField
-              fullWidth
-              label="Full Name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              error={!!errors.name}
-              helperText={errors.name}
-              sx={{ mb: 3 }}
-              disabled={isLoading}
-            />
-
-            <TextField
-              fullWidth
-              label="Email Address"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              error={!!errors.email}
-              helperText={errors.email}
-              sx={{ mb: 3 }}
-              disabled={isLoading}
-            />
-
-            <FormControl fullWidth sx={{ mb: 3 }}>
-              <InputLabel>I want to...</InputLabel>
-              <Select
-                value={formData.role}
-                label="I want to..."
-                onChange={(e) => handleRoleChange(e.target.value)}
-                disabled={isLoading}
-              >
-                <MenuItem value="learner">Learn new skills</MenuItem>
-                <MenuItem value="mentor">Teach others</MenuItem>
-                <MenuItem value="both">Both learn and teach</MenuItem>
-              </Select>
-            </FormControl>
-
-            <TextField
-              fullWidth
-              label="Password"
-              name="password"
-              type={showPassword ? "text" : "password"}
-              value={formData.password}
-              onChange={handleChange}
-              error={!!errors.password}
-              helperText={errors.password}
-              sx={{ mb: 3 }}
-              disabled={isLoading}
-              InputProps={{
-                endAdornment: (
-                  <Button
-                    onClick={() => setShowPassword(!showPassword)}
-                    sx={{ minWidth: "auto", p: 1 }}
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
                   >
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </Button>
-                ),
-              }}
-            />
+                    <Box
+                      sx={{
+                        display: "inline-flex",
+                        p: 2,
+                        borderRadius: "50%",
+                        background:
+                          "linear-gradient(135deg, #28A745 0%, #20C997 100%)",
+                        mb: 2,
+                        position: 'relative'
+                      }}
+                    >
+                      <UserPlus size={32} color="white" />
+                      <motion.div
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        style={{
+                          position: 'absolute',
+                          inset: -8,
+                          borderRadius: '50%',
+                          border: '2px solid rgba(40, 167, 69, 0.3)',
+                        }}
+                      />
+                    </Box>
+                  </motion.div>
 
-            <TextField
-              fullWidth
-              label="Confirm Password"
-              name="confirmPassword"
-              type={showConfirmPassword ? "text" : "password"}
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              error={!!errors.confirmPassword}
-              helperText={errors.confirmPassword}
-              sx={{ mb: 4 }}
-              disabled={isLoading}
-              InputProps={{
-                endAdornment: (
-                  <Button
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    sx={{ minWidth: "auto", p: 1 }}
+                  <Typography
+                    variant="h4"
+                    fontWeight="bold"
+                    sx={{
+                      background: "linear-gradient(135deg, #28A745 0%, #20C997 100%)",
+                      backgroundClip: "text",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      mb: 1,
+                    }}
                   >
-                    {showConfirmPassword ? (
-                      <EyeOff size={20} />
-                    ) : (
-                      <Eye size={20} />
-                    )}
-                  </Button>
-                ),
-              }}
-            />
+                    Join SkillForge
+                  </Typography>
 
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              size="large"
-              disabled={isLoading}
-              sx={{
-                background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
-                py: 1.5,
-                borderRadius: 2,
-                fontSize: "1.1rem",
-                mb: 3,
-                "&:hover": {
-                  background:
-                    "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
-                  transform: "translateY(-1px)",
-                  boxShadow: "0 8px 25px rgba(0, 123, 255, 0.3)",
-                },
-                "&:disabled": {
-                  background: "rgba(0, 123, 255, 0.3)",
-                },
-                transition: "all 0.3s ease",
-              }}
-            >
-              {isLoading ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                "Create Account"
-              )}
-            </Button>
+                  <Typography variant="body1" color="text.secondary">
+                    Start your journey of learning and growth
+                  </Typography>
 
-            <Box sx={{ textAlign: "center" }}>
-              <Typography variant="body2" color="text.secondary">
-                Already have an account?{" "}
-                <Link
-                  href="/login"
-                  style={{ color: "#007BFF", textDecoration: "none" }}
-                >
-                  Sign in here
-                </Link>
-              </Typography>
-            </Box>
+                  {/* Status Chip */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    <Chip
+                      icon={<Rocket size={16} />}
+                      label="Launch Your Learning Journey"
+                      variant="outlined"
+                      size="small"
+                      sx={{
+                        mt: 2,
+                        borderColor: '#28A745',
+                        color: '#28A745',
+                        '& .MuiChip-icon': { color: '#28A745' }
+                      }}
+                    />
+                  </motion.div>
+                </Box>
+
+                {/* Signup Form */}
+                <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
+                  <motion.div variants={itemVariants}>
+                    <TextField
+                      fullWidth
+                      label="Full Name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      error={!!errors.name}
+                      helperText={errors.name}
+                      sx={{ mb: 3 }}
+                      disabled={isLoading}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <User size={20} color="#666" />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </motion.div>
+
+                  <motion.div variants={itemVariants}>
+                    <TextField
+                      fullWidth
+                      label="Email Address"
+                      name="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      error={!!errors.email}
+                      helperText={errors.email}
+                      sx={{ mb: 3 }}
+                      disabled={isLoading}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Mail size={20} color="#666" />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </motion.div>
+
+                  <motion.div variants={itemVariants}>
+                    <FormControl fullWidth sx={{ mb: 3 }}>
+                      <InputLabel>I want to...</InputLabel>
+                      <Select
+                        value={formData.role}
+                        label="I want to..."
+                        onChange={(e) => handleRoleChange(e.target.value)}
+                        disabled={isLoading}
+                        startAdornment={
+                          <InputAdornment position="start">
+                            <Target size={20} color="#666" />
+                          </InputAdornment>
+                        }
+                      >
+                        <MenuItem value="learner">🎓 Learn new skills</MenuItem>
+                        <MenuItem value="mentor">👨‍🏫 Teach others</MenuItem>
+                        <MenuItem value="both">🚀 Both learn and teach</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </motion.div>
+
+                  <motion.div variants={itemVariants}>
+                    <TextField
+                      fullWidth
+                      label="Password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={handleChange}
+                      error={!!errors.password}
+                      helperText={errors.password}
+                      sx={{ mb: 3 }}
+                      disabled={isLoading}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Lock size={20} color="#666" />
+                          </InputAdornment>
+                        ),
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={() => setShowPassword(!showPassword)}
+                              edge="end"
+                            >
+                              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </motion.div>
+
+                  <motion.div variants={itemVariants}>
+                    <TextField
+                      fullWidth
+                      label="Confirm Password"
+                      name="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      error={!!errors.confirmPassword}
+                      helperText={errors.confirmPassword}
+                      sx={{ mb: 4 }}
+                      disabled={isLoading}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Lock size={20} color="#666" />
+                          </InputAdornment>
+                        ),
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                              edge="end"
+                            >
+                              {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </motion.div>
+
+                  <motion.div variants={itemVariants}>
+                    <Button
+                      type="submit"
+                      fullWidth
+                      variant="contained"
+                      size="large"
+                      disabled={isLoading}
+                      sx={{
+                        background: "linear-gradient(135deg, #28A745 0%, #20C997 100%)",
+                        py: 1.8,
+                        borderRadius: 3,
+                        fontSize: "1.1rem",
+                        fontWeight: 600,
+                        mb: 3,
+                        position: 'relative',
+                        overflow: 'hidden',
+                        "&:hover": {
+                          background:
+                            "linear-gradient(135deg, #218838 0%, #17A2B8 100%)",
+                          transform: "translateY(-2px)",
+                          boxShadow: "0 15px 35px rgba(40, 167, 69, 0.4)",
+                        },
+                        "&:disabled": {
+                          background: "rgba(40, 167, 69, 0.3)",
+                        },
+                        transition: "all 0.3s ease",
+                      }}
+                    >
+                      {isLoading ? (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <CircularProgress size={24} color="inherit" />
+                          <Typography>Creating Account...</Typography>
+                        </Box>
+                      ) : (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <Typography>Create Account</Typography>
+                          <ArrowRight size={20} />
+                        </Box>
+                      )}
+                    </Button>
+                  </motion.div>
+
+                  <Divider sx={{ my: 3 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Already have an account?
+                    </Typography>
+                  </Divider>
+
+                  <motion.div variants={itemVariants}>
+                    <Link href="/login" passHref style={{ textDecoration: "none" }}>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        size="large"
+                        sx={{
+                          borderColor: "#28A745",
+                          color: "#28A745",
+                          py: 1.8,
+                          borderRadius: 3,
+                          fontSize: "1.1rem",
+                          fontWeight: 600,
+                          borderWidth: 2,
+                          "&:hover": {
+                            borderColor: "#20C997",
+                            color: "#20C997",
+                            backgroundColor: "rgba(40, 167, 69, 0.05)",
+                            borderWidth: 2,
+                            transform: "translateY(-1px)",
+                          },
+                          transition: "all 0.3s ease",
+                        }}
+                      >
+                        Sign In Instead
+                      </Button>
+                    </Link>
+                  </motion.div>
+                </Box>
+              </Paper>
+            </motion.div>
           </Box>
-        </Paper>
+        </motion.div>
+      </Container>
+
+      {/* Additional floating elements */}
+      <motion.div
+        animate={{
+          rotate: [0, 360],
+        }}
+        transition={{
+          duration: 25,
+          repeat: Infinity,
+          ease: "linear"
+        }}
+        style={{
+          position: 'absolute',
+          top: '70%',
+          right: '3%',
+          zIndex: 1
+        }}
+      >
+        <Box
+          sx={{
+            width: 35,
+            height: 35,
+            borderRadius: '6px',
+            background: 'rgba(40, 167, 69, 0.2)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(40, 167, 69, 0.3)'
+          }}
+        />
       </motion.div>
-    </Container>
+
+      {/* CSS for shape animations */}
+      <style jsx global>{`
+        .shape1 {
+          animation: float1 9s ease-in-out infinite;
+        }
+        .shape2 {
+          animation: float2 11s ease-in-out infinite;
+        }
+        .shape3 {
+          animation: float3 13s ease-in-out infinite;
+        }
+        
+        @keyframes float1 {
+          0%, 100% { transform: translate(0, 0) rotate(0deg); }
+          33% { transform: translate(25px, -35px) rotate(120deg); }
+          66% { transform: translate(-30px, 25px) rotate(240deg); }
+        }
+        
+        @keyframes float2 {
+          0%, 100% { transform: translate(0, 0) rotate(0deg); }
+          50% { transform: translate(-35px, -25px) rotate(180deg); }
+        }
+        
+        @keyframes float3 {
+          0%, 100% { transform: translate(0, 0) rotate(0deg); }
+          25% { transform: translate(15px, -45px) rotate(90deg); }
+          50% { transform: translate(-25px, -15px) rotate(180deg); }
+          75% { transform: translate(-5px, 35px) rotate(270deg); }
+        }
+      `}</style>
+    </Box>
   );
 }

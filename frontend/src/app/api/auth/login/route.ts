@@ -58,12 +58,17 @@ export async function POST(request: NextRequest) {
       role: user.role,
       avatar: user.avatar,
       bio: user.bio,
+      location: user.location,
+      experience: user.experience,
       skills: user.skills,
+      learningGoals: user.learningGoals,
+      availability: user.availability,
       university: user.university,
       year: user.year,
       major: user.major,
       isEmailVerified: user.isEmailVerified,
       createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     };
 
     // Set HTTP-only cookie

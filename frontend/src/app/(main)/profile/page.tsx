@@ -95,7 +95,7 @@ interface ProfileFormData {
 }
 
 export default function ProfilePage() {
-  const { user, updateUser, isLoading } = useAuth();
+  const { user, updateUser, refreshUser, isLoading } = useAuth();
   const router = useRouter();
   
   const [formData, setFormData] = useState<ProfileFormData>({
@@ -121,8 +121,10 @@ export default function ProfilePage() {
   useEffect(() => {
     if (!isLoading && !user) {
       router.push('/login');
+      return;
     }
     
+    // Initialize form data when user data is available
     if (user) {
       setFormData({
         name: user.name || '',
@@ -138,6 +140,24 @@ export default function ProfilePage() {
       });
     }
   }, [user, isLoading, router]);
+
+  // Additional effect to handle user data updates
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        name: user.name || prev.name,
+        email: user.email || prev.email,
+        bio: user.bio || prev.bio,
+        role: user.role || prev.role,
+        location: user.location || prev.location,
+        experience: user.experience || prev.experience,
+        skillsLearning: user.skills?.learning || prev.skillsLearning,
+        skillsTeaching: user.skills?.teaching || prev.skillsTeaching,
+        learningGoals: user.learningGoals || prev.learningGoals,
+        availability: user.availability || prev.availability
+      }));
+    }
+  }, [user]);
 
   const handleInputChange = (field: keyof ProfileFormData, value: string | string[]) => {
     setFormData(prev => ({
@@ -187,6 +207,8 @@ export default function ProfilePage() {
       if (response.ok) {
         const updatedUser = await response.json();
         updateUser(updatedUser.user);
+        // Also refresh user data from server to ensure consistency
+        await refreshUser();
         setIsEditing(false);
         toast.success('Profile updated successfully!');
       } else {

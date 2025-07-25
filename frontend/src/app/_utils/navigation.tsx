@@ -7,6 +7,9 @@ import ForumIcon from '@mui/icons-material/Forum';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import BookIcon from '@mui/icons-material/Book';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import SchoolIcon from '@mui/icons-material/School';
 
 const NAVIGATION: Navigation = [
   {
@@ -44,6 +47,28 @@ const NAVIGATION: Navigation = [
     segment: 'progress',
     title: 'My Progress',
     icon: <TrendingUpIcon />,
+  },
+  {
+    kind: 'divider',
+  },
+  {
+    kind: 'header',
+    title: '💰 Credit System',
+  },
+  {
+    segment: 'credits',
+    title: 'Credit Dashboard',
+    icon: <AccountBalanceWalletIcon />,
+  },
+  {
+    segment: 'rewards',
+    title: 'Teacher Rewards',
+    icon: <EmojiEventsIcon />,
+  },
+  {
+    segment: 'sessions',
+    title: 'Book Sessions',
+    icon: <SchoolIcon />,
   },
   {
     kind: 'divider',

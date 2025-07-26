@@ -9,15 +9,36 @@ interface SessionRating {
   sessionId: string;
   rating: number; // 1-5 stars
   feedback: string;
-  ratingDetails?: {
-    teachingQuality?: number;
-    punctuality?: number;
-    preparedness?: number;
-    communication?: number;
-    helpfulness?: number;
-  };
+  ratingDetails?: RatingDetails;
   learningOutcomes?: string[];
   wouldRecommend?: boolean;
+}
+
+interface RatingDetails {
+  teachingQuality?: number;
+  punctuality?: number;
+  preparedness?: number;
+  communication?: number;
+  helpfulness?: number;
+}
+
+interface TeacherCreditDocument {
+  userId: string;
+  totalEarned: number;
+  reputation: number;
+  level: 'bronze' | 'silver' | 'gold' | 'platinum';
+  achievements: string[];
+  bonusCredits: number;
+  save(): Promise<void>;
+}
+
+interface SessionDocument {
+  teacherId: string;
+  studentId: string;
+  teacherRating: number;
+  studentRating: number;
+  duration: number;
+  save(): Promise<void>;
 }
 
 export async function POST(request: NextRequest) {
@@ -41,9 +62,7 @@ export async function POST(request: NextRequest) {
       sessionId, 
       rating, 
       feedback, 
-      ratingDetails, 
-      learningOutcomes, 
-      wouldRecommend 
+      learningOutcomes
     } = body;
 
     // Validate input
@@ -110,7 +129,7 @@ export async function POST(request: NextRequest) {
 
     // If student rated teacher, update teacher's reputation and potentially award credits
     if (isStudent) {
-      await updateTeacherReputation(session.teacherId.toString(), rating, ratingDetails);
+      await updateTeacherReputation(session.teacherId.toString(), rating);
       
       // Award teaching credits if not already done
       if (!session.teacherRating && session.paymentType !== 'free') {
@@ -156,8 +175,7 @@ export async function POST(request: NextRequest) {
 // Helper function to update teacher reputation
 async function updateTeacherReputation(
   teacherId: string, 
-  rating: number, 
-  ratingDetails?: any
+  rating: number
 ) {
   const teacherCredit = await Credit.findOne({ userId: teacherId });
   if (!teacherCredit) return;
@@ -179,13 +197,13 @@ async function updateTeacherReputation(
   updateTeacherLevel(teacherCredit);
 
   // Add achievements based on milestones
-  checkAchievements(teacherCredit, rating, ratingDetails);
+  checkAchievements(teacherCredit, rating);
 
   await teacherCredit.save();
 }
 
 // Helper function to update teacher level
-function updateTeacherLevel(teacherCredit: any) {
+function updateTeacherLevel(teacherCredit: TeacherCreditDocument) {
   const { totalEarned, reputation } = teacherCredit;
   
   // Level requirements: sessions + reputation
@@ -201,7 +219,7 @@ function updateTeacherLevel(teacherCredit: any) {
 }
 
 // Helper function to check and award achievements
-function checkAchievements(teacherCredit: any, rating: number, ratingDetails?: any) {
+function checkAchievements(teacherCredit: TeacherCreditDocument, rating: number) {
   const achievements = teacherCredit.achievements || [];
 
   // Perfect rating achievement
@@ -234,7 +252,7 @@ function checkAchievements(teacherCredit: any, rating: number, ratingDetails?: a
 }
 
 // Helper function to award completion bonus
-async function awardCompletionBonus(session: any) {
+async function awardCompletionBonus(session: SessionDocument) {
   const avgRating = (session.teacherRating + session.studentRating) / 2;
   
   // Award bonus credits for high-quality sessions (4+ stars average)

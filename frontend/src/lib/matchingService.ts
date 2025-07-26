@@ -108,9 +108,12 @@ export class MatchingService {
 
   // Calculate compatibility between student and teacher
   private static async calculateMatch(
-    student: any, // Will be typed properly with User interface
-    teacher: any, // Will be typed properly with User interface  
-    teacherCredit: any, // Will be typed properly with Credit interface
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    student: any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    teacher: any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    teacherCredit: any,
     preferences: MatchingPreferences
   ): Promise<MatchResult> {
     

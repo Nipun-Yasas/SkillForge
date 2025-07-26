@@ -145,7 +145,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await fetch("/api/auth/logout", {
         method: "POST",
       });
+      
+      // Clear user state
       setUser(null);
+      
+      // Clear all browser storage
+      if (typeof window !== 'undefined') {
+        // Clear localStorage completely
+        localStorage.clear();
+        
+        // Clear sessionStorage completely
+        sessionStorage.clear();
+        
+        // Clear any specific auth-related items that might exist
+        const authKeys = [
+          'token', 'authToken', 'auth_token', 'access_token',
+          'user', 'userData', 'user_data', 'currentUser',
+          'session', 'sessionId', 'session_id',
+          'skillforge_token', 'skillforge_user', 'skillforge_session'
+        ];
+        
+        authKeys.forEach(key => {
+          localStorage.removeItem(key);
+          sessionStorage.removeItem(key);
+        });
+        
+        // Clear any cookies that might be accessible to JavaScript
+        document.cookie.split(";").forEach(function(c) { 
+          document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+        });
+      }
+      
       toast.success("Logged out successfully");
     } catch (error) {
       console.error("Logout error:", error);

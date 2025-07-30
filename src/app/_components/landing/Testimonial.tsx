@@ -25,7 +25,7 @@ const testimonialData: Testimonial[] = [
   {
     quote:
       "Lorem ipsum dolor sit amet, elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Orci nulla pellentesque dignissim enim. Amet consectetur adipiscing",
-    author: "Kathy Sullivan",
+    author: "Kath Sullivan",
     role: "CEO at Ordian IT",
   },
   {

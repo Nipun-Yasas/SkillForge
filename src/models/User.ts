@@ -116,7 +116,6 @@ const UserSchema = new Schema<IUser>(
 );
 
 // Index for efficient queries
-UserSchema.index({ email: 1 });
 UserSchema.index({ "skills.teaching": 1 });
 UserSchema.index({ "skills.learning": 1 });
 

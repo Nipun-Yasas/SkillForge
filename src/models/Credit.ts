@@ -69,7 +69,6 @@ const CreditSchema = new Schema<ICredit>(
 );
 
 // Indexes for better query performance
-CreditSchema.index({ userId: 1 });
 CreditSchema.index({ reputation: -1 });
 CreditSchema.index({ level: 1 });
 

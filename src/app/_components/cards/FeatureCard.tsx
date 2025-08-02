@@ -2,6 +2,7 @@ import Card from "@mui/material/Card";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 type Feature = {
@@ -52,11 +53,13 @@ const FeatureCard: React.FC<Feature> = ({ icon, title, description }) => {
       <Button
         variant="contained"
         sx={{
+          background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+          "&:hover": {
+            background: "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
+          },
           px: 2,
           py: 1.5,
           borderRadius: 20,
-          backgroundColor: "cyan.500",
-          color: "white",
           textTransform: "none",
         }}
         endIcon={<ArrowForwardIcon />}

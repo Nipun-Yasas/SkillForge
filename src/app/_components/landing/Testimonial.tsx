@@ -1,17 +1,17 @@
 "use client";
 
-import { useTheme, useMediaQuery } from "@mui/material";
 import { useRef, useEffect } from "react";
 
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
-
-import TestimonialCard from "../cards/TestimonialCard";
-import BackgroundShape from "../background/BackgroundShape";
+import { useTheme, useMediaQuery } from "@mui/material";
 
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+import TestimonialCard from "../cards/TestimonialCard";
+import BackgroundShape from "../background/BackgroundShape";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -120,7 +120,12 @@ const Testimonials: React.FC = () => {
       justifyContent="center"
     >
       <Box maxWidth="1350px" width="100%">
-        <Typography variant="body1" textAlign="center">
+        <Typography
+          variant="h4"
+          textAlign="center"
+          fontWeight="bold"
+          sx={{ mb: 3 }}
+        >
           Testimonial
         </Typography>
 

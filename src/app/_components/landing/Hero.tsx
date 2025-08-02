@@ -1,23 +1,26 @@
+import Image from "next/image";
+import Link from "next/link";
+
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+
 import { motion } from "framer-motion";
 import { BookOpen, Users, Zap } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
 
 export default function Hero() {
   return (
     <Box
       sx={{
         display: "flex",
-        overflowX: "hidden",
+        overflow: "hidden",
         flexDirection: { xs: "column-reverse", md: "row" },
         alignItems: "center",
         justifyContent: "space-between",
         position: "relative",
-        py: { xs: 0, md: 2 },
-        mt: { xs: -7, md: 0 },
+        minHeight: { xs: "auto", md: "90vh" },
+        width: "100%",
+        mt: 3,
       }}
     >
       <Box
@@ -25,10 +28,10 @@ export default function Hero() {
           position: "absolute",
           backgroundColor: "shapeColor.main",
           borderRadius: "50%",
-          height: 400,
-          width: 500,
-          top: { xs: 400, md: 120 },
-          left: { xs: "-30%", md: -87 },
+          height: 300,
+          width: 300,
+          top: { xs: "70%", md: 120 },
+          left: { xs: "-15%", md: -87 },
           zIndex: 0,
           opacity: 0.5,
         }}
@@ -40,6 +43,7 @@ export default function Hero() {
           width: { xs: "100%", md: "50%" },
           textAlign: { xs: "center", md: "left" },
           position: "relative",
+          justifyContent: "center",
           zIndex: 2,
           p: 2.5,
         }}
@@ -78,7 +82,6 @@ export default function Hero() {
               mt: 3,
               mb: 4,
               fontWeight: 400,
-              maxWidth: "500px",
             }}
           >
             Connect with peer mentors, exchange skills, and accelerate your
@@ -87,7 +90,15 @@ export default function Hero() {
           </Typography>
 
           {/* Feature highlights */}
-          <Box sx={{ display: "flex", gap: 3, mb: 4, flexWrap: "wrap" }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              gap: 3,
+              mb: 4,
+              flexWrap: "wrap",
+            }}
+          >
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Users size={20} color="#007BFF" />
               <Typography variant="body2" color="text.secondary">
@@ -113,6 +124,7 @@ export default function Hero() {
               display: "flex",
               gap: 2,
               flexDirection: { xs: "column", sm: "row" },
+              justifyContent: "center",
             }}
           >
             <Link href="/signup" passHref>
@@ -122,10 +134,10 @@ export default function Hero() {
                 sx={{
                   background:
                     "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
-                  px: 4,
-                  py: 1.5,
+                  px: { xs: 1, md: 1, lg: 2 },
+                  py: { xs: 1, md: 1, lg: 2 },
                   borderRadius: 2,
-                  fontSize: "1.1rem",
+                  fontSize: { xs: "0.8rem", md: "1rem", lg: "1.1rem" },
                   "&:hover": {
                     background:
                       "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
@@ -138,17 +150,17 @@ export default function Hero() {
                 Start Learning Today
               </Button>
             </Link>
-            <Link href="/findmentor" passHref>
+            <Link href="/login" passHref>
               <Button
                 variant="outlined"
                 size="large"
                 sx={{
                   borderColor: "#007BFF",
                   color: "#007BFF",
-                  px: 4,
-                  py: 1.5,
+                  px: { xs: 1, md: 1, lg: 2 },
+                  py: { xs: 1, md: 1, lg: 2 },
                   borderRadius: 2,
-                  fontSize: "1.1rem",
+                  fontSize: { xs: "0.8rem", md: "1rem", lg: "1.1rem" },
                   "&:hover": {
                     borderColor: "#6A0DAD",
                     color: "#6A0DAD",
@@ -172,9 +184,10 @@ export default function Hero() {
           position: "relative",
           zIndex: 1,
           mt: { xs: 4, md: 0 },
+          height: { xs: "auto", md: "100%" },
         }}
       >
-        {/* Animated background shapes */}
+        {/* Animated background shapes - constrain their position */}
         <motion.div
           animate={{
             rotate: 360,
@@ -188,13 +201,15 @@ export default function Hero() {
             position: "absolute",
             backgroundColor: "#6A0DAD",
             borderRadius: "50% 60% 10% 90% / 20% 30% 60% 80%",
-            height: 300,
-            width: 300,
+            height: "60%",
+            width: "60%",
             left: "20%",
-            top: "60%",
+            top: "50%",
             transform: "translate(-50%, -50%)",
             zIndex: 0,
             opacity: 0.1,
+            maxHeight: 300,
+            maxWidth: 300,
           }}
         />
 
@@ -209,8 +224,10 @@ export default function Hero() {
           }}
           style={{
             position: "absolute",
-            width: 200,
-            height: 200,
+            width: "40%",
+            height: "40%",
+            maxWidth: 200,
+            maxHeight: 200,
             backgroundColor: "#FF7A00",
             borderRadius: "70% 10% 80% 20% / 20% 10% 90% 100%",
             top: "30%",
@@ -228,19 +245,20 @@ export default function Hero() {
           style={{
             position: "relative",
             zIndex: 2,
+            width: "100%", // Control the width
+            display: "flex",
+            justifyContent: "center",
           }}
         >
           <Image
             src="/person.svg"
             alt="SkillForge - Peer-to-peer learning platform"
-            width={400}
-            height={400}
+            width={600}
+            height={600}
             priority
             style={{
+              width: "auto",
               height: "auto",
-              width: "100%",
-              maxWidth: "450px",
-              filter: "drop-shadow(0 10px 30px rgba(0, 123, 255, 0.2))",
             }}
           />
         </motion.div>

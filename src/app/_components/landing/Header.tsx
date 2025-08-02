@@ -1,12 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
+
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { BookOpen, LogOut, Settings, User, Users } from "lucide-react";
 
 import { ThemeSwitcher } from "@toolpad/core";
 
-import { useAuth } from "@/contexts/AuthContext";
-import MenuIcon from "@mui/icons-material/Menu";
 import AppBar from "@mui/material/AppBar";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -18,12 +19,14 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { motion } from "framer-motion";
-import { BookOpen, LogOut, Settings, User, Users } from "lucide-react";
+
+import MenuIcon from "@mui/icons-material/Menu";
+
+import { useAuth } from "@/contexts/AuthContext";
 
 const drawerWidth = 240;
 
-export default function DrawerAppBar() {
+export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { user, logout } = useAuth();
@@ -52,11 +55,10 @@ export default function DrawerAppBar() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          p: 2,
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <BookOpen size={32} color="#007BFF" />
+          <BookOpen size={20} color="primary.main" />
           <Typography
             variant="h5"
             sx={{
@@ -70,42 +72,51 @@ export default function DrawerAppBar() {
             SkillForge
           </Typography>
         </Box>
-        <ThemeSwitcher />
       </Box>
       <Divider />
       <Box sx={{ py: 2, display: "flex", flexDirection: "column", gap: 2 }}>
-        <Typography variant="body1" sx={{ color: "textblack.main" }}>
-          <Link
-            href="#about"
-            style={{ textDecoration: "none", color: "inherit" }}
+        <Link href="#about" style={{ textDecoration: "none" }}>
+          <Typography
+            variant="body1"
+            sx={{
+              color: "primary.main",
+              transition: "color 0.3s ease",
+            }}
           >
-            About Us
-          </Link>
-        </Typography>
-        <Typography variant="body1" sx={{ color: "textblack.main" }}>
-          <Link
-            href="#features"
-            style={{ textDecoration: "none", color: "inherit" }}
+            About
+          </Typography>
+        </Link>
+
+        <Link href="#features" style={{ textDecoration: "none" }}>
+          <Typography
+            variant="body1"
+            sx={{
+              color: "primary.main",
+              transition: "color 0.3s ease",
+            }}
           >
             Features
-          </Link>
-        </Typography>
-        <Typography variant="body1" sx={{ color: "textblack.main" }}>
-          <Link
-            href="/findmentor"
-            style={{ textDecoration: "none", color: "inherit" }}
+          </Typography>
+        </Link>
+
+        <Link href="/login" style={{ textDecoration: "none" }}>
+          <Typography
+            variant="body1"
+            sx={{
+              color: "primary.main",
+              transition: "color 0.3s ease",
+              mx: 2,
+              gap: 2,
+            }}
           >
+            <Users size={16} />
+            <span> </span>
             Find Mentors
-          </Link>
-        </Typography>
+          </Typography>
+        </Link>
         {user && (
-          <Typography variant="body1" sx={{ color: "textblack.main" }}>
-            <Link
-              href="/dashboard"
-              style={{ textDecoration: "none", color: "inherit" }}
-            >
-              Dashboard
-            </Link>
+          <Typography variant="body1" sx={{ color: "text.primary" }}>
+            <Link href="/dashboard">Dashboard</Link>
           </Typography>
         )}
       </Box>
@@ -129,12 +140,37 @@ export default function DrawerAppBar() {
         ) : (
           <>
             <Link href="/login" passHref style={{ textDecoration: "none" }}>
-              <Button variant="outlined" size="small">
+              <Button
+                variant="outlined"
+                size="small"
+                sx={{
+                  borderColor: "primary.main",
+                  color: "primary.main",
+                  "&:hover": {
+                    borderColor: "secondary.main",
+                    color: "secondary.main",
+                  },
+                }}
+              >
                 Login
               </Button>
             </Link>
+
             <Link href="/signup" passHref style={{ textDecoration: "none" }}>
-              <Button variant="contained" size="small">
+              <Button
+                variant="contained"
+                size="small"
+                sx={{
+                  background:
+                    "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                  "&:hover": {
+                    background:
+                      "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
+                    transform: "translateY(-1px)",
+                  },
+                  transition: "all 0.3s ease",
+                }}
+              >
                 Sign Up
               </Button>
             </Link>
@@ -148,12 +184,10 @@ export default function DrawerAppBar() {
     <>
       <AppBar
         component="nav"
-        sx={{
-          bgcolor: "rgba(255, 255, 255, 0.95)",
-          backdropFilter: "blur(10px)",
-          borderBottom: "1px solid rgba(0, 123, 255, 0.1)",
-        }}
         elevation={0}
+        sx={{
+          backgroundColor: "#0000",
+        }}
       >
         <Toolbar>
           <IconButton
@@ -161,7 +195,7 @@ export default function DrawerAppBar() {
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: "none" }, color: "textblack.main" }}
+            sx={{ mr: 2, display: { sm: "none" }, color: "primary.main" }}
           >
             <MenuIcon />
           </IconButton>
@@ -209,10 +243,10 @@ export default function DrawerAppBar() {
               flexGrow: 1,
               display: { xs: "flex", sm: "none" },
               alignItems: "center",
-              gap: 1,
+              gap: 2,
             }}
           >
-            <BookOpen size={28} color="#007BFF" />
+            <BookOpen size={32} color="#007BFF" />
             <Typography
               variant="h6"
               sx={{
@@ -227,22 +261,23 @@ export default function DrawerAppBar() {
             </Typography>
           </Box>
 
+          <Box sx={{ mx: 2 }}>
+            <ThemeSwitcher />
+          </Box>
+
           {/* Navigation */}
           <Box
             sx={{
-              display: { xs: "none", sm: "flex" },
+              display: { xs: "none", md: "flex" },
               gap: { sm: 2, md: 3 },
               alignItems: "center",
             }}
           >
-            <ThemeSwitcher />
-
             <Link href="#about" style={{ textDecoration: "none" }}>
               <Typography
                 variant="body1"
                 sx={{
-                  color: "textblack.main",
-                  "&:hover": { color: "primary.main" },
+                  color: "primary.main",
                   transition: "color 0.3s ease",
                 }}
               >
@@ -254,8 +289,7 @@ export default function DrawerAppBar() {
               <Typography
                 variant="body1"
                 sx={{
-                  color: "textblack.main",
-                  "&:hover": { color: "primary.main" },
+                  color: "primary.main",
                   transition: "color 0.3s ease",
                 }}
               >
@@ -263,16 +297,15 @@ export default function DrawerAppBar() {
               </Typography>
             </Link>
 
-            <Link href="/findmentor" style={{ textDecoration: "none" }}>
+            <Link href="/login" style={{ textDecoration: "none" }}>
               <Typography
                 variant="body1"
                 sx={{
-                  color: "textblack.main",
-                  "&:hover": { color: "primary.main" },
+                  color: "primary.main",
                   transition: "color 0.3s ease",
                   display: "flex",
                   alignItems: "center",
-                  gap: 0.5,
+                  gap: 1,
                 }}
               >
                 <Users size={16} />
@@ -401,7 +434,7 @@ export default function DrawerAppBar() {
             keepMounted: true,
           }}
           sx={{
-            display: { xs: "block", sm: "none" },
+            display: { xs: "block", md: "none" },
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: drawerWidth,
@@ -411,9 +444,6 @@ export default function DrawerAppBar() {
           {drawer}
         </Drawer>
       </nav>
-      <Box component="main" sx={{ p: 3 }}>
-        <Toolbar />
-      </Box>
     </>
   );
 }

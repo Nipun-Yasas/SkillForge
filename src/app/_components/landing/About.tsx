@@ -1,15 +1,18 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+
+import Image from "next/image";
+import Link from "next/link";
+
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+
 import { motion } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Target, Users, Zap } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useEffect, useRef } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -89,7 +92,6 @@ export default function About() {
         alignItems: "center",
         justifyContent: "space-between",
         position: "relative",
-        py: { xs: 5, md: 10 },
       }}
     >
       {/* Left Side: Illustration */}

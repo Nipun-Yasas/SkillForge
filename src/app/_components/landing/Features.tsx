@@ -110,7 +110,7 @@ export default function Features() {
         ref={featureRef}
         id="features"
         sx={{
-          backgroundColor: "rgba(207, 250, 254, 0.4)",
+          backgroundColor: "background.main",
           py: { xs: 5, md: 5 },
         }}
       >

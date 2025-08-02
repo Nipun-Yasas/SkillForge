@@ -1,7 +1,8 @@
-import { useEffect,useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import Link from "next/link";
 import Image from "next/image";
+
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
@@ -11,55 +12,73 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-
 export default function Hero() {
-
   const actionRef = useRef(null);
-  
-    useEffect(() => {
-      if (!actionRef.current) return;
-  
-      const ctx = gsap.context(() => {
-        const element = actionRef.current;
-  
-        const anim = gsap.fromTo(
-          element,
-          { opacity: 0, y: 100 },
-          {
+
+  useEffect(() => {
+    if (!actionRef.current) return;
+
+    const ctx = gsap.context(() => {
+      const element = actionRef.current;
+
+      const anim = gsap.fromTo(
+        element,
+        { opacity: 0, y: 100 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          ease: "power3.out",
+        }
+      );
+
+      ScrollTrigger.create({
+        trigger: element,
+        start: "top 80%",
+        end: "bottom 20%",
+        toggleActions: "play reverse play reverse",
+        animation: anim,
+        onEnter: () => {
+          gsap.to(element, {
             opacity: 1,
             y: 0,
             duration: 1,
             ease: "power3.out",
-          }
-        );
-  
-        ScrollTrigger.create({
-          trigger: element,
-          start: "top 80%",
-          end: "bottom 20%",
-          toggleActions: "play reverse play reverse",
-          animation: anim,
-          onEnter: () => {
-            gsap.to(element, { opacity: 1, y: 0, duration: 1, ease: "power3.out" });
-          },
-          onLeave: () => {
-            gsap.to(element, { opacity: 0, y: 100, duration: 1, ease: "power3.out" });
-          },
-          onLeaveBack: () => {
-            gsap.to(element, { opacity: 0, y: -100, duration: 1, ease: "power3.out" });
-          },
-          onEnterBack: () => {
-            gsap.to(element, { opacity: 1, y: 0, duration: 1, ease: "power3.out" });
-          },
-        });
-      }, actionRef);
-  
-      return () => ctx.revert();
-    }, []);
+          });
+        },
+        onLeave: () => {
+          gsap.to(element, {
+            opacity: 0,
+            y: 100,
+            duration: 1,
+            ease: "power3.out",
+          });
+        },
+        onLeaveBack: () => {
+          gsap.to(element, {
+            opacity: 0,
+            y: -100,
+            duration: 1,
+            ease: "power3.out",
+          });
+        },
+        onEnterBack: () => {
+          gsap.to(element, {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: "power3.out",
+          });
+        },
+      });
+    }, actionRef);
+
+    return () => ctx.revert();
+  }, []);
 
   return (
     <Box
-    ref={actionRef}
+      ref={actionRef}
       width="100%"
       sx={{
         display: "flex",
@@ -84,7 +103,11 @@ export default function Hero() {
           variant="h3"
           fontWeight="bold"
           color="primary.main"
-          sx={{ lineHeight: { xs: "40px", md: "40px" },mt:{xs:5,md:3} }}
+          sx={{
+            lineHeight: { xs: "40px", md: "40px" },
+            mt: { xs: 5, md: 3 },
+            mb: { xs: 5, md: 3 },
+          }}
         >
           Start Learning Today with SkillForge!
         </Typography>
@@ -100,7 +123,17 @@ export default function Hero() {
 
         <Box sx={{ mt: 4 }}>
           <Link href="/signUp" passHref>
-            <Button variant="contained" size="large">
+            <Button
+              variant="contained"
+              size="large"
+              sx={{
+                background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                "&:hover": {
+                  background:
+                    "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
+                },
+              }}
+            >
               Join Now
             </Button>
           </Link>
@@ -132,7 +165,7 @@ export default function Hero() {
         />
 
         <Image
-          src="/Footer.svg"
+          src="/student.png"
           alt="Hero illustration"
           width={300}
           height={300}
@@ -140,9 +173,9 @@ export default function Hero() {
           style={{
             position: "relative",
             zIndex: 2,
-             height: "auto",
+            height: "auto",
             width: "100%",
-            maxWidth: "400px"
+            maxWidth: "400px",
           }}
         />
       </Box>

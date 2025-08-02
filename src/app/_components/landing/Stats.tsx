@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { useEffect, useRef } from "react";
+
 import CountUp from "react-countup";
 
 import { motion } from "framer-motion";
@@ -44,14 +46,14 @@ const StatItem: React.FC<StatItemProps> = ({
       sx={{
         p: 3,
         borderRadius: 3,
-        background: "rgba(255, 255, 255, 0.8)",
+        background: "backgroundcolor.primary",
         backdropFilter: "blur(10px)",
         border: "1px solid rgba(0, 123, 255, 0.1)",
         transition: "all 0.3s ease",
         "&:hover": {
           transform: "translateY(-5px)",
           boxShadow: "0 10px 30px rgba(0, 123, 255, 0.2)",
-          background: "rgba(255, 255, 255, 0.95)",
+          background: "backgroundcolor.secondary",
         },
       }}
     >
@@ -167,7 +169,7 @@ export default function Stats() {
       width="100%"
       id="stats"
       sx={{
-        background: "linear-gradient(135deg, #f8fbff 0%, #e3f2fd 100%)",
+        background: "text.primary",
         px: { xs: 2, md: 4 },
         py: { xs: 6, md: 8 },
         position: "relative",

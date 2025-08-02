@@ -1,7 +1,6 @@
 import Box from '@mui/material/Box';
 import Image from 'next/image';
 
-import SearchBar from './SearchBar'; 
 
 export default function CustomAppTitle() {
   return (
@@ -18,10 +17,9 @@ export default function CustomAppTitle() {
       <Image
         src="/logo.svg"
         alt="Company Logo"
-        width={100}
-        height={100}
+        width={90}
+        height={50}
       />
-      <SearchBar/>
     </Box>
   );
 }

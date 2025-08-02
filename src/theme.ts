@@ -1,13 +1,72 @@
-"use client";
 import { createTheme } from "@mui/material/styles";
 
 import { outlinedInputClasses } from "@mui/material/OutlinedInput";
+
+
+declare module "@mui/material/styles" {
+  interface Palette {
+    accent: Palette["primary"];
+    header: {
+      main: string;
+      secondary: string;
+    };
+    btn: {
+      primary: string;
+      secondary: string;
+    };
+    backgroundcolor: {
+      primary: string;
+      secondary: string;
+    };
+    textblack: {
+      main: string;
+      contrastText: string;
+    };
+    shapeColor: {
+      main: string;
+    };
+    featureColor: {
+      main: string;
+    };
+    footerColor: {
+      main: string;
+    };
+  }
+  interface PaletteOptions {
+    accent?: PaletteOptions["primary"];
+    header?: {
+      main: string;
+      secondary: string;
+    };
+    btn?: {
+      primary: string;
+      secondary: string;
+    };
+    backgroundcolor?: {
+      primary: string;
+      secondary: string;
+    };
+    textblack?: {
+      main: string;
+      contrastText: string;
+    };
+    shapeColor?: {
+      main: string;
+    };
+    featureColor?: {
+      main: string;
+    };
+    footerColor?: {
+      main: string;
+    };
+  }
+}
 
 const theme = createTheme({
   cssVariables: {
     colorSchemeSelector: "data-toolpad-color-scheme",
   },
-  defaultColorScheme: 'light',
+  defaultColorScheme: "light",
   colorSchemes: {
     light: {
       palette: {
@@ -53,13 +112,25 @@ const theme = createTheme({
           dark: "#CC5500",
           contrastText: "#fff",
         },
-        landHeader: {
-          main: "#ffffff",
-          contrastText: "#000000",
+        header: {
+          main: "#90c0f3ff",
+          secondary: "#0056CC",
+        },
+        backgroundcolor: {
+          primary: "#1A1A1A",
+          secondary: "#4D4D4D",
         },
         textblack: {
           main: "#000000",
           contrastText: "#ffffff",
+        },
+        text: {
+          primary: "#1A1A1A",
+          secondary: "#4D4D4D",
+        },
+        btn: {
+          primary: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+          secondary: "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
         },
         shapeColor: {
           main: "#6A0DAD",
@@ -116,13 +187,21 @@ const theme = createTheme({
           dark: "#CC5500",
           contrastText: "#fff",
         },
-        landHeader: {
-          main: "#1a1a1a",
-          contrastText: "#ffffff",
+        backgroundcolor: {
+          primary: "#FFFFFF",
+          secondary: "#B0B0B0",
         },
         textblack: {
           main: "#ffffff",
           contrastText: "#000000",
+        },
+        text: {
+          primary: "#FFFFFF",
+          secondary: "#B0B0B0",
+        },
+        btn: {
+          primary: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+          secondary: "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
         },
         shapeColor: {
           main: "#4A0080",
@@ -246,129 +325,3 @@ const theme = createTheme({
   },
 });
 
-// Enhance theme with beautiful sidebar styling
-theme.components = {
-  ...theme.components,
-  // Toolpad Core DashboardLayout sidebar styling
-  MuiDrawer: {
-    styleOverrides: {
-      paper: {
-        background: 'linear-gradient(180deg, #f8fbff 0%, #e3f2fd 100%)',
-        borderRight: '1px solid rgba(0, 123, 255, 0.1)',
-        boxShadow: '4px 0 20px rgba(0, 123, 255, 0.08)',
-        // Ensure solid background for mobile and small screens
-        '@media (max-width: 900px)': {
-          background: '#ffffff',
-          backdropFilter: 'none',
-          boxShadow: '2px 0 10px rgba(0, 0, 0, 0.1)',
-        },
-        // Fix for temporary drawer (mobile)
-        '&.MuiDrawer-paperAnchorLeft': {
-          background: '#ffffff',
-        },
-        // Fix for permanent drawer on mobile
-        '&.MuiPaper-root': {
-          background: 'linear-gradient(180deg, #f8fbff 0%, #e3f2fd 100%)',
-          '@media (max-width: 900px)': {
-            background: '#ffffff',
-          },
-        },
-        '& .MuiListItemButton-root': {
-          margin: '4px 12px',
-          borderRadius: '12px',
-          padding: '12px 16px',
-          transition: 'all 0.3s ease',
-          '&:hover': {
-            background: 'linear-gradient(135deg, rgba(0, 123, 255, 0.1) 0%, rgba(106, 13, 173, 0.05) 100%)',
-            transform: 'translateX(4px)',
-            boxShadow: '0 4px 12px rgba(0, 123, 255, 0.15)',
-          },
-          '&.Mui-selected': {
-            background: 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
-            color: '#fff',
-            boxShadow: '0 4px 16px rgba(0, 123, 255, 0.3)',
-            '&:hover': {
-              background: 'linear-gradient(135deg, #0056CC 0%, #4A0080 100%)',
-            },
-            '& .MuiListItemIcon-root': {
-              color: '#fff',
-            },
-            '& .MuiListItemText-primary': {
-              color: '#fff',
-              fontWeight: 600,
-            },
-          },
-        },
-        '& .MuiListItemIcon-root': {
-          minWidth: '40px',
-          color: '#007BFF',
-          transition: 'all 0.3s ease',
-        },
-        '& .MuiListItemText-primary': {
-          fontFamily: 'Poppins, sans-serif',
-          fontWeight: 500,
-          fontSize: '0.95rem',
-          color: '#2c3e50',
-        },
-        '& .MuiListSubheader-root': {
-          background: 'transparent',
-          fontFamily: 'Poppins, sans-serif',
-          fontWeight: 700,
-          fontSize: '0.75rem',
-          color: '#6A0DAD',
-          textTransform: 'uppercase',
-          letterSpacing: '0.5px',
-          padding: '16px 16px 8px 16px',
-          lineHeight: 1.2,
-        },
-        '& .MuiDivider-root': {
-          margin: '8px 16px',
-          borderColor: 'rgba(0, 123, 255, 0.1)',
-        },
-      },
-    },
-  },
-  // Fix for mobile drawer backdrop
-  MuiBackdrop: {
-    styleOverrides: {
-      root: {
-        '&.MuiBackdrop-invisible': {
-          backgroundColor: 'transparent',
-        },
-        // Ensure proper backdrop for mobile drawer
-        '&.MuiDrawer-backdrop': {
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        },
-      },
-    },
-  },
-  // App bar styling
-  MuiAppBar: {
-    styleOverrides: {
-      root: {
-        background: 'linear-gradient(135deg, #fff 0%, #f8fbff 100%)',
-        color: '#2c3e50',
-        boxShadow: '0 2px 20px rgba(0, 123, 255, 0.08)',
-        borderBottom: '1px solid rgba(0, 123, 255, 0.1)',
-        // Ensure proper z-index and background for mobile
-        '@media (max-width: 900px)': {
-          background: '#ffffff',
-          zIndex: 1200,
-        },
-      },
-    },
-  },
-  // Additional styling for mobile layout
-  MuiContainer: {
-    styleOverrides: {
-      root: {
-        '@media (max-width: 900px)': {
-          paddingLeft: '16px',
-          paddingRight: '16px',
-        },
-      },
-    },
-  },
-};
-
-export default theme;

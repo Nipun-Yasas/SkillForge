@@ -18,7 +18,7 @@ const NAVIGATION: Navigation = [
   },
   {
     segment: 'dashboard',
-    title: 'Home Dashboard',
+    title: 'Dashboard',
     icon: <DashboardIcon />,
   },
   {
@@ -84,7 +84,7 @@ const NAVIGATION: Navigation = [
   },
   {
     segment: 'questions',
-    title: 'Help & Q&A',
+    title: 'Help / Q&A',
     icon: <HelpOutlineIcon />,
   },
   {

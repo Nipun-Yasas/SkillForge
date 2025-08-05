@@ -237,7 +237,7 @@ export default function ProgressPage() {
             <Typography variant="h4" fontWeight="bold" color="#007BFF" sx={{ mt: 1 }}>
               {totalXP.toLocaleString()}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="black">
               Total XP
             </Typography>
           </Paper>
@@ -247,7 +247,7 @@ export default function ProgressPage() {
             <Typography variant="h4" fontWeight="bold" color="#6A0DAD" sx={{ mt: 1 }}>
               {completedGoals}/{learningGoals.length}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="black">
               Goals Achieved
             </Typography>
           </Paper>
@@ -257,7 +257,7 @@ export default function ProgressPage() {
             <Typography variant="h4" fontWeight="bold" color="#FF7A00" sx={{ mt: 1 }}>
               {earnedAchievements}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="black">
               Achievements
             </Typography>
           </Paper>
@@ -267,7 +267,7 @@ export default function ProgressPage() {
             <Typography variant="h4" fontWeight="bold" color="#28a745" sx={{ mt: 1 }}>
               {weeklyHours.toFixed(1)}h
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="black">
               This Week
             </Typography>
           </Paper>

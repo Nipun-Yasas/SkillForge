@@ -48,8 +48,7 @@ export default function ChatPage() {
   return (
     <Box sx={{ 
       display: 'flex', 
-      height: 'calc(100vh - 64px)', // Account for app header
-      backgroundColor: 'grey.50'
+      height: 'calc(100vh - 64px)',
     }}>
       {/* Sidebar */}
       <ChatSidebar 

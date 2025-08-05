@@ -30,7 +30,7 @@ export default function Footer() {
 
       ScrollTrigger.create({
         trigger: element,
-        start: "top 80%",
+        start: "top 100%",
         end: "bottom 20%",
         toggleActions: "play reverse play reverse",
         onEnter: () => {
@@ -81,6 +81,7 @@ export default function Footer() {
         pt: { xs: 5, md: 5 },
         pb: { xs: 5, md: 5 },
         width: "100%",
+        maxHeight: "350px",
         backgroundColor: "#0056CC",
       }}
     >

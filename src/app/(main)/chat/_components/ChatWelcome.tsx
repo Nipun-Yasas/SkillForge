@@ -19,7 +19,6 @@ export default function ChatWelcome() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'grey.50',
         flexDirection: 'column',
         p: 4
       }}

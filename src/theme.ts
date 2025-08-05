@@ -2,7 +2,6 @@ import { createTheme } from "@mui/material/styles";
 
 import { outlinedInputClasses } from "@mui/material/OutlinedInput";
 
-
 declare module "@mui/material/styles" {
   interface Palette {
     accent: Palette["primary"];
@@ -121,8 +120,8 @@ const theme = createTheme({
           secondary: "#4D4D4D",
         },
         textblack: {
-          main: "#000000",
-          contrastText: "#ffffff",
+          main: '#ffffff',
+          contrastText: '#000000',
         },
         text: {
           primary: "#1A1A1A",
@@ -192,8 +191,8 @@ const theme = createTheme({
           secondary: "#B0B0B0",
         },
         textblack: {
-          main: "#ffffff",
-          contrastText: "#000000",
+          main: '#000000',
+          contrastText: '#ffffff',
         },
         text: {
           primary: "#FFFFFF",
@@ -269,28 +268,24 @@ const theme = createTheme({
       fontSize: "3rem",
       fontWeight: 700,
       fontFamily: "Poppins, sans-serif",
-      color: "#007BFF",
       lineHeight: 1.2,
     },
     h2: {
       fontSize: "2.5rem",
       fontWeight: 700,
       fontFamily: "Poppins, sans-serif",
-      color: "#007BFF",
       lineHeight: 1.3,
     },
     h3: {
       fontSize: "2rem",
       fontWeight: 600,
       fontFamily: "Poppins, sans-serif",
-      color: "#6A0DAD",
       lineHeight: 1.4,
     },
     h4: {
       fontSize: "1.5rem",
       fontWeight: 600,
       fontFamily: "Poppins, sans-serif",
-      color: "#6A0DAD",
       lineHeight: 1.4,
     },
     h5: {
@@ -309,13 +304,11 @@ const theme = createTheme({
       fontFamily: "Inter, sans-serif",
       fontSize: "1rem",
       lineHeight: 1.6,
-      color: "#333333",
     },
     body2: {
       fontFamily: "Inter, sans-serif",
       fontSize: "0.875rem",
       lineHeight: 1.6,
-      color: "#666666",
     },
     button: {
       fontFamily: "Poppins, sans-serif",
@@ -325,3 +318,4 @@ const theme = createTheme({
   },
 });
 
+export default theme;

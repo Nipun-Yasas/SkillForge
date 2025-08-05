@@ -126,13 +126,13 @@ export default function AISmartSearch() {
         }}
       >
         <Box sx={{ textAlign: 'center', mb: 3 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 2 }}>
+          <Box color='textblack.main' sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 2 }}>
             <AIIcon sx={{ fontSize: 40 }} />
-            <Typography variant="h3" fontWeight="bold">
+            <Typography variant="h3" fontWeight="bold" color='textblack.main'>
               AI Smart Search
             </Typography>
           </Box>
-          <Typography variant="h6" sx={{ opacity: 0.9 }}>
+          <Typography color='textblack.main' variant="h6" sx={{ opacity: 0.9 }}>
             Describe what you want to learn, and our AI will find the perfect mentors for you!
           </Typography>
         </Box>
@@ -150,13 +150,12 @@ export default function AISmartSearch() {
             variant="outlined"
             disabled={loading}
             sx={{
+              color: "textblack.main",
               mb: 2,
               '& .MuiOutlinedInput-root': {
-                backgroundColor: 'white',
                 borderRadius: 2,
                 '&.Mui-focused': {
                   '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'white',
                     borderWidth: 2
                   }
                 }
@@ -179,18 +178,17 @@ export default function AISmartSearch() {
             disabled={loading || !prompt.trim()}
             startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <SendIcon />}
             sx={{
-              py: 1.5,
-              borderRadius: 2,
-              backgroundColor: 'white',
-              color: 'primary.main',
-              fontWeight: 'bold',
-              '&:hover': {
-                backgroundColor: 'grey.100'
-              },
-              '&:disabled': {
-                backgroundColor: 'grey.300',
-                color: 'grey.600'
-              }
+              background:
+                    "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                  borderRadius: 2,
+                  fontSize: { xs: "0.8rem", md: "1rem", lg: "1.1rem" },
+                  "&:hover": {
+                    background:
+                      "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 8px 25px rgba(0, 123, 255, 0.3)",
+                  },
+                  transition: "all 0.3s ease",
             }}
           >
             {loading ? 'AI is finding perfect matches...' : 'Find My Perfect Mentors'}
@@ -198,22 +196,19 @@ export default function AISmartSearch() {
         </Box>
 
         {/* Sample Prompts */}
-        <Box sx={{ mt: 3, textAlign: 'center' }}>
+        <Box color="textblack.main" sx={{ mt: 3, textAlign: 'center' }}>
           <Typography variant="body2" sx={{ mb: 1, opacity: 0.8 }}>
             💡 Try these examples:
           </Typography>
           <Stack direction="row" spacing={1} flexWrap="wrap" justifyContent="center" gap={1}>
             {samplePrompts.slice(0, 3).map((sample, index) => (
               <Chip
+              
                 key={index}
                 label={sample}
                 onClick={() => setPrompt(sample)}
                 sx={{
-                  backgroundColor: 'rgba(255,255,255,0.2)',
-                  color: 'white',
-                  '&:hover': {
-                    backgroundColor: 'rgba(255,255,255,0.3)'
-                  },
+                  color: "textblack.main",
                   cursor: 'pointer'
                 }}
               />

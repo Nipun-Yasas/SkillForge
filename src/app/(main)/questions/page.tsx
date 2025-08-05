@@ -329,7 +329,6 @@ export default function QuestionsPage() {
                     <AccordionSummary
                       expandIcon={<ExpandMoreIcon />}
                       sx={{ 
-                        backgroundColor: 'grey.50',
                         borderRadius: 2,
                         '&.Mui-expanded': {
                           borderBottomLeftRadius: 0,
@@ -532,7 +531,7 @@ export default function QuestionsPage() {
                 </Typography>
                 
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  <Paper sx={{ p: 2, backgroundColor: 'grey.50', borderRadius: 2 }}>
+                  <Paper sx={{ p: 2,  borderRadius: 2 }}>
                     <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1 }}>
                       🕒 Response Times
                     </Typography>
@@ -543,7 +542,7 @@ export default function QuestionsPage() {
                     </Typography>
                   </Paper>
                   
-                  <Paper sx={{ p: 2, backgroundColor: 'grey.50', borderRadius: 2 }}>
+                  <Paper sx={{ p: 2, borderRadius: 2 }}>
                     <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1 }}>
                       🌟 Before Contacting
                     </Typography>

@@ -68,7 +68,6 @@ export default function Header({ onSearch, onFilterChange }: HeaderProps) {
         mb: 5,
         borderRadius: 4,
         p: 4,
-        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
         border: '1px solid rgba(255, 255, 255, 0.2)'
       }}
     >
@@ -93,7 +92,7 @@ export default function Header({ onSearch, onFilterChange }: HeaderProps) {
       </Box>
 
       {/* Search and Filters */}
-      <Box sx={{
+      <Box  sx={{
         display: "flex",
         gap: 2,
         alignItems: "center",
@@ -112,7 +111,6 @@ export default function Header({ onSearch, onFilterChange }: HeaderProps) {
             flexGrow: 1,
             '& .MuiOutlinedInput-root': {
               borderRadius: 3,
-              backgroundColor: 'white',
               '&:hover': {
                 '& .MuiOutlinedInput-notchedOutline': {
                   borderColor: 'primary.main',
@@ -150,8 +148,6 @@ export default function Header({ onSearch, onFilterChange }: HeaderProps) {
             sx={{
               textTransform: "none",
               borderRadius: 2,
-              backgroundColor: 'white',
-              '&:hover': { backgroundColor: 'grey.50' }
             }}
           >
             Category
@@ -165,8 +161,6 @@ export default function Header({ onSearch, onFilterChange }: HeaderProps) {
             sx={{
               textTransform: "none",
               borderRadius: 2,
-              backgroundColor: 'white',
-              '&:hover': { backgroundColor: 'grey.50' }
             }}
           >
             Availability
@@ -180,8 +174,6 @@ export default function Header({ onSearch, onFilterChange }: HeaderProps) {
             sx={{
               textTransform: "none",
               borderRadius: 2,
-              backgroundColor: 'white',
-              '&:hover': { backgroundColor: 'grey.50' }
             }}
           >
             Preference

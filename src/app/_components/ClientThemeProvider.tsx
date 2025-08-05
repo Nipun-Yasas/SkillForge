@@ -8,7 +8,6 @@ export default function ClientThemeProvider({
   children: React.ReactNode;
 }) {
   useEffect(() => {
-    // Ensure color scheme is properly set on client
     if (typeof window !== "undefined") {
       const html = document.documentElement;
       if (!html.getAttribute("data-toolpad-color-scheme")) {
@@ -19,3 +18,5 @@ export default function ClientThemeProvider({
 
   return <>{children}</>;
 }
+
+

@@ -166,14 +166,13 @@ export default function ChatSidebar({
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <SearchIcon fontSize="small" color="action" />
+                <SearchIcon fontSize="small" />
               </InputAdornment>
             ),
           }}
           sx={{
             '& .MuiOutlinedInput-root': {
               borderRadius: 3,
-              backgroundColor: 'grey.50'
             }
           }}
         />
@@ -221,7 +220,7 @@ export default function ChatSidebar({
                     borderRight: selectedConversationId === conversation.id ? '3px solid' : 'none',
                     borderRightColor: selectedConversationId === conversation.id ? 'primary.main' : 'transparent',
                     '&:hover': {
-                      backgroundColor: 'grey.50'
+                      backgroundColor: 'primary.main',  
                     }
                   }}
                 >
@@ -287,7 +286,7 @@ export default function ChatSidebar({
               ))
             ) : (
               <Box sx={{ p: 3, textAlign: 'center' }}>
-                <MessageIcon sx={{ fontSize: 48, color: 'grey.300', mb: 2 }} />
+                <MessageIcon sx={{ fontSize: 48, mb: 2 }} />
                 <Typography variant="body2" color="text.secondary">
                   No conversations found
                 </Typography>
@@ -311,11 +310,7 @@ export default function ChatSidebar({
                     py: 2,
                     px: 3,
                     borderBottom: '1px solid',
-                    borderColor: 'grey.100',
                     cursor: 'pointer',
-                    '&:hover': {
-                      backgroundColor: 'grey.50'
-                    }
                   }}
                 >
                   <ListItemAvatar>

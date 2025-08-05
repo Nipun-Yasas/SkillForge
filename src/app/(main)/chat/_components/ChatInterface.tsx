@@ -123,7 +123,6 @@ export default function ChatInterface({
           borderRadius: 0,
           borderBottom: '1px solid',
           borderColor: 'divider',
-          backgroundColor: 'white'
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -174,7 +173,6 @@ export default function ChatInterface({
         sx={{
           flex: 1,
           overflow: 'auto',
-          backgroundColor: 'grey.50',
           p: 2
         }}
       >
@@ -212,7 +210,7 @@ export default function ChatInterface({
                     elevation={1}
                     sx={{
                       p: 2,
-                      backgroundColor: msg.isOwn ? 'primary.main' : 'white',
+                      backgroundColor: msg.isOwn ? 'primary.main' : '',
                       color: msg.isOwn ? 'white' : 'text.primary',
                       borderRadius: 3,
                       borderTopRightRadius: msg.isOwn ? 1 : 3,
@@ -272,7 +270,6 @@ export default function ChatInterface({
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: 3,
-                backgroundColor: 'grey.50'
               }
             }}
             InputProps={{

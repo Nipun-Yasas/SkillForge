@@ -1,18 +1,19 @@
-import type { Metadata } from "next";
+"use client";
+
+import { Suspense } from "react";
+
 import "./globals.css";
 
-import { Poppins, Roboto, Lexend, Inter } from "next/font/google";
+import { Poppins, Inter } from "next/font/google";
+
+import { CircularProgress } from "@mui/material";
 
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import { NextAppProvider } from "@toolpad/core/nextjs";
-import { Suspense } from "react";
 import { Toaster } from "react-hot-toast";
-import ClientThemeProvider from "./_components/ClientThemeProvider";
-
-
-import LinearProgress from "@mui/material/LinearProgress";
 import NAVIGATION from "./_utils/navigation";
+import theme from "../theme";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -27,12 +28,6 @@ const poppins = Poppins({
   variable: "--font-poppins",
 });
 
-export const metadata: Metadata = {
-  title: "SkillForge - Master Skills. Teach Others. Forge Your Future.",
-  description:
-    "Connect with peer mentors, exchange skills, and accelerate your learning journey through AI-powered matching and hands-on experience.",
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -44,12 +39,14 @@ export default function RootLayout({
         className={`${inter.variable} ${poppins.variable}`}
         suppressHydrationWarning
       >
-        <ClientThemeProvider>
           <AuthProvider>
             <AppRouterCacheProvider>
-              <Suspense fallback={<LinearProgress />}>
-                <NextAppProvider navigation={NAVIGATION}>
-                  {children}
+              <Suspense fallback={<CircularProgress />}>
+              
+                <NextAppProvider navigation={NAVIGATION} theme={theme}>
+                  <Suspense fallback={<CircularProgress />}>
+                    {children}
+                  </Suspense>
                   <Toaster
                     position="top-right"
                     toastOptions={{
@@ -77,7 +74,6 @@ export default function RootLayout({
               </Suspense>
             </AppRouterCacheProvider>
           </AuthProvider>
-        </ClientThemeProvider>
       </body>
     </html>
   );

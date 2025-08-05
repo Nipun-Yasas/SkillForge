@@ -100,7 +100,6 @@ export default function Dashboard() {
             p: 3,
             mb: 4,
             borderRadius: 3,
-            background: "linear-gradient(135deg, #f8fbff 0%, #e3f2fd 100%)",
             border: "1px solid rgba(0, 123, 255, 0.1)",
           }}
         >

@@ -1,55 +1,56 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthContext";
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Container,
-  Divider,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Paper,
-  Select,
-  TextField,
-  Typography,
-  IconButton,
-  InputAdornment,
-  Chip,
-  Avatar,
-  useTheme,
-  useMediaQuery,
-} from "@mui/material";
+import { useState } from "react";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import Container from "@mui/material/Container";
+import Divider from "@mui/material/Divider";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Paper from "@mui/material/Paper";
+import Select from "@mui/material/Select";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import InputAdornment from "@mui/material/InputAdornment";
+import Chip from "@mui/material/Chip";
+import Avatar from "@mui/material/Avatar";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
+
 import { motion } from "framer-motion";
-import { 
-  BookOpen, 
-  Eye, 
-  EyeOff, 
-  UserPlus, 
-  Mail, 
-  Lock, 
+import {
+  BookOpen,
+  Eye,
+  EyeOff,
+  UserPlus,
+  Mail,
+  Lock,
   User,
-  ArrowRight, 
+  ArrowRight,
   Sparkles,
   Users,
-  
   Award,
   GraduationCap,
   Target,
   Star,
-  Rocket
+  Rocket,
 } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+
 import BackgroundShape from "../_components/background/BackgroundShape";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function SignupPage() {
   const router = useRouter();
   const { signup } = useAuth();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const [formData, setFormData] = useState({
     name: "",
@@ -147,38 +148,38 @@ export default function SignupPage() {
       y: 0,
       transition: {
         duration: 0.6,
-        staggerChildren: 0.1
-      }
-    }
+        staggerChildren: 0.1,
+      },
+    },
   };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
+    visible: { opacity: 1, y: 0 },
   };
 
   const stats = [
     { icon: Users, value: "10K+", label: "Learners" },
     { icon: GraduationCap, value: "500+", label: "Mentors" },
-    { icon: Award, value: "1000+", label: "Skills" }
+    { icon: Award, value: "1000+", label: "Skills" },
   ];
 
   const features = [
     { icon: Target, text: "Personalized Learning Paths" },
     { icon: Sparkles, text: "AI-Powered Skill Matching" },
-    { icon: Star, text: "Expert Mentor Network" }
+    { icon: Star, text: "Expert Mentor Network" },
   ];
 
   return (
-    <Box 
-      sx={{ 
-        minHeight: '100vh',
-        position: 'relative',
-        overflow: 'hidden',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        display: 'flex',
-        alignItems: 'center',
-        py: 4
+    <Box
+      sx={{
+        minHeight: "100vh",
+        position: "relative",
+        overflow: "hidden",
+        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        display: "flex",
+        alignItems: "center",
+        py: 4,
       }}
     >
       {/* Animated Background Shapes */}
@@ -215,7 +216,7 @@ export default function SignupPage() {
         rx={120}
         ry={140}
       />
-      
+
       {/* Floating Elements */}
       <motion.div
         animate={{
@@ -225,29 +226,30 @@ export default function SignupPage() {
         transition={{
           duration: 7,
           repeat: Infinity,
-          ease: "easeInOut"
+          ease: "easeInOut",
         }}
         style={{
-          position: 'absolute',
-          top: '15%',
-          right: '10%',
-          zIndex: 1
+          position: "absolute",
+          top: "15%",
+          right: "10%",
+          zIndex: 1,
         }}
       >
         <Box
+          color="textblack.main"
           sx={{
             width: 70,
             height: 70,
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, #28A745 0%, #20C997 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 20px 40px rgba(40, 167, 69, 0.3)',
-            backdropFilter: 'blur(10px)'
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+            justifyContent: "center",
+            boxShadow: "0 20px 40px rgba(40, 167, 69, 0.3)",
+            backdropFilter: "blur(10px)",
           }}
         >
-          <Rocket size={28} color="white" />
+          <Rocket size={28} />
         </Box>
       </motion.div>
 
@@ -259,29 +261,29 @@ export default function SignupPage() {
         transition={{
           duration: 9,
           repeat: Infinity,
-          ease: "easeInOut"
+          ease: "easeInOut",
         }}
         style={{
-          position: 'absolute',
-          bottom: '25%',
-          left: '8%',
-          zIndex: 1
+          position: "absolute",
+          bottom: "25%",
+          left: "8%",
+          zIndex: 1,
         }}
       >
         <Box
+          color="textblack.main"
           sx={{
             width: 50,
             height: 50,
-            borderRadius: '12px',
-            background: 'rgba(255, 255, 255, 0.15)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
+            borderRadius: "12px",
+            backdropFilter: "blur(10px)",
+            border: "1px solid rgba(255, 255, 255, 0.2)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          <GraduationCap size={20} color="white" />
+          <GraduationCap size={20} />
         </Box>
       </motion.div>
 
@@ -293,17 +295,17 @@ export default function SignupPage() {
         >
           <Box
             sx={{
-              display: 'grid',
-              gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+              display: "grid",
+              gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
               gap: 6,
-              alignItems: 'center',
-              minHeight: '80vh'
+              alignItems: "center",
+              minHeight: "80vh",
             }}
           >
             {/* Left Side - Welcome Content */}
             {!isMobile && (
               <motion.div variants={itemVariants}>
-                <Box sx={{ color: 'white', pr: 4 }}>
+                <Box sx={{ pr: 4 }}>
                   {/* Logo */}
                   <Link href="/" style={{ textDecoration: "none" }}>
                     <Box
@@ -316,19 +318,19 @@ export default function SignupPage() {
                     >
                       <Avatar
                         sx={{
-                          bgcolor: 'rgba(255, 255, 255, 0.1)',
-                          backdropFilter: 'blur(10px)',
+                          bgcolor: "rgba(255, 255, 255, 0.1)",
+                          backdropFilter: "blur(10px)",
                           width: 48,
-                          height: 48
+                          height: 48,
                         }}
                       >
-                        <BookOpen size={24} color="white" />
+                        <BookOpen size={24} />
                       </Avatar>
                       <Typography
                         variant="h4"
+                        color="textblack.main"
                         sx={{
                           fontWeight: 700,
-                          color: 'white'
                         }}
                       >
                         SkillForge
@@ -337,34 +339,41 @@ export default function SignupPage() {
                   </Link>
 
                   {/* Hero Content */}
-                  <Typography 
-                    variant="h2" 
-                    sx={{ 
-                      fontWeight: 800, 
+                  <Typography
+                    variant="h2"
+                    color="textblack.main"
+                    sx={{
+                      fontWeight: 800,
                       mb: 3,
-                      fontSize: { xs: '2rem', md: '3rem' }
+                      fontSize: { xs: "2rem", md: "3rem" },
                     }}
                   >
                     Begin Your
-                    <Box component="span" sx={{ display: 'block', color: '#FFD700' }}>
+                    <Box
+                      component="span"
+                      sx={{ display: "block", color: "#FFD700" }}
+                    >
                       Learning Adventure
                     </Box>
                   </Typography>
 
-                  <Typography 
-                    variant="h6" 
-                    sx={{ 
-                      mb: 4, 
+                  <Typography
+                    variant="h6"
+                    color="textblack.main"
+                    sx={{
+                      mb: 4,
                       opacity: 0.9,
                       lineHeight: 1.6,
-                      maxWidth: '500px'
+                      maxWidth: "500px",
                     }}
                   >
-                    Join thousands of learners and mentors building skills together. Start your journey with AI-powered personalized learning.
+                    Join thousands of learners and mentors building skills
+                    together. Start your journey with AI-powered personalized
+                    learning.
                   </Typography>
 
                   {/* Stats */}
-                  <Box sx={{ display: 'flex', gap: 4, mb: 4 }}>
+                  <Box sx={{ display: "flex", gap: 4, mb: 4 }}>
                     {stats.map((stat, index) => (
                       <motion.div
                         key={index}
@@ -372,20 +381,32 @@ export default function SignupPage() {
                         whileHover={{ scale: 1.05 }}
                       >
                         <Box
+                          color="textblack.main"
                           sx={{
-                            textAlign: 'center',
+                            textAlign: "center",
                             p: 2,
                             borderRadius: 2,
-                            background: 'rgba(255, 255, 255, 0.1)',
-                            backdropFilter: 'blur(10px)',
-                            border: '1px solid rgba(255, 255, 255, 0.2)'
+                            background: "rgba(255, 255, 255, 0.1)",
+                            backdropFilter: "blur(10px)",
+                            border: "1px solid rgba(255, 255, 255, 0.2)",
                           }}
                         >
-                          <stat.icon size={24} color="white" style={{ marginBottom: '8px' }} />
-                          <Typography variant="h6" fontWeight="bold">
+                          <stat.icon
+                            size={24}
+                            style={{ marginBottom: "8px" }}
+                          />
+                          <Typography
+                            variant="h6"
+                            color="textblack.main"
+                            fontWeight="bold"
+                          >
                             {stat.value}
                           </Typography>
-                          <Typography variant="caption" sx={{ opacity: 0.8 }}>
+                          <Typography
+                            variant="caption"
+                            color="textblack.main"
+                            sx={{ opacity: 0.8 }}
+                          >
                             {stat.label}
                           </Typography>
                         </Box>
@@ -394,25 +415,33 @@ export default function SignupPage() {
                   </Box>
 
                   {/* Features */}
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <Box
+                    sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+                  >
                     {features.map((feature, index) => (
                       <motion.div
                         key={index}
                         variants={itemVariants}
                         whileHover={{ x: 10 }}
                       >
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 2 }}
+                        >
                           <Box
                             sx={{
                               p: 1,
-                              borderRadius: '50%',
-                              background: 'rgba(255, 215, 0, 0.2)',
-                              backdropFilter: 'blur(10px)'
+                              borderRadius: "50%",
+                              background: "rgba(255, 215, 0, 0.2)",
+                              backdropFilter: "blur(10px)",
                             }}
                           >
                             <feature.icon size={16} color="#FFD700" />
                           </Box>
-                          <Typography variant="body1" sx={{ opacity: 0.9 }}>
+                          <Typography
+                            variant="body1"
+                            color="textblack.main"
+                            sx={{ opacity: 0.9 }}
+                          >
                             {feature.text}
                           </Typography>
                         </Box>
@@ -427,15 +456,15 @@ export default function SignupPage() {
             <motion.div variants={itemVariants}>
               <Paper
                 elevation={0}
+                color="backgroundcolor.primary"
                 sx={{
                   p: isMobile ? 3 : 4,
                   borderRadius: 4,
-                  background: 'rgba(255, 255, 255, 0.95)',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                  boxShadow: '0 25px 50px rgba(0, 0, 0, 0.15)',
-                  position: 'relative',
-                  overflow: 'hidden'
+                  backdropFilter: "blur(20px)",
+                  border: "1px solid rgba(255, 255, 255, 0.3)",
+                  boxShadow: "0 25px 50px rgba(0, 0, 0, 0.15)",
+                  position: "relative",
+                  overflow: "hidden",
                 }}
               >
                 {/* Form Header */}
@@ -482,7 +511,7 @@ export default function SignupPage() {
                         background:
                           "linear-gradient(135deg, #28A745 0%, #20C997 100%)",
                         mb: 2,
-                        position: 'relative'
+                        position: "relative",
                       }}
                     >
                       <UserPlus size={32} color="white" />
@@ -490,10 +519,10 @@ export default function SignupPage() {
                         animate={{ scale: [1, 1.2, 1] }}
                         transition={{ duration: 2, repeat: Infinity }}
                         style={{
-                          position: 'absolute',
+                          position: "absolute",
                           inset: -8,
-                          borderRadius: '50%',
-                          border: '2px solid rgba(40, 167, 69, 0.3)',
+                          borderRadius: "50%",
+                          border: "2px solid rgba(40, 167, 69, 0.3)",
                         }}
                       />
                     </Box>
@@ -503,7 +532,8 @@ export default function SignupPage() {
                     variant="h4"
                     fontWeight="bold"
                     sx={{
-                      background: "linear-gradient(135deg, #28A745 0%, #20C997 100%)",
+                      background:
+                        "linear-gradient(135deg, #28A745 0%, #20C997 100%)",
                       backgroundClip: "text",
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
@@ -530,16 +560,20 @@ export default function SignupPage() {
                       size="small"
                       sx={{
                         mt: 2,
-                        borderColor: '#28A745',
-                        color: '#28A745',
-                        '& .MuiChip-icon': { color: '#28A745' }
+                        borderColor: "#28A745",
+                        color: "#28A745",
+                        "& .MuiChip-icon": { color: "#28A745" },
                       }}
                     />
                   </motion.div>
                 </Box>
 
                 {/* Signup Form */}
-                <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
+                <Box
+                  component="form"
+                  onSubmit={handleSubmit}
+                  sx={{ width: "100%" }}
+                >
                   <motion.div variants={itemVariants}>
                     <TextField
                       fullWidth
@@ -599,7 +633,9 @@ export default function SignupPage() {
                       >
                         <MenuItem value="learner">🎓 Learn new skills</MenuItem>
                         <MenuItem value="mentor">👨‍🏫 Teach others</MenuItem>
-                        <MenuItem value="both">🚀 Both learn and teach</MenuItem>
+                        <MenuItem value="both">
+                          🚀 Both learn and teach
+                        </MenuItem>
                       </Select>
                     </FormControl>
                   </motion.div>
@@ -628,7 +664,11 @@ export default function SignupPage() {
                               onClick={() => setShowPassword(!showPassword)}
                               edge="end"
                             >
-                              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                              {showPassword ? (
+                                <EyeOff size={20} />
+                              ) : (
+                                <Eye size={20} />
+                              )}
                             </IconButton>
                           </InputAdornment>
                         ),
@@ -657,10 +697,16 @@ export default function SignupPage() {
                         endAdornment: (
                           <InputAdornment position="end">
                             <IconButton
-                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                              onClick={() =>
+                                setShowConfirmPassword(!showConfirmPassword)
+                              }
                               edge="end"
                             >
-                              {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                              {showConfirmPassword ? (
+                                <EyeOff size={20} />
+                              ) : (
+                                <Eye size={20} />
+                              )}
                             </IconButton>
                           </InputAdornment>
                         ),
@@ -676,14 +722,15 @@ export default function SignupPage() {
                       size="large"
                       disabled={isLoading}
                       sx={{
-                        background: "linear-gradient(135deg, #28A745 0%, #20C997 100%)",
+                        background:
+                          "linear-gradient(135deg, #28A745 0%, #20C997 100%)",
                         py: 1.8,
                         borderRadius: 3,
                         fontSize: "1.1rem",
                         fontWeight: 600,
                         mb: 3,
-                        position: 'relative',
-                        overflow: 'hidden',
+                        position: "relative",
+                        overflow: "hidden",
                         "&:hover": {
                           background:
                             "linear-gradient(135deg, #218838 0%, #17A2B8 100%)",
@@ -697,12 +744,16 @@ export default function SignupPage() {
                       }}
                     >
                       {isLoading ? (
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 2 }}
+                        >
                           <CircularProgress size={24} color="inherit" />
                           <Typography>Creating Account...</Typography>
                         </Box>
                       ) : (
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 2 }}
+                        >
                           <Typography>Create Account</Typography>
                           <ArrowRight size={20} />
                         </Box>
@@ -717,7 +768,11 @@ export default function SignupPage() {
                   </Divider>
 
                   <motion.div variants={itemVariants}>
-                    <Link href="/login" passHref style={{ textDecoration: "none" }}>
+                    <Link
+                      href="/login"
+                      passHref
+                      style={{ textDecoration: "none" }}
+                    >
                       <Button
                         fullWidth
                         variant="outlined"
@@ -759,23 +814,23 @@ export default function SignupPage() {
         transition={{
           duration: 25,
           repeat: Infinity,
-          ease: "linear"
+          ease: "linear",
         }}
         style={{
-          position: 'absolute',
-          top: '70%',
-          right: '3%',
-          zIndex: 1
+          position: "absolute",
+          top: "70%",
+          right: "3%",
+          zIndex: 1,
         }}
       >
         <Box
           sx={{
             width: 35,
             height: 35,
-            borderRadius: '6px',
-            background: 'rgba(40, 167, 69, 0.2)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(40, 167, 69, 0.3)'
+            borderRadius: "6px",
+            background: "rgba(40, 167, 69, 0.2)",
+            backdropFilter: "blur(10px)",
+            border: "1px solid rgba(40, 167, 69, 0.3)",
           }}
         />
       </motion.div>
@@ -791,23 +846,44 @@ export default function SignupPage() {
         .shape3 {
           animation: float3 13s ease-in-out infinite;
         }
-        
+
         @keyframes float1 {
-          0%, 100% { transform: translate(0, 0) rotate(0deg); }
-          33% { transform: translate(25px, -35px) rotate(120deg); }
-          66% { transform: translate(-30px, 25px) rotate(240deg); }
+          0%,
+          100% {
+            transform: translate(0, 0) rotate(0deg);
+          }
+          33% {
+            transform: translate(25px, -35px) rotate(120deg);
+          }
+          66% {
+            transform: translate(-30px, 25px) rotate(240deg);
+          }
         }
-        
+
         @keyframes float2 {
-          0%, 100% { transform: translate(0, 0) rotate(0deg); }
-          50% { transform: translate(-35px, -25px) rotate(180deg); }
+          0%,
+          100% {
+            transform: translate(0, 0) rotate(0deg);
+          }
+          50% {
+            transform: translate(-35px, -25px) rotate(180deg);
+          }
         }
-        
+
         @keyframes float3 {
-          0%, 100% { transform: translate(0, 0) rotate(0deg); }
-          25% { transform: translate(15px, -45px) rotate(90deg); }
-          50% { transform: translate(-25px, -15px) rotate(180deg); }
-          75% { transform: translate(-5px, 35px) rotate(270deg); }
+          0%,
+          100% {
+            transform: translate(0, 0) rotate(0deg);
+          }
+          25% {
+            transform: translate(15px, -45px) rotate(90deg);
+          }
+          50% {
+            transform: translate(-25px, -15px) rotate(180deg);
+          }
+          75% {
+            transform: translate(-5px, 35px) rotate(270deg);
+          }
         }
       `}</style>
     </Box>

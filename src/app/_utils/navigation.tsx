@@ -10,6 +10,7 @@ import BookIcon from '@mui/icons-material/Book';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import SchoolIcon from '@mui/icons-material/School';
+import CreateIcon from '@mui/icons-material/Create';
 
 const NAVIGATION: Navigation = [
   {
@@ -42,6 +43,11 @@ const NAVIGATION: Navigation = [
     segment: 'courses',
     title: 'Learning Courses',
     icon: <BookIcon />,
+  },
+  {
+    segment: 'courses/manage',
+    title: 'Manage Courses',
+    icon: <CreateIcon />,
   },
   {
     segment: 'progress',

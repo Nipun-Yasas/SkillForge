@@ -17,6 +17,10 @@ import {
   StepLabel,
   StepContent,
   Chip,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import {
   School,
@@ -28,15 +32,40 @@ import {
   TrendingUp,
   EmojiEvents,
   Add,
+  CheckCircle,
+  Search,
+  CalendarMonth,
+  Chat,
 } from '@mui/icons-material';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 const LearningCreditsGuide = () => {
+  const router = useRouter();
   const [openConvertDialog, setOpenConvertDialog] = useState(false);
   const [openPurchaseDialog, setOpenPurchaseDialog] = useState(false);
+  const [openSuccessDialog, setOpenSuccessDialog] = useState(false);
   const [convertAmount, setConvertAmount] = useState('');
   const [purchaseAmount, setPurchaseAmount] = useState('');
+  const [totalCredits, setTotalCredits] = useState(0);
   const [alert, setAlert] = useState<{ type: 'success' | 'error' | 'info'; message: string } | null>(null);
+
+  // Fetch current credits on component load
+  useEffect(() => {
+    const fetchCredits = async () => {
+      try {
+        const response = await fetch('/api/credits');
+        const data = await response.json();
+        if (data.success) {
+          setTotalCredits(data.data.creditInfo.learningCredits || 0);
+        }
+      } catch (error) {
+        console.log('Could not fetch credits:', error);
+      }
+    };
+    
+    fetchCredits();
+  }, []);
 
   const handleConvertCredits = async () => {
     try {
@@ -51,6 +80,13 @@ const LearningCreditsGuide = () => {
         setAlert({ type: 'success', message: 'Credits converted successfully!' });
         setOpenConvertDialog(false);
         setConvertAmount('');
+        
+        // Refresh total credits
+        const creditsResponse = await fetch('/api/credits');
+        const creditsData = await creditsResponse.json();
+        if (creditsData.success) {
+          setTotalCredits(creditsData.data.creditInfo.learningCredits || 0);
+        }
       } else {
         setAlert({ type: 'error', message: data.error });
       }
@@ -77,9 +113,17 @@ const LearningCreditsGuide = () => {
 
       const data = await response.json();
       if (data.success) {
-        setAlert({ type: 'success', message: 'Credits purchased successfully!' });
+        // Fetch updated total credits
+        const creditsResponse = await fetch('/api/credits');
+        const creditsData = await creditsResponse.json();
+        
+        if (creditsData.success) {
+          setTotalCredits(creditsData.data.creditInfo.learningCredits || 0);
+        }
+        
         setOpenPurchaseDialog(false);
         setPurchaseAmount('');
+        setOpenSuccessDialog(true);
       } else {
         setAlert({ type: 'error', message: data.error });
       }
@@ -136,9 +180,22 @@ const LearningCreditsGuide = () => {
         How to Get Learning Credits
       </Typography>
 
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        Learning credits are the currency you use to book sessions with teachers. Here are all the ways to get them:
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="body1" color="text.secondary">
+          Learning credits are the currency you use to book sessions with teachers. Here are all the ways to get them:
+        </Typography>
+        <Card sx={{ p: 2, backgroundColor: '#f8f9fa', border: '2px solid #4CAF50' }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, textAlign: 'center' }}>
+            Your Current Balance
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
+            <Star sx={{ color: '#4CAF50' }} />
+            <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#4CAF50' }}>
+              {totalCredits} Credits
+            </Typography>
+          </Box>
+        </Card>
+      </Box>
 
       {/* Credit Methods Overview */}
       <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 3, mb: 4 }}>
@@ -365,6 +422,135 @@ const LearningCreditsGuide = () => {
             sx={{ backgroundColor: '#9C27B0' }}
           >
             Purchase for ${purchaseAmount ? parseInt(purchaseAmount) * 2 : 0}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Success Confirmation Dialog */}
+      <Dialog 
+        open={openSuccessDialog} 
+        onClose={() => setOpenSuccessDialog(false)} 
+        maxWidth="md" 
+        fullWidth
+      >
+        <DialogTitle sx={{ textAlign: 'center', pb: 1 }}>
+          <CheckCircle sx={{ fontSize: 60, color: '#4CAF50', mb: 2 }} />
+          <Typography variant="h4" component="div" sx={{ color: '#4CAF50', fontWeight: 'bold' }}>
+            🎉 Credits Purchased Successfully!
+          </Typography>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 0 }}>
+          <Box sx={{ textAlign: 'center', mb: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              You now have <Chip label={`${totalCredits} total credits`} color="success" sx={{ fontWeight: 'bold', fontSize: '1rem' }} /> in your account!
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Here&apos;s what you can do with your credits:
+            </Typography>
+          </Box>
+
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 2, mb: 3 }}>
+            <Card sx={{ p: 2, border: '2px solid #4CAF50', backgroundColor: '#f8fff8' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                <Search sx={{ color: '#4CAF50', fontSize: 30 }} />
+                <Typography variant="h6" sx={{ color: '#4CAF50' }}>
+                  Find Expert Mentors
+                </Typography>
+              </Box>
+              <List dense>
+                <ListItem>
+                  <ListItemIcon><Star sx={{ color: '#FF9800', fontSize: 20 }} /></ListItemIcon>
+                  <ListItemText primary="Browse 500+ verified mentors" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon><Star sx={{ color: '#FF9800', fontSize: 20 }} /></ListItemIcon>
+                  <ListItemText primary="Filter by skills, rating & availability" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon><Star sx={{ color: '#FF9800', fontSize: 20 }} /></ListItemIcon>
+                  <ListItemText primary="Read reviews from other students" />
+                </ListItem>
+              </List>
+            </Card>
+
+            <Card sx={{ p: 2, border: '2px solid #2196F3', backgroundColor: '#f8fbff' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                <CalendarMonth sx={{ color: '#2196F3', fontSize: 30 }} />
+                <Typography variant="h6" sx={{ color: '#2196F3' }}>
+                  Book Sessions
+                </Typography>
+              </Box>
+              <List dense>
+                <ListItem>
+                  <ListItemIcon><Star sx={{ color: '#FF9800', fontSize: 20 }} /></ListItemIcon>
+                  <ListItemText primary="Schedule 1-on-1 or group sessions" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon><Star sx={{ color: '#FF9800', fontSize: 20 }} /></ListItemIcon>
+                  <ListItemText primary="Choose your preferred time slots" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon><Star sx={{ color: '#FF9800', fontSize: 20 }} /></ListItemIcon>
+                  <ListItemText primary="Get instant confirmation" />
+                </ListItem>
+              </List>
+            </Card>
+
+            <Card sx={{ p: 2, border: '2px solid #9C27B0', backgroundColor: '#fdf8ff' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                <Chat sx={{ color: '#9C27B0', fontSize: 30 }} />
+                <Typography variant="h6" sx={{ color: '#9C27B0' }}>
+                  Start Learning
+                </Typography>
+              </Box>
+              <List dense>
+                <ListItem>
+                  <ListItemIcon><Star sx={{ color: '#FF9800', fontSize: 20 }} /></ListItemIcon>
+                  <ListItemText primary="Connect with mentors instantly" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon><Star sx={{ color: '#FF9800', fontSize: 20 }} /></ListItemIcon>
+                  <ListItemText primary="Chat before booking sessions" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon><Star sx={{ color: '#FF9800', fontSize: 20 }} /></ListItemIcon>
+                  <ListItemText primary="Get personalized learning paths" />
+                </ListItem>
+              </List>
+            </Card>
+          </Box>
+
+          <Box sx={{ textAlign: 'center', p: 3, backgroundColor: '#f5f5f5', borderRadius: 2 }}>
+            <Typography variant="body1" sx={{ mb: 2, fontWeight: 'bold' }}>
+              💡 Ready to start your learning journey?
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Browse our amazing community of mentors and find the perfect match for your learning goals!
+            </Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
+          <Button 
+            onClick={() => setOpenSuccessDialog(false)}
+            variant="outlined"
+            size="large"
+          >
+            Stay Here
+          </Button>
+          <Button 
+            onClick={() => {
+              setOpenSuccessDialog(false);
+              router.push('/findmentor');
+            }}
+            variant="contained"
+            size="large"
+            startIcon={<Search />}
+            sx={{ 
+              background: 'linear-gradient(45deg, #4CAF50 30%, #66BB6A 90%)',
+              px: 3
+            }}
+          >
+            Find Mentors Now
           </Button>
         </DialogActions>
       </Dialog>

@@ -16,7 +16,6 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Grid,
   Card,
   CardContent,
   CardActions,
@@ -35,6 +34,7 @@ import {
   CircularProgress,
   Alert,
 } from '@mui/material';
+import { Grid } from '@mui/material';
 import {
   Add,
   Edit,
@@ -45,7 +45,7 @@ import {
   Visibility,
   VisibilityOff,
   PlayCircle,
-  Users,
+  People,
   Star,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
@@ -102,7 +102,7 @@ interface CourseFormData {
     title: string;
     description: string;
     duration: string;
-    resources: {
+    resources?: {
       title: string;
       url: string;
       type: 'video' | 'pdf' | 'link' | 'quiz';
@@ -201,7 +201,10 @@ export default function CourseManagementPage() {
         category: course.category,
         prerequisites: course.prerequisites,
         learningOutcomes: course.learningOutcomes,
-        modules: course.modules,
+        modules: course.modules.map(module => ({
+          ...module,
+          resources: module.resources || []
+        })),
         isPublished: course.isPublished,
       });
     } else {
@@ -482,7 +485,7 @@ export default function CourseManagementPage() {
         ) : (
           <Grid container spacing={3}>
             {courses.map((course) => (
-              <Grid item xs={12} sm={6} lg={4} key={course._id}>
+              <Grid container spacing={2} sm={6} lg={4} key={course._id}>
                 <Card
                   sx={{
                     height: '100%',
@@ -507,7 +510,7 @@ export default function CourseManagementPage() {
                       position: 'relative',
                     }}
                   >
-                    <PlayCircle size={60} color="white" style={{ opacity: 0.8 }} />
+                    <PlayCircle sx={{ fontSize: 60, color: 'white', opacity: 0.8 }} />
                     <Box sx={{ position: 'absolute', top: 12, right: 12 }}>
                       <Chip
                         label={course.isPublished ? 'Published' : 'Draft'}
@@ -528,13 +531,13 @@ export default function CourseManagementPage() {
                     {/* Stats */}
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <Users size={16} />
+                        <People sx={{ fontSize: 16 }} />
                         <Typography variant="body2" color="text.secondary">
                           {course.enrolledStudents}
                         </Typography>
                       </Box>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <Star size={16} />
+                        <Star sx={{ fontSize: 16 }} />
                         <Typography variant="body2" color="text.secondary">
                           {course.rating.toFixed(1)} ({course.totalRatings})
                         </Typography>
@@ -596,13 +599,13 @@ export default function CourseManagementPage() {
           <DialogContent>
             <Grid container spacing={3} sx={{ mt: 1 }}>
               {/* Basic Info */}
-              <Grid item xs={12}>
+              <Grid container spacing={2}>
                 <Typography variant="h6" gutterBottom>
                   Basic Information
                 </Typography>
               </Grid>
               
-              <Grid item xs={12}>
+              <Grid container spacing={2}>
                 <TextField
                   fullWidth
                   label="Course Title"
@@ -612,7 +615,7 @@ export default function CourseManagementPage() {
                 />
               </Grid>
               
-              <Grid item xs={12}>
+              <Grid container spacing={2}>
                 <TextField
                   fullWidth
                   label="Short Description"
@@ -624,7 +627,7 @@ export default function CourseManagementPage() {
                 />
               </Grid>
               
-              <Grid item xs={12}>
+              <Grid container spacing={2}>
                 <TextField
                   fullWidth
                   label="Long Description"
@@ -635,7 +638,7 @@ export default function CourseManagementPage() {
                 />
               </Grid>
 
-              <Grid item xs={6}>
+              <Grid container spacing={2}>
                 <TextField
                   fullWidth
                   label="Duration (e.g., 8 weeks)"
@@ -645,7 +648,7 @@ export default function CourseManagementPage() {
                 />
               </Grid>
 
-              <Grid item xs={6}>
+              <Grid container spacing={2} >
                 <FormControl fullWidth required>
                   <InputLabel>Level</InputLabel>
                   <Select
@@ -660,7 +663,7 @@ export default function CourseManagementPage() {
                 </FormControl>
               </Grid>
 
-              <Grid item xs={6}>
+              <Grid container spacing={2}>
                 <FormControl fullWidth required>
                   <InputLabel>Category</InputLabel>
                   <Select
@@ -677,7 +680,7 @@ export default function CourseManagementPage() {
                 </FormControl>
               </Grid>
 
-              <Grid item xs={6}>
+              <Grid container spacing={2}>
                 <TextField
                   fullWidth
                   label="Price"
@@ -687,7 +690,7 @@ export default function CourseManagementPage() {
                 />
               </Grid>
 
-              <Grid item xs={12}>
+              <Grid container spacing={2}>
                 <FormControlLabel
                   control={
                     <Switch
@@ -709,7 +712,7 @@ export default function CourseManagementPage() {
               </Grid>
 
               {/* Tags */}
-              <Grid item xs={12}>
+              <Grid container spacing={2}>
                 <Typography variant="h6" gutterBottom>
                   Tags
                 </Typography>
@@ -734,7 +737,7 @@ export default function CourseManagementPage() {
               </Grid>
 
               {/* Prerequisites */}
-              <Grid item xs={12}>
+              <Grid container spacing={2}>
                 <Typography variant="h6" gutterBottom>
                   Prerequisites
                 </Typography>
@@ -766,7 +769,7 @@ export default function CourseManagementPage() {
               </Grid>
 
               {/* Learning Outcomes */}
-              <Grid item xs={12}>
+              <Grid container spacing={2}>
                 <Typography variant="h6" gutterBottom>
                   Learning Outcomes *
                 </Typography>
@@ -798,7 +801,7 @@ export default function CourseManagementPage() {
               </Grid>
 
               {/* Course Modules */}
-              <Grid item xs={12}>
+              <Grid container spacing={2}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                   <Typography variant="h6">
                     Course Modules
@@ -817,7 +820,7 @@ export default function CourseManagementPage() {
                     </AccordionSummary>
                     <AccordionDetails>
                       <Grid container spacing={2}>
-                        <Grid item xs={12}>
+                        <Grid container spacing={2}>
                           <TextField
                             fullWidth
                             label="Module Title"
@@ -825,7 +828,7 @@ export default function CourseManagementPage() {
                             onChange={(e) => handleUpdateModule(index, 'title', e.target.value)}
                           />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid container spacing={2}>
                           <TextField
                             fullWidth
                             label="Module Description"
@@ -835,7 +838,7 @@ export default function CourseManagementPage() {
                             onChange={(e) => handleUpdateModule(index, 'description', e.target.value)}
                           />
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid container spacing={2}>
                           <TextField
                             fullWidth
                             label="Duration (e.g., 120 minutes)"
@@ -843,7 +846,7 @@ export default function CourseManagementPage() {
                             onChange={(e) => handleUpdateModule(index, 'duration', e.target.value)}
                           />
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid container spacing={2}>
                           <Button
                             color="error"
                             onClick={() => handleRemoveModule(index)}

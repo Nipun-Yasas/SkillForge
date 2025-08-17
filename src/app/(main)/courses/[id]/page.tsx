@@ -10,11 +10,9 @@ import {
   Chip,
   Button,
   Avatar,
-  Rating,
+ 
   LinearProgress,
-  Grid,
-  Card,
-  CardContent,
+  // Grid, (remove from here)
   Divider,
   List,
   ListItem,
@@ -32,10 +30,9 @@ import {
   Users,
   Star,
   CheckCircle,
-  ExpandMore,
-  ArrowBack,
+  ArrowLeft,
   BookOpen,
-  Award,
+ 
   Target,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -197,7 +194,7 @@ export default function CourseDetailPage() {
       >
         {/* Back Button */}
         <Button
-          startIcon={<ArrowBack />}
+          startIcon={<ArrowLeft />}
           onClick={() => router.back()}
           sx={{ mb: 3 }}
         >

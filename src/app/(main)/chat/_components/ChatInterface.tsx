@@ -21,7 +21,8 @@ import {
   Circle as CircleIcon,
   VideoCall as VideoCallIcon,
   Call as CallIcon,
-  MoreVert as MoreVertIcon
+  MoreVert as MoreVertIcon,
+  DoneAll as DoneAllIcon
 } from '@mui/icons-material';
 
 interface Message {
@@ -153,71 +154,193 @@ export default function ChatInterface({
         sx={{
           flex: 1,
           overflow: 'auto',
-          p: 2
+          p: 2,
+          backgroundColor: (theme) => theme.palette.mode === 'dark' 
+            ? 'rgba(18, 18, 18, 0.8)' 
+            : 'rgba(245, 245, 245, 0.8)',
+          backgroundImage: (theme) => theme.palette.mode === 'dark'
+            ? 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0)'
+            : 'radial-gradient(circle at 1px 1px, rgba(0,0,0,0.1) 1px, transparent 0)',
+          backgroundSize: '20px 20px',
         }}
       >
         <List sx={{ p: 0 }}>
-          {messages.map((msg) => (
-            <ListItem
-              key={msg._id}
-              sx={{
-                display: 'flex',
-                justifyContent: msg.isOwnMessage ? 'flex-end' : 'flex-start',
-                p: 1
-              }}
-            >
-              <Box
+          {messages.map((msg, index) => {
+            const showAvatar = !msg.isOwnMessage && (index === 0 || messages[index - 1]?.senderId !== msg.senderId);
+            const isLastInGroup = index === messages.length - 1 || messages[index + 1]?.senderId !== msg.senderId;
+            
+            return (
+              <ListItem
+                key={msg._id}
                 sx={{
-                  maxWidth: '70%',
                   display: 'flex',
-                  flexDirection: msg.isOwnMessage ? 'row-reverse' : 'row',
-                  alignItems: 'flex-end',
-                  gap: 1
+                  justifyContent: msg.isOwnMessage ? 'flex-end' : 'flex-start',
+                  p: 0.5,
+                  alignItems: 'flex-end'
                 }}
               >
-                {!msg.isOwnMessage && (
-                  <Avatar 
-                    src={msg.senderAvatar || selectedChat.user.avatar} 
-                    alt={msg.senderName}
-                    sx={{ width: 32, height: 32 }}
-                  >
-                    {msg.senderName.charAt(0)}
-                  </Avatar>
-                )}
+                <Box
+                  sx={{
+                    maxWidth: '75%',
+                    display: 'flex',
+                    flexDirection: msg.isOwnMessage ? 'row-reverse' : 'row',
+                    alignItems: 'flex-end',
+                    gap: 1,
+                    mb: isLastInGroup ? 1 : 0
+                  }}
+                >
+                  {/* Avatar - only show for other users and first message in group */}
+                  {showAvatar ? (
+                    <Avatar 
+                      src={msg.senderAvatar || selectedChat.user.avatar} 
+                      alt={msg.senderName}
+                      sx={{ 
+                        width: 32, 
+                        height: 32,
+                        border: (theme) => `2px solid ${theme.palette.background.paper}`,
+                        boxShadow: (theme) => theme.palette.mode === 'dark'
+                          ? '0 2px 4px rgba(0,0,0,0.5)'
+                          : '0 2px 4px rgba(0,0,0,0.1)'
+                      }}
+                    >
+                      {msg.senderName.charAt(0)}
+                    </Avatar>
+                  ) : !msg.isOwnMessage ? (
+                    <Box sx={{ width: 32 }} /> // Spacer for alignment
+                  ) : null}
 
-                <Box>
-                  <Paper
-                    elevation={1}
-                    sx={{
-                      p: 2,
-                      backgroundColor: msg.isOwnMessage ? 'primary.main' : '',
-                      color: msg.isOwnMessage ? 'white' : 'text.primary',
-                      borderRadius: 3,
-                      borderTopRightRadius: msg.isOwnMessage ? 1 : 3,
-                      borderTopLeftRadius: msg.isOwnMessage ? 3 : 1
-                    }}
-                  >
-                    <Typography variant="body1" component="div">
-                      {msg.content}
-                    </Typography>
-                  </Paper>
-                  <Typography 
-                    variant="caption" 
-                    color="text.secondary"
-                    component="div"
-                    sx={{ 
-                      display: 'block', 
-                      mt: 0.5,
-                      textAlign: msg.isOwnMessage ? 'right' : 'left',
-                      px: 1
-                    }}
-                  >
-                    {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </Typography>
+                  <Box sx={{ position: 'relative' }}>
+                    {/* Message Bubble */}
+                    <Paper
+                      elevation={0}
+                      sx={{
+                        p: 1.5,
+                        px: 2,
+                        position: 'relative',
+                        background: msg.isOwnMessage 
+                          ? 'linear-gradient(135deg, #007BFF 0%, #0056b3 100%)'
+                          : (theme) => theme.palette.mode === 'dark'
+                            ? theme.palette.grey[800]
+                            : theme.palette.background.paper,
+                        color: msg.isOwnMessage 
+                          ? 'white' 
+                          : (theme) => theme.palette.text.primary,
+                        borderRadius: 2.5,
+                        borderTopRightRadius: msg.isOwnMessage ? 0.5 : 2.5,
+                        borderTopLeftRadius: msg.isOwnMessage ? 2.5 : (showAvatar ? 0.5 : 2.5),
+                        borderBottomRightRadius: msg.isOwnMessage && isLastInGroup ? 0.5 : 2.5,
+                        borderBottomLeftRadius: !msg.isOwnMessage && isLastInGroup ? 0.5 : 2.5,
+                        boxShadow: msg.isOwnMessage 
+                          ? '0 2px 8px rgba(0, 123, 255, 0.3)'
+                          : (theme) => theme.palette.mode === 'dark'
+                            ? '0 2px 8px rgba(0, 0, 0, 0.6)'
+                            : '0 2px 8px rgba(0, 0, 0, 0.1)',
+                        border: (theme) => !msg.isOwnMessage && theme.palette.mode === 'dark' 
+                          ? `1px solid ${theme.palette.grey[700]}` 
+                          : 'none',
+                        '&::before': msg.isOwnMessage && isLastInGroup ? {
+                          content: '""',
+                          position: 'absolute',
+                          bottom: 0,
+                          right: -8,
+                          width: 0,
+                          height: 0,
+                          borderLeft: '8px solid #007BFF',
+                          borderBottom: '8px solid transparent',
+                        } : (!msg.isOwnMessage && isLastInGroup) ? {
+                          content: '""',
+                          position: 'absolute',
+                          bottom: 0,
+                          left: -8,
+                          width: 0,
+                          height: 0,
+                          borderRight: (theme) => theme.palette.mode === 'dark'
+                            ? `8px solid ${theme.palette.grey[800]}`
+                            : `8px solid ${theme.palette.background.paper}`,
+                          borderBottom: '8px solid transparent',
+                        } : {},
+                        transition: 'all 0.2s ease',
+                        '&:hover': {
+                          transform: 'translateY(-1px)',
+                          boxShadow: msg.isOwnMessage 
+                            ? '0 4px 12px rgba(0, 123, 255, 0.4)'
+                            : (theme) => theme.palette.mode === 'dark'
+                              ? '0 4px 12px rgba(0, 0, 0, 0.8)'
+                              : '0 4px 12px rgba(0, 0, 0, 0.15)',
+                        }
+                      }}
+                    >
+                      {/* Sender name for group chats (if not own message and first in group) */}
+                      {!msg.isOwnMessage && showAvatar && (
+                        <Typography 
+                          variant="caption" 
+                          sx={{ 
+                            fontWeight: 'bold',
+                            color: 'primary.main',
+                            display: 'block',
+                            mb: 0.5
+                          }}
+                        >
+                          {msg.senderName}
+                        </Typography>
+                      )}
+                      
+                      {/* Message content */}
+                      <Typography 
+                        variant="body1" 
+                        component="div"
+                        sx={{
+                          wordBreak: 'break-word',
+                          lineHeight: 1.4,
+                          fontSize: '0.95rem'
+                        }}
+                      >
+                        {msg.content}
+                      </Typography>
+                      
+                      {/* Timestamp and status */}
+                      <Box 
+                        sx={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'flex-end',
+                          mt: 0.5,
+                          gap: 0.5
+                        }}
+                      >
+                        <Typography 
+                          variant="caption" 
+                          sx={{
+                            color: msg.isOwnMessage ? 'rgba(255,255,255,0.8)' : 'text.secondary',
+                            fontSize: '0.75rem',
+                            fontWeight: 500
+                          }}
+                        >
+                          {new Date(msg.createdAt).toLocaleTimeString([], { 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                          })}
+                        </Typography>
+                        
+                        {/* Message status for own messages */}
+                        {msg.isOwnMessage && (
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <DoneAllIcon 
+                              sx={{ 
+                                fontSize: 16, 
+                                color: 'rgba(255,255,255,0.8)',
+                                ml: 0.25
+                              }} 
+                            />
+                          </Box>
+                        )}
+                      </Box>
+                    </Paper>
+                  </Box>
                 </Box>
-              </Box>
-            </ListItem>
-          ))}
+              </ListItem>
+            );
+          })}
         </List>
         <div ref={messagesEndRef} />
       </Box>
@@ -229,11 +352,25 @@ export default function ChatInterface({
           p: 2,
           borderRadius: 0,
           borderTop: '1px solid',
-          borderColor: 'divider'
+          borderColor: 'divider',
+          backgroundColor: (theme) => theme.palette.mode === 'dark' 
+            ? theme.palette.grey[900] 
+            : theme.palette.background.paper
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 1 }}>
-          <IconButton size="small" color="primary">
+        <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 1.5 }}>
+          <IconButton 
+            size="small" 
+            color="primary"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'primary.main',
+                color: 'white',
+                transform: 'scale(1.1)'
+              },
+              transition: 'all 0.2s ease'
+            }}
+          >
             <AttachFileIcon />
           </IconButton>
           
@@ -250,12 +387,58 @@ export default function ChatInterface({
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: 3,
+                backgroundColor: (theme) => theme.palette.mode === 'dark' 
+                  ? theme.palette.grey[800] 
+                  : '#f8f9fa',
+                border: '2px solid transparent',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  backgroundColor: (theme) => theme.palette.mode === 'dark' 
+                    ? theme.palette.grey[700] 
+                    : 'white',
+                  border: (theme) => theme.palette.mode === 'dark' 
+                    ? '2px solid rgba(144, 202, 249, 0.5)' 
+                    : '2px solid #e3f2fd',
+                },
+                '&.Mui-focused': {
+                  backgroundColor: (theme) => theme.palette.mode === 'dark' 
+                    ? theme.palette.grey[700] 
+                    : 'white',
+                  border: '2px solid #2196f3',
+                  boxShadow: '0 0 0 3px rgba(33, 150, 243, 0.1)',
+                },
+                '& fieldset': {
+                  border: 'none',
+                }
+              },
+              '& .MuiInputBase-input': {
+                fontSize: '0.95rem',
+                lineHeight: 1.4,
+                color: (theme) => theme.palette.mode === 'dark' 
+                  ? theme.palette.grey[100] 
+                  : theme.palette.text.primary,
+                '&::placeholder': {
+                  color: (theme) => theme.palette.mode === 'dark' 
+                    ? theme.palette.grey[400] 
+                    : theme.palette.grey[600],
+                  opacity: 1,
+                }
               }
             }}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton size="small">
+                  <IconButton 
+                    size="small"
+                    sx={{
+                      '&:hover': {
+                        backgroundColor: 'warning.main',
+                        color: 'white',
+                        transform: 'scale(1.1)'
+                      },
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
                     <EmojiIcon />
                   </IconButton>
                 </InputAdornment>
@@ -268,14 +451,24 @@ export default function ChatInterface({
             onClick={handleSendMessage}
             disabled={!message.trim()}
             sx={{
-              bgcolor: message.trim() ? 'primary.main' : 'grey.300',
+              backgroundColor: 'primary.main',
               color: 'white',
+              width: 48,
+              height: 48,
               '&:hover': {
-                bgcolor: message.trim() ? 'primary.dark' : 'grey.400'
+                backgroundColor: 'primary.dark',
+                transform: 'scale(1.05)',
               },
               '&:disabled': {
-                color: 'grey.500'
-              }
+                backgroundColor: (theme) => theme.palette.mode === 'dark' 
+                  ? theme.palette.grey[700] 
+                  : 'grey.300',
+                color: (theme) => theme.palette.mode === 'dark' 
+                  ? theme.palette.grey[500] 
+                  : 'grey.500',
+              },
+              transition: 'all 0.2s ease',
+              boxShadow: '0 2px 8px rgba(33, 150, 243, 0.3)',
             }}
           >
             <SendIcon />
@@ -289,14 +482,48 @@ export default function ChatInterface({
             size="small"
             variant="outlined"
             clickable
-            sx={{ fontSize: '0.75rem' }}
+            onClick={() => setMessage("Schedule a session with me! 📅")}
+            sx={{ 
+              fontSize: '0.75rem',
+              borderColor: (theme) => theme.palette.mode === 'dark' 
+                ? theme.palette.grey[600] 
+                : theme.palette.grey[300],
+              color: (theme) => theme.palette.mode === 'dark' 
+                ? theme.palette.grey[100] 
+                : theme.palette.text.primary,
+              '&:hover': {
+                backgroundColor: (theme) => theme.palette.mode === 'dark' 
+                  ? 'rgba(144, 202, 249, 0.1)' 
+                  : 'rgba(33, 150, 243, 0.1)',
+                borderColor: (theme) => theme.palette.mode === 'dark' 
+                  ? 'rgba(144, 202, 249, 0.5)' 
+                  : 'rgba(33, 150, 243, 0.5)',
+              }
+            }}
           />
           <Chip
             label="Share Resource"
             size="small"
             variant="outlined"
             clickable
-            sx={{ fontSize: '0.75rem' }}
+            onClick={() => setMessage("Here's a resource I found helpful! 📚")}
+            sx={{ 
+              fontSize: '0.75rem',
+              borderColor: (theme) => theme.palette.mode === 'dark' 
+                ? theme.palette.grey[600] 
+                : theme.palette.grey[300],
+              color: (theme) => theme.palette.mode === 'dark' 
+                ? theme.palette.grey[100] 
+                : theme.palette.text.primary,
+              '&:hover': {
+                backgroundColor: (theme) => theme.palette.mode === 'dark' 
+                  ? 'rgba(144, 202, 249, 0.1)' 
+                  : 'rgba(33, 150, 243, 0.1)',
+                borderColor: (theme) => theme.palette.mode === 'dark' 
+                  ? 'rgba(144, 202, 249, 0.5)' 
+                  : 'rgba(33, 150, 243, 0.5)',
+              }
+            }}
           />
           <Chip
             label="Quick Thanks"
@@ -304,7 +531,47 @@ export default function ChatInterface({
             variant="outlined"
             clickable
             onClick={() => setMessage("Thank you for the help! 🙏")}
-            sx={{ fontSize: '0.75rem' }}
+            sx={{ 
+              fontSize: '0.75rem',
+              borderColor: (theme) => theme.palette.mode === 'dark' 
+                ? theme.palette.grey[600] 
+                : theme.palette.grey[300],
+              color: (theme) => theme.palette.mode === 'dark' 
+                ? theme.palette.grey[100] 
+                : theme.palette.text.primary,
+              '&:hover': {
+                backgroundColor: (theme) => theme.palette.mode === 'dark' 
+                  ? 'rgba(144, 202, 249, 0.1)' 
+                  : 'rgba(33, 150, 243, 0.1)',
+                borderColor: (theme) => theme.palette.mode === 'dark' 
+                  ? 'rgba(144, 202, 249, 0.5)' 
+                  : 'rgba(33, 150, 243, 0.5)',
+              }
+            }}
+          />
+          <Chip
+            label="How do I connect with you?"
+            size="small"
+            variant="outlined"
+            clickable
+            onClick={() => setMessage("How to connect Zoom or any other platform?")}
+            sx={{ 
+              fontSize: '0.75rem',
+              borderColor: (theme) => theme.palette.mode === 'dark' 
+                ? theme.palette.grey[600] 
+                : theme.palette.grey[300],
+              color: (theme) => theme.palette.mode === 'dark' 
+                ? theme.palette.grey[100] 
+                : theme.palette.text.primary,
+              '&:hover': {
+                backgroundColor: (theme) => theme.palette.mode === 'dark' 
+                  ? 'rgba(144, 202, 249, 0.1)' 
+                  : 'rgba(33, 150, 243, 0.1)',
+                borderColor: (theme) => theme.palette.mode === 'dark' 
+                  ? 'rgba(144, 202, 249, 0.5)' 
+                  : 'rgba(33, 150, 243, 0.5)',
+              }
+            }}
           />
         </Box>
       </Paper>

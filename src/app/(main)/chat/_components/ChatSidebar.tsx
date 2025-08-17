@@ -25,103 +25,47 @@ import {
 } from '@mui/icons-material';
 
 interface User {
-  id: string;
+  _id: string;
   name: string;
+  email: string;
   avatar?: string;
-  isOnline: boolean;
-  lastSeen?: string;
+  role: string;
 }
 
-interface Conversation {
-  id: string;
-  user: {
-    name: string;
-    avatar?: string;
-    isOnline: boolean;
-  };
-  lastMessage: string;
-  timestamp: string;
-  unreadCount: number;
+interface ChatUser {
+  conversationId?: string;
+  user: User;
+  lastMessage?: string;
+  lastMessageTime?: Date;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  lastMessageSender?: any;
 }
 
 interface ChatSidebarProps {
-  onConversationSelect?: (conversation: Conversation) => void;
-  onUserSelect?: (user: User) => void;
-  selectedConversationId?: string;
+  chats: ChatUser[];
+  usersForNewConversation: User[];
+  selectedChat: ChatUser | null;
+  onChatSelect: (chat: ChatUser) => void;
+  onUserSelect: (user: User) => Promise<void>;
+  isLoading: boolean;
 }
 
 export default function ChatSidebar({ 
-  onConversationSelect, 
-  onUserSelect, 
-  selectedConversationId 
+  chats,
+  usersForNewConversation, 
+  selectedChat,
+  onChatSelect,
+  onUserSelect,
+  isLoading
 }: ChatSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<'conversations' | 'users'>('conversations');
 
-  // Mock data - replace with real data from your backend
-  const [conversations] = useState<Conversation[]>([
-    {
-      id: '1',
-      user: {
-        name: 'Nipun Yasas',
-        avatar: '/nipun.png',
-        isOnline: true
-      },
-      lastMessage: 'Hey! Thanks for the React tutorial session.',
-      timestamp: '2 min ago',
-      unreadCount: 2
-    },
-    {
-      id: '2',
-      user: {
-        name: 'Dinithi Dewmini',
-        avatar: '/dinithi.png',
-        isOnline: true
-      },
-      lastMessage: 'The Figma project looks great!',
-      timestamp: '1 hour ago',
-      unreadCount: 0
-    },
-    {
-      id: '3',
-      user: {
-        name: 'Alex Chen',
-        avatar: '/alex.png',
-        isOnline: false
-      },
-      lastMessage: 'Can we schedule the ML session for tomorrow?',
-      timestamp: '3 hours ago',
-      unreadCount: 1
-    }
-  ]);
-
-  const [users] = useState<User[]>([
-    {
-      id: '4',
-      name: 'Sarah Johnson',
-      avatar: '/sarah.png',
-      isOnline: true
-    },
-    {
-      id: '5',
-      name: 'Mike Rodriguez',
-      avatar: '/mike.png',
-      isOnline: false,
-      lastSeen: '5 min ago'
-    },
-    {
-      id: '6',
-      name: 'Emily Davis',
-      avatar: '/emily.png',
-      isOnline: true
-    }
-  ]);
-
-  const filteredConversations = conversations.filter(conv =>
-    conv.user.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredChats = chats.filter(chat =>
+    chat.user.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const filteredUsers = users.filter(user =>
+  const filteredUsers = usersForNewConversation.filter(user =>
     user.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -204,21 +148,27 @@ export default function ChatSidebar({
       <Box sx={{ flex: 1, overflow: 'auto' }}>
         {activeTab === 'conversations' ? (
           <List sx={{ p: 0 }}>
-            {filteredConversations.length > 0 ? (
-              filteredConversations.map((conversation) => (
+            {isLoading ? (
+              <Box sx={{ p: 3, textAlign: 'center' }}>
+                <Typography variant="body2" color="text.secondary">
+                  Loading conversations...
+                </Typography>
+              </Box>
+            ) : filteredChats.length > 0 ? (
+              filteredChats.map((chat) => (
                 <ListItem
-                  key={conversation.id}
+                  key={chat.conversationId}
                   component="div"
-                  onClick={() => onConversationSelect?.(conversation)}
+                  onClick={() => onChatSelect(chat)}
                   sx={{
                     py: 2,
                     px: 3,
                     borderBottom: '1px solid',
                     borderColor: 'grey.100',
                     cursor: 'pointer',
-                    backgroundColor: selectedConversationId === conversation.id ? 'primary.50' : 'transparent',
-                    borderRight: selectedConversationId === conversation.id ? '3px solid' : 'none',
-                    borderRightColor: selectedConversationId === conversation.id ? 'primary.main' : 'transparent',
+                    backgroundColor: selectedChat?.conversationId === chat.conversationId ? 'primary.50' : 'transparent',
+                    borderRight: selectedChat?.conversationId === chat.conversationId ? '3px solid' : 'none',
+                    borderRightColor: selectedChat?.conversationId === chat.conversationId ? 'primary.main' : 'transparent',
                     '&:hover': {
                       backgroundColor: 'primary.main',  
                     }
@@ -229,19 +179,17 @@ export default function ChatSidebar({
                       overlap="circular"
                       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                       badgeContent={
-                        conversation.user.isOnline ? (
-                          <CircleIcon sx={{ fontSize: 12, color: 'success.main' }} />
-                        ) : null
+                        <CircleIcon sx={{ fontSize: 12, color: 'success.main' }} />
                       }
                     >
-                      <Avatar src={conversation.user.avatar} alt={conversation.user.name}>
-                        {conversation.user.name.charAt(0)}
+                      <Avatar src={chat.user.avatar} alt={chat.user.name}>
+                        {chat.user.name.charAt(0)}
                       </Avatar>
                     </Badge>
                   </ListItemAvatar>
                   <ListItemText
-                    primary={conversation.user.name}
-                    secondary={conversation.lastMessage}
+                    primary={chat.user.name}
+                    secondary={chat.lastMessage || 'Start chatting...'}
                     primaryTypographyProps={{
                       variant: 'subtitle2',
                       fontWeight: 'medium'
@@ -257,7 +205,7 @@ export default function ChatSidebar({
                     }}
                   />
                   
-                  {/* Timestamp and unread badge */}
+                  {/* Timestamp and role badge */}
                   <Box sx={{ 
                     display: 'flex', 
                     flexDirection: 'column', 
@@ -266,21 +214,19 @@ export default function ChatSidebar({
                     minWidth: 'fit-content'
                   }}>
                     <Typography variant="caption" color="text.secondary" component="span">
-                      {conversation.timestamp}
+                      {chat.lastMessageTime ? new Date(chat.lastMessageTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Now'}
                     </Typography>
-                    {conversation.unreadCount > 0 && (
-                      <Chip
-                        label={conversation.unreadCount}
-                        size="small"
-                        color="primary"
-                        sx={{ 
-                          minWidth: 20, 
-                          height: 20, 
-                          fontSize: '0.75rem',
-                          '& .MuiChip-label': { px: 1 }
-                        }}
-                      />
-                    )}
+                    <Chip
+                      label={chat.user.role}
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                      sx={{ 
+                        height: 20, 
+                        fontSize: '0.7rem',
+                        '& .MuiChip-label': { px: 1 }
+                      }}
+                    />
                   </Box>
                 </ListItem>
               ))
@@ -300,17 +246,27 @@ export default function ChatSidebar({
                 🤝 Available Mentors & Students
               </Typography>
             </ListItem>
-            {filteredUsers.length > 0 ? (
+            {isLoading ? (
+              <Box sx={{ p: 3, textAlign: 'center' }}>
+                <Typography variant="body2" color="text.secondary">
+                  Loading users...
+                </Typography>
+              </Box>
+            ) : filteredUsers.length > 0 ? (
               filteredUsers.map((user) => (
                 <ListItem
-                  key={user.id}
+                  key={user._id}
                   component="div"
-                  onClick={() => onUserSelect?.(user)}
+                  onClick={() => onUserSelect(user)}
                   sx={{
                     py: 2,
                     px: 3,
                     borderBottom: '1px solid',
+                    borderColor: 'grey.100',
                     cursor: 'pointer',
+                    '&:hover': {
+                      backgroundColor: 'action.hover',
+                    }
                   }}
                 >
                   <ListItemAvatar>
@@ -318,9 +274,7 @@ export default function ChatSidebar({
                       overlap="circular"
                       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                       badgeContent={
-                        user.isOnline ? (
-                          <CircleIcon sx={{ fontSize: 12, color: 'success.main' }} />
-                        ) : null
+                        <CircleIcon sx={{ fontSize: 12, color: 'success.main' }} />
                       }
                     >
                       <Avatar src={user.avatar} alt={user.name}>
@@ -330,14 +284,14 @@ export default function ChatSidebar({
                   </ListItemAvatar>
                   <ListItemText
                     primary={user.name}
-                    secondary={user.isOnline ? '● Online' : `Last seen ${user.lastSeen || 'recently'}`}
+                    secondary={`${user.role} • ${user.email}`}
                     primaryTypographyProps={{
                       variant: 'subtitle2',
                       fontWeight: 'medium'
                     }}
                     secondaryTypographyProps={{
                       variant: 'body2',
-                      sx: { color: user.isOnline ? '#4caf50' : 'text.secondary' }
+                      sx: { color: 'text.secondary' }
                     }}
                   />
                 </ListItem>

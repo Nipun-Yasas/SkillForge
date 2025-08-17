@@ -25,60 +25,50 @@ import {
 } from '@mui/icons-material';
 
 interface Message {
-  id: string;
+  _id: string;
   senderId: string;
   senderName: string;
   content: string;
-  timestamp: string;
-  isOwn: boolean;
+  createdAt: Date;
+  isOwnMessage: boolean;
+  senderAvatar?: string;
+}
+
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  role: string;
+}
+
+interface ChatUser {
+  conversationId?: string;
+  user: User;
+  lastMessage?: string;
+  lastMessageTime?: Date;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  lastMessageSender?: any;
 }
 
 interface ChatInterfaceProps {
-  recipientName: string;
-  recipientAvatar?: string;
-  isOnline: boolean;
+  selectedChat: ChatUser;
+  messages: Message[];
+  onSendMessage: (content: string) => Promise<void>;
 }
 
 export default function ChatInterface({ 
-  recipientName, 
-  recipientAvatar, 
-  isOnline 
+  selectedChat,
+  messages: propMessages,
+  onSendMessage
 }: ChatInterfaceProps) {
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      senderId: '1',
-      senderName: recipientName,
-      content: 'Hey! Thanks for agreeing to mentor me in React. When can we start?',
-      timestamp: '10:30 AM',
-      isOwn: false
-    },
-    {
-      id: '2',
-      senderId: 'me',
-      senderName: 'Me',
-      content: 'Hi! I\'m excited to help you learn React. How about we start with the basics this weekend?',
-      timestamp: '10:32 AM',
-      isOwn: true
-    },
-    {
-      id: '3',
-      senderId: '1',
-      senderName: recipientName,
-      content: 'Perfect! Should I prepare anything beforehand?',
-      timestamp: '10:35 AM',
-      isOwn: false
-    },
-    {
-      id: '4',
-      senderId: 'me',
-      senderName: 'Me',
-      content: 'Just make sure you have Node.js installed and a code editor ready. We\'ll start with creating your first React component!',
-      timestamp: '10:36 AM',
-      isOwn: true
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>(propMessages || []);
+
+  // Update messages when propMessages change
+  useEffect(() => {
+    setMessages(propMessages || []);
+  }, [propMessages]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -90,20 +80,15 @@ export default function ChatInterface({
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!message.trim()) return;
 
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      senderId: 'me',
-      senderName: 'Me',
-      content: message,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      isOwn: true
-    };
-
-    setMessages(prev => [...prev, newMessage]);
-    setMessage("");
+    try {
+      await onSendMessage(message);
+      setMessage("");
+    } catch (error) {
+      console.error('Failed to send message:', error);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -131,25 +116,20 @@ export default function ChatInterface({
               overlap="circular"
               anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
               badgeContent={
-                isOnline ? (
-                  <CircleIcon sx={{ fontSize: 14, color: 'success.main' }} />
-                ) : null
+                // For now, we'll show all users as online since we don't have real-time status
+                <CircleIcon sx={{ fontSize: 14, color: 'success.main' }} />
               }
             >
-              <Avatar src={recipientAvatar} alt={recipientName} sx={{ width: 45, height: 45 }}>
-                {recipientName.charAt(0)}
+              <Avatar src={selectedChat.user.avatar} alt={selectedChat.user.name} sx={{ width: 45, height: 45 }}>
+                {selectedChat.user.name.charAt(0)}
               </Avatar>
             </Badge>
             <Box>
               <Typography variant="h6" fontWeight="bold" component="div">
-                {recipientName}
+                {selectedChat.user.name}
               </Typography>
               <Typography variant="body2" color="text.secondary" component="div">
-                {isOnline ? (
-                  <span style={{ color: '#4caf50' }}>● Online</span>
-                ) : (
-                  'Last seen recently'
-                )}
+                <span style={{ color: '#4caf50' }}>● Online</span>
               </Typography>
             </Box>
           </Box>
@@ -179,10 +159,10 @@ export default function ChatInterface({
         <List sx={{ p: 0 }}>
           {messages.map((msg) => (
             <ListItem
-              key={msg.id}
+              key={msg._id}
               sx={{
                 display: 'flex',
-                justifyContent: msg.isOwn ? 'flex-end' : 'flex-start',
+                justifyContent: msg.isOwnMessage ? 'flex-end' : 'flex-start',
                 p: 1
               }}
             >
@@ -190,14 +170,14 @@ export default function ChatInterface({
                 sx={{
                   maxWidth: '70%',
                   display: 'flex',
-                  flexDirection: msg.isOwn ? 'row-reverse' : 'row',
+                  flexDirection: msg.isOwnMessage ? 'row-reverse' : 'row',
                   alignItems: 'flex-end',
                   gap: 1
                 }}
               >
-                {!msg.isOwn && (
+                {!msg.isOwnMessage && (
                   <Avatar 
-                    src={recipientAvatar} 
+                    src={msg.senderAvatar || selectedChat.user.avatar} 
                     alt={msg.senderName}
                     sx={{ width: 32, height: 32 }}
                   >
@@ -210,11 +190,11 @@ export default function ChatInterface({
                     elevation={1}
                     sx={{
                       p: 2,
-                      backgroundColor: msg.isOwn ? 'primary.main' : '',
-                      color: msg.isOwn ? 'white' : 'text.primary',
+                      backgroundColor: msg.isOwnMessage ? 'primary.main' : '',
+                      color: msg.isOwnMessage ? 'white' : 'text.primary',
                       borderRadius: 3,
-                      borderTopRightRadius: msg.isOwn ? 1 : 3,
-                      borderTopLeftRadius: msg.isOwn ? 3 : 1
+                      borderTopRightRadius: msg.isOwnMessage ? 1 : 3,
+                      borderTopLeftRadius: msg.isOwnMessage ? 3 : 1
                     }}
                   >
                     <Typography variant="body1" component="div">
@@ -228,11 +208,11 @@ export default function ChatInterface({
                     sx={{ 
                       display: 'block', 
                       mt: 0.5,
-                      textAlign: msg.isOwn ? 'right' : 'left',
+                      textAlign: msg.isOwnMessage ? 'right' : 'left',
                       px: 1
                     }}
                   >
-                    {msg.timestamp}
+                    {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </Typography>
                 </Box>
               </Box>

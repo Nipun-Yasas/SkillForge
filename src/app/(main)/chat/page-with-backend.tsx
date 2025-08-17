@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Container } from '@mui/material';
+import { Box, Typography, Button, Container } from '@mui/material';
 import ChatSidebar from './_components/ChatSidebar';
 import ChatWelcome from './_components/ChatWelcome';
 import ChatInterface from './_components/ChatInterface';
@@ -71,7 +71,6 @@ export default function ChatPage() {
   // Handle selecting an existing chat
   const handleChatSelect = (chat: ChatUser) => {
     setSelectedChat(chat);
-    setMessages([]); // Clear previous messages
     if (chat.conversationId) {
       loadMessages(chat.conversationId);
     }
@@ -90,7 +89,6 @@ export default function ChatPage() {
       setSelectedChat(newChat);
       setChats(prev => [newChat, ...prev]);
       setUsersForNewConversation(prev => prev.filter(u => u._id !== user._id));
-      setMessages([]); // Clear messages for new conversation
       loadMessages(conversation.conversationId);
     } catch (error) {
       console.error('Error creating conversation:', error);
@@ -106,13 +104,6 @@ export default function ChatPage() {
       if (result.message) {
         setMessages(prev => [...prev, result.message]);
         setLastMessageTime(result.message.createdAt);
-        
-        // Update the chat's last message in the sidebar
-        setChats(prev => prev.map(chat => 
-          chat.conversationId === selectedChat.conversationId 
-            ? { ...chat, lastMessage: content, lastMessageTime: new Date() }
-            : chat
-        ));
       }
     } catch (error) {
       console.error('Error sending message:', error);
@@ -121,8 +112,6 @@ export default function ChatPage() {
 
   // Polling for real-time updates
   useEffect(() => {
-    if (isLoading) return; // Don't start polling until initial load is done
-
     const pollInterval = setInterval(async () => {
       try {
         // Poll conversation list
@@ -145,10 +134,10 @@ export default function ChatPage() {
       } catch (error) {
         console.error('Polling error:', error);
       }
-    }, 5000); // Poll every 5 seconds to reduce server load
+    }, 300); // Poll every 300ms as requested
 
     return () => clearInterval(pollInterval);
-  }, [selectedChat?.conversationId, lastMessageTime, isLoading]);
+  }, [selectedChat?.conversationId, lastMessageTime]);
 
   // Initial load
   useEffect(() => {
@@ -158,16 +147,33 @@ export default function ChatPage() {
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
       <Typography variant="h4" fontWeight="bold" sx={{ mb: 3 }}>
-        💬 Messages
+        Chat System
       </Typography>
+
+      {/* Testing Buttons */}
+      <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
+        <Button 
+          variant="outlined" 
+          onClick={() => ChatAPI.runFullTest()}
+          size="small"
+        >
+          🧪 Run Full API Test
+        </Button>
+        <Button 
+          variant="outlined" 
+          onClick={loadUsersAndConversations}
+          size="small"
+        >
+          🔄 Refresh Users
+        </Button>
+      </Box>
 
       <Box sx={{ 
         display: 'flex', 
-        height: '75vh',
+        height: '70vh',
         border: '1px solid #e0e0e0',
         borderRadius: 2,
-        overflow: 'hidden',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+        overflow: 'hidden'
       }}>
         {/* Sidebar */}
         <ChatSidebar
@@ -183,7 +189,7 @@ export default function ChatPage() {
         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           {selectedChat ? (
             <ChatInterface
-              selectedChat={selectedChat}
+              chat={selectedChat}
               messages={messages}
               onSendMessage={handleSendMessage}
             />

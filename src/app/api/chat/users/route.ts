@@ -12,14 +12,6 @@ interface PopulatedUser {
   role: string;
 }
 
-interface PopulatedConversation {
-  _id: string;
-  participants: PopulatedUser[];
-  lastMessage?: string;
-  lastMessageTime?: Date;
-  lastMessageSender?: PopulatedUser;
-}
-
 export async function GET(request: NextRequest) {
   try {
     await connectDB();

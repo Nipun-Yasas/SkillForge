@@ -6,7 +6,7 @@ import Conversation from "@/models/Conversation";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { conversationId: string } }
+  { params }: { params: Promise<{ conversationId: string }> }
 ) {
   try {
     await connectDB();
@@ -23,7 +23,7 @@ export async function GET(
     }
 
     const currentUserId = decoded.userId;
-    const { conversationId } = params;
+    const { conversationId } = await params;
 
     // Verify user is participant in this conversation
     const conversation = await Conversation.findById(conversationId);

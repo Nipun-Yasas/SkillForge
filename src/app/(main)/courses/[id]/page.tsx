@@ -10,6 +10,7 @@ import {
   Chip,
   Button,
   Avatar,
+  Grid,
  
   LinearProgress,
   // Grid, (remove from here)
@@ -24,6 +25,7 @@ import {
   CircularProgress,
   Alert,
 } from '@mui/material';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import {
   PlayCircle,
   Clock,
@@ -203,7 +205,7 @@ export default function CourseDetailPage() {
 
         <Grid container spacing={4}>
           {/* Left Column - Course Info */}
-          <Grid item xs={12} md={8}>
+          <Grid container spacing={2}>
             {/* Course Header */}
             <Paper sx={{ p: 4, mb: 3, borderRadius: 3 }}>
               <Box sx={{ mb: 3 }}>
@@ -281,7 +283,7 @@ export default function CourseDetailPage() {
             <Paper sx={{ p: 4, mb: 3, borderRadius: 3 }}>
               <Typography variant="h5" fontWeight="bold" gutterBottom>
                 <Target size={24} style={{ marginRight: 8, verticalAlign: 'middle' }} />
-                What You'll Learn
+                What You&#39;ll Learn
               </Typography>
               <List>
                 {course.learningOutcomes.map((outcome, index) => (
@@ -373,7 +375,7 @@ export default function CourseDetailPage() {
           </Grid>
 
           {/* Right Column - Enrollment */}
-          <Grid item xs={12} md={4}>
+          <Grid container spacing={2}>
             <Paper sx={{ p: 3, borderRadius: 3, position: 'sticky', top: 24 }}>
               {/* Course Image */}
               <Box

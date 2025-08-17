@@ -16,7 +16,17 @@ import {
   CardContent,
   Divider,
   IconButton,
-  Skeleton
+  Skeleton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Alert,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText
 } from '@mui/material';
 import {
   ArrowBack as ArrowBackIcon,
@@ -25,7 +35,10 @@ import {
   AttachMoney as MoneyIcon,
   Star as StarIcon,
   Message as MessageIcon,
-  VideoCall as VideoCallIcon
+  VideoCall as VideoCallIcon,
+  SwapHoriz as SwapHorizIcon,
+  CheckCircle as CheckCircleIcon,
+  Info as InfoIcon
 } from '@mui/icons-material';
 
 interface Mentor {
@@ -46,6 +59,15 @@ export default function MentorProfile() {
   const router = useRouter();
   const [mentor, setMentor] = useState<Mentor | null>(null);
   const [loading, setLoading] = useState(true);
+  const [openBarterDialog, setOpenBarterDialog] = useState(false);
+  const [consultationMessage, setConsultationMessage] = useState('');
+
+  const handleSendConsultationRequest = () => {
+    // In a real app, this would send a message to the mentor
+    // For now, we'll just navigate to chat
+    router.push('/chat');
+    setOpenBarterDialog(false);
+  };
 
   useEffect(() => {
     const fetchMentor = async () => {
@@ -183,6 +205,7 @@ export default function MentorProfile() {
                 variant="outlined"
                 size="large"
                 startIcon={<VideoCallIcon />}
+                onClick={() => setOpenBarterDialog(true)}
                 sx={{
                   borderColor: 'white',
                   color: 'white',
@@ -361,6 +384,7 @@ export default function MentorProfile() {
                   fullWidth
                   size="large"
                   startIcon={<VideoCallIcon />}
+                  onClick={() => setOpenBarterDialog(true)}
                 >
                   Book Free Consultation
                 </Button>
@@ -369,6 +393,117 @@ export default function MentorProfile() {
           </Card>
         </Box>
       </Box>
+
+      {/* Barter System Explanation Dialog */}
+      <Dialog 
+        open={openBarterDialog} 
+        onClose={() => setOpenBarterDialog(false)} 
+        maxWidth="md" 
+        fullWidth
+      >
+        <DialogTitle sx={{ textAlign: 'center', pb: 1 }}>
+          <InfoIcon sx={{ fontSize: 50, color: '#2196F3', mb: 2 }} />
+          <Typography variant="h4" component="div" sx={{ color: '#2196F3', fontWeight: 'bold' }}>
+            🤝 Free Consultation - SkillForge Barter System
+          </Typography>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 0 }}>
+          <Alert severity="info" sx={{ mb: 3 }}>
+            <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+              Great news! Your first consultation with any mentor is completely FREE!
+            </Typography>
+          </Alert>
+
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="h6" gutterBottom sx={{ color: '#2196F3', fontWeight: 'bold' }}>
+              🔄 How Our Barter System Works:
+            </Typography>
+            <List>
+              <ListItem>
+                <ListItemIcon>
+                  <CheckCircleIcon sx={{ color: '#4CAF50' }} />
+                </ListItemIcon>
+                <ListItemText 
+                  primary="Free First Session" 
+                  secondary="Every mentor offers a FREE 30-minute consultation to new students"
+                />
+              </ListItem>
+              <ListItem>
+                <ListItemIcon>
+                  <SwapHorizIcon sx={{ color: '#FF9800' }} />
+                </ListItemIcon>
+                <ListItemText 
+                  primary="Teach to Learn" 
+                  secondary="Share your skills to earn teaching credits, then use them to learn from others"
+                />
+              </ListItem>
+              <ListItem>
+                <ListItemIcon>
+                  <StarIcon sx={{ color: '#9C27B0' }} />
+                </ListItemIcon>
+                <ListItemText 
+                  primary="Credit Exchange" 
+                  secondary="1 hour of teaching = 2 credits, 1 hour of learning = 2 credits (1:1 ratio)"
+                />
+              </ListItem>
+              <ListItem>
+                <ListItemIcon>
+                  <SchoolIcon sx={{ color: '#2196F3' }} />
+                </ListItemIcon>
+                <ListItemText 
+                  primary="Community Growth" 
+                  secondary="Everyone learns and teaches, creating a thriving knowledge-sharing community"
+                />
+              </ListItem>
+            </List>
+          </Box>
+
+          <Card sx={{ p: 3, backgroundColor: '#f8f9fa', border: '2px solid #4CAF50' }}>
+            <Typography variant="h6" gutterBottom sx={{ color: '#4CAF50', textAlign: 'center' }}>
+              🎯 Ready to Start Your Free Consultation?
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 3, textAlign: 'center' }}>
+              Send {mentor?.name} a message to introduce yourself and schedule your free session!
+            </Typography>
+            <TextField
+              fullWidth
+              multiline
+              rows={4}
+              placeholder={`Hi ${mentor?.name}! I'm interested in learning about ${mentor?.skills.slice(0, 2).join(' and ')}. Could we schedule a free consultation to discuss how you can help me achieve my learning goals?`}
+              value={consultationMessage}
+              onChange={(e) => setConsultationMessage(e.target.value)}
+              sx={{ mb: 2 }}
+            />
+          </Card>
+
+          <Box sx={{ textAlign: 'center', mt: 3, p: 2, backgroundColor: '#e3f2fd', borderRadius: 2 }}>
+            <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+              💡 Pro Tip: The more specific you are about your learning goals, the better {mentor?.name} can prepare for your session!
+            </Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
+          <Button 
+            onClick={() => setOpenBarterDialog(false)}
+            variant="outlined"
+            size="large"
+          >
+            Maybe Later
+          </Button>
+          <Button 
+            onClick={handleSendConsultationRequest}
+            variant="contained"
+            size="large"
+            startIcon={<MessageIcon />}
+            sx={{ 
+              background: 'linear-gradient(45deg, #4CAF50 30%, #66BB6A 90%)',
+              px: 3
+            }}
+          >
+            Send Message & Book Session
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }

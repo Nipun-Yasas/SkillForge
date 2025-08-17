@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ThreadDetail from './_components/ThreadDetail';
 import {
   Box,
@@ -23,7 +23,10 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  CircularProgress,
+  Alert,
+  Snackbar
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -41,25 +44,14 @@ import {
   QuestionAnswer as QuestionAnswerIcon
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-
-interface Thread {
-  id: string;
-  title: string;
-  content: string;
-  author: {
-    name: string;
-    avatar?: string;
-    badge?: string;
-  };
-  category: string;
-  tags: string[];
-  replies: number;
-  likes: number;
-  createdAt: string;
-  lastReply?: string;
-  isPinned?: boolean;
-  isAnswered?: boolean;
-}
+import { 
+  getThreads, 
+  createThread, 
+  likeThread, 
+  bookmarkThread,
+  Thread as ThreadType,
+  CreateThreadData 
+} from '@/lib/forumService';
 
 const forumCategories = [
   {
@@ -120,107 +112,7 @@ const forumCategories = [
   }
 ];
 
-const mockThreads: Thread[] = [
-  {
-    id: '1',
-    title: 'How do I get started with JavaScript?',
-    content: 'I\'m completely new to programming and want to learn JavaScript. What\'s the best roadmap to follow?',
-    author: { name: 'Alex Chen', avatar: '/alex.png' },
-    category: 'skill-help',
-    tags: ['JavaScript', 'Beginner', 'Roadmap'],
-    replies: 12,
-    likes: 8,
-    createdAt: '2 hours ago',
-    lastReply: '30 min ago',
-    isAnswered: true
-  },
-  {
-    id: '2',
-    title: 'Looking for a React mentor who\'s beginner-friendly',
-    content: 'I\'ve been learning React for a month and need guidance on best practices and project structure.',
-    author: { name: 'Sarah Johnson', avatar: '/sarah.png', badge: 'Student' },
-    category: 'mentor-recommendations',
-    tags: ['React', 'Mentorship', 'Beginner'],
-    replies: 6,
-    likes: 15,
-    createdAt: '4 hours ago',
-    lastReply: '1 hour ago'
-  },
-  {
-    id: '3',
-    title: 'Frontend dev here! Looking for someone to help with backend',
-    content: 'Working on a productivity app. Need help with Node.js and database design. Anyone interested?',
-    author: { name: 'Mike Rodriguez', avatar: '/mike.png', badge: 'Developer' },
-    category: 'project-collaboration',
-    tags: ['Frontend', 'Backend', 'Node.js', 'Collaboration'],
-    replies: 9,
-    likes: 22,
-    createdAt: '6 hours ago',
-    lastReply: '2 hours ago',
-    isPinned: true
-  },
-  {
-    id: '4',
-    title: 'Notion vs Trello – which do you prefer for project management?',
-    content: 'I\'m trying to decide between Notion and Trello for managing my learning projects. What are your experiences?',
-    author: { name: 'Emily Davis', avatar: '/emily.png' },
-    category: 'general-skill-talk',
-    tags: ['Productivity', 'Tools', 'Project Management'],
-    replies: 18,
-    likes: 31,
-    createdAt: '8 hours ago',
-    lastReply: '45 min ago'
-  },
-  {
-    id: '5',
-    title: 'Redesigned my portfolio site – feedback appreciated!',
-    content: 'Just finished redesigning my portfolio. Looking for honest feedback on design and UX.',
-    author: { name: 'David Kim', avatar: '/david.png', badge: 'Designer' },
-    category: 'feedback-zone',
-    tags: ['Portfolio', 'Design', 'Feedback', 'UX'],
-    replies: 14,
-    likes: 27,
-    createdAt: '12 hours ago',
-    lastReply: '3 hours ago'
-  },
-  {
-    id: '6',
-    title: 'Let\'s start a weekend study group for Python!',
-    content: 'Looking to organize a virtual study group every Saturday. Who\'s interested in joining?',
-    author: { name: 'Lisa Wang', avatar: '/lisa.png' },
-    category: 'events-meetups',
-    tags: ['Python', 'Study Group', 'Weekend', 'Virtual'],
-    replies: 8,
-    likes: 19,
-    createdAt: '1 day ago',
-    lastReply: '4 hours ago'
-  },
-  {
-    id: '7',
-    title: 'Just landed my first freelance gig – thanks SkillForge!',
-    content: 'After 3 months of learning and mentorship, I got my first paid project! Grateful for this community.',
-    author: { name: 'Carlos Martinez', avatar: '/carlos.png', badge: 'Graduate' },
-    category: 'success-stories',
-    tags: ['Freelance', 'Success', 'Milestone', 'Gratitude'],
-    replies: 25,
-    likes: 89,
-    createdAt: '1 day ago',
-    lastReply: '1 hour ago'
-  },
-  {
-    id: '8',
-    title: 'I\'m a Frontend Dev with 4 years experience – AMA!',
-    content: 'Happy to answer questions about React, career growth, interviews, or anything frontend related.',
-    author: { name: 'Jessica Brown', avatar: '/jessica.png', badge: 'Expert' },
-    category: 'ama-threads',
-    tags: ['AMA', 'Frontend', 'React', 'Career'],
-    replies: 42,
-    likes: 156,
-    createdAt: '2 days ago',
-    lastReply: '20 min ago',
-    isPinned: true
-  }
-];
+// const mockThreads: ThreadType[] = [];
 
 export default function DiscussionPage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -234,24 +126,162 @@ export default function DiscussionPage() {
     category: '',
     tags: ''
   });
-
-  const filteredThreads = mockThreads.filter(thread => {
-    const matchesCategory = selectedCategory === 'all' || thread.category === selectedCategory;
-    const matchesSearch = thread.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         thread.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-    return matchesCategory && matchesSearch;
+  
+  // API state
+  const [threads, setThreads] = useState<ThreadType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0
+  });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success' as 'success' | 'error'
   });
 
-  const sortedThreads = [...filteredThreads].sort((a, b) => {
-    switch (sortBy) {
-      case 'popular':
-        return b.likes - a.likes;
-      case 'replies':
-        return b.replies - a.replies;
-      default:
-        return 0; // Keep original order for 'recent'
+  // Load threads
+  useEffect(() => {
+    loadThreads();
+  }, [selectedCategory, searchTerm, sortBy, pagination.page]);
+
+  const loadThreads = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await getThreads(
+        selectedCategory,
+        searchTerm,
+        sortBy,
+        pagination.page,
+        pagination.limit
+      );
+      
+      setThreads(response.threads);
+      setPagination(response.pagination);
+    } catch (err) {
+      console.error('Error loading threads:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load threads');
+    } finally {
+      setLoading(false);
     }
-  });
+  };
+
+  const handleCreateThread = async () => {
+    try {
+      if (!newThread.title || !newThread.content || !newThread.category) {
+        setSnackbar({
+          open: true,
+          message: 'Please fill in all required fields',
+          severity: 'error'
+        });
+        return;
+      }
+
+      const threadData: CreateThreadData = {
+        title: newThread.title,
+        content: newThread.content,
+        category: newThread.category,
+        tags: newThread.tags
+      };
+
+      await createThread(threadData);
+      
+      setOpenNewThread(false);
+      setNewThread({ title: '', content: '', category: '', tags: '' });
+      setSnackbar({
+        open: true,
+        message: 'Thread created successfully!',
+        severity: 'success'
+      });
+      
+      // Reload threads
+      loadThreads();
+    } catch (err) {
+      console.error('Error creating thread:', err);
+      setSnackbar({
+        open: true,
+        message: err instanceof Error ? err.message : 'Failed to create thread',
+        severity: 'error'
+      });
+    }
+  };
+
+  const handleLikeThread = async (threadId: string) => {
+    try {
+      const response = await likeThread(threadId);
+      
+      // Update thread in state
+      setThreads(prevThreads => 
+        prevThreads.map(thread => 
+          thread._id === threadId 
+            ? { ...thread, likes: response.likesCount }
+            : thread
+        )
+      );
+    } catch (err) {
+      console.error('Error liking thread:', err);
+      setSnackbar({
+        open: true,
+        message: 'Failed to like thread',
+        severity: 'error'
+      });
+    }
+  };
+
+  const handleBookmarkThread = async (threadId: string) => {
+    try {
+      await bookmarkThread(threadId);
+      setSnackbar({
+        open: true,
+        message: 'Thread bookmark updated!',
+        severity: 'success'
+      });
+    } catch (err) {
+      console.error('Error bookmarking thread:', err);
+      setSnackbar({
+        open: true,
+        message: 'Failed to bookmark thread',
+        severity: 'error'
+      });
+    }
+  };
+
+  const handleThreadClick = (threadId: string) => {
+    setSelectedThread(threadId);
+  };
+
+  const handleBackToForum = () => {
+    setSelectedThread(null);
+    // Reload threads in case there were changes
+    loadThreads();
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  // Search with debounce
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      if (pagination.page !== 1) {
+        setPagination(prev => ({ ...prev, page: 1 }));
+      } else {
+        loadThreads();
+      }
+    }, 500);
+
+    return () => clearTimeout(debounceTimer);
+  }, [searchTerm]);
+
+  // Reset page when category or sort changes
+  useEffect(() => {
+    setPagination(prev => ({ ...prev, page: 1 }));
+  }, [selectedCategory, sortBy]);
 
   const getCategoryIcon = (categoryId: string) => {
     const category = forumCategories.find(cat => cat.id === categoryId);
@@ -263,19 +293,18 @@ export default function DiscussionPage() {
     return category?.color || '#007BFF';
   };
 
-  const handleCreateThread = () => {
-    // Here you would typically send the data to your backend
-    console.log('Creating thread:', newThread);
-    setOpenNewThread(false);
-    setNewThread({ title: '', content: '', category: '', tags: '' });
-  };
-
-  const handleThreadClick = (threadId: string) => {
-    setSelectedThread(threadId);
-  };
-
-  const handleBackToForum = () => {
-    setSelectedThread(null);
+  const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) return 'Less than an hour ago';
+    if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+    
+    return date.toLocaleDateString();
   };
 
   // If a thread is selected, show the thread detail view
@@ -345,7 +374,7 @@ export default function DiscussionPage() {
                     {category.name}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    {mockThreads.filter(t => t.category === category.id).length} threads
+                    {threads.filter(t => t.category === category.id).length} threads
                   </Typography>
                 </CardContent>
               </Card>
@@ -374,12 +403,14 @@ export default function DiscussionPage() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               sx={{ flex: 1, minWidth: 250 }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }
               }}
             />
             <FormControl sx={{ minWidth: 120 }}>
@@ -399,130 +430,136 @@ export default function DiscussionPage() {
 
         {/* Threads List */}
         <Box sx={{ mb: 4 }}>
-          {sortedThreads.map((thread, index) => (
-            <motion.div
-              key={thread.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-            >
-              <Paper
-                sx={{
-                  p: 3,
-                  mb: 2,
-                  borderRadius: 3,
-                  border: thread.isPinned ? 2 : 1,
-                  borderColor: thread.isPinned ? 'primary.main' : 'divider',
-                  '&:hover': {
-                    boxShadow: '0 4px 20px rgba(0, 123, 255, 0.1)',
-                  },
-                }}
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+              <CircularProgress />
+            </Box>
+          ) : error ? (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+              <Button onClick={loadThreads} sx={{ ml: 2 }}>
+                Retry
+              </Button>
+            </Alert>
+          ) : threads.length === 0 ? (
+            <Paper sx={{ p: 6, textAlign: 'center', borderRadius: 3 }}>
+              <SearchIcon sx={{ fontSize: 60, color: 'grey.300', mb: 2 }} />
+              <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
+                No discussions found
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Try adjusting your search terms or browse different categories
+              </Typography>
+            </Paper>
+          ) : (
+            threads.map((thread, index) => (
+              <motion.div
+                key={thread._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
               >
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                  <Avatar sx={{ bgcolor: getCategoryColor(thread.category), width: 48, height: 48 }}>
-                    {getCategoryIcon(thread.category)}
-                  </Avatar>
-                  
-                  <Box sx={{ flex: 1 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 1 }}>
-                      <Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                          {thread.isPinned && (
-                            <Chip label="Pinned" size="small" color="primary" />
-                          )}
-                          {thread.isAnswered && (
-                            <Chip label="Answered" size="small" color="success" />
-                          )}
-                        </Box>
-                        <Typography 
-                          variant="h6" 
-                          fontWeight="bold" 
-                          sx={{ 
-                            cursor: 'pointer', 
-                            '&:hover': { color: 'primary.main' } 
-                          }}
-                          onClick={() => handleThreadClick(thread.id)}
-                        >
-                          {thread.title}
-                        </Typography>
-                      </Box>
-                      
-                      <Box sx={{ display: 'flex', gap: 1 }}>
-                        <IconButton size="small">
-                          <BookmarkIcon />
-                        </IconButton>
-                        <Button
-                          size="small"
-                          startIcon={<ThumbUpIcon />}
-                          sx={{ minWidth: 'auto' }}
-                        >
-                          {thread.likes}
-                        </Button>
-                      </Box>
-                    </Box>
+                <Paper
+                  sx={{
+                    p: 3,
+                    mb: 2,
+                    borderRadius: 3,
+                    border: thread.isPinned ? 2 : 1,
+                    borderColor: thread.isPinned ? 'primary.main' : 'divider',
+                    '&:hover': {
+                      boxShadow: '0 4px 20px rgba(0, 123, 255, 0.1)',
+                    },
+                  }}
+                >
+                  <Box sx={{ display: 'flex', gap: 2 }}>
+                    <Avatar sx={{ bgcolor: getCategoryColor(thread.category), width: 48, height: 48 }}>
+                      {getCategoryIcon(thread.category)}
+                    </Avatar>
                     
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                      {thread.content}
-                    </Typography>
-                    
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 2 }}>
-                      {thread.tags.map((tag) => (
-                        <Chip key={tag} label={tag} size="small" variant="outlined" />
-                      ))}
-                    </Box>
-                    
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Avatar sx={{ width: 24, height: 24 }} src={thread.author.avatar}>
-                            {thread.author.name.charAt(0)}
-                          </Avatar>
-                          <Typography variant="body2" color="text.secondary">
-                            {thread.author.name}
+                    <Box sx={{ flex: 1 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 1 }}>
+                        <Box>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                            {thread.isPinned && (
+                              <Chip label="Pinned" size="small" color="primary" />
+                            )}
+                            {thread.isAnswered && (
+                              <Chip label="Answered" size="small" color="success" />
+                            )}
+                          </Box>
+                          <Typography 
+                            variant="h6" 
+                            fontWeight="bold" 
+                            sx={{ 
+                              cursor: 'pointer', 
+                              '&:hover': { color: 'primary.main' } 
+                            }}
+                            onClick={() => handleThreadClick(thread._id)}
+                          >
+                            {thread.title}
                           </Typography>
-                          {thread.author.badge && (
-                            <Chip label={thread.author.badge} size="small" variant="outlined" />
-                          )}
                         </Box>
-                        <Typography variant="caption" color="text.secondary">
-                          {thread.createdAt}
-                        </Typography>
+                        
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                          <IconButton size="small" onClick={() => handleBookmarkThread(thread._id)}>
+                            <BookmarkIcon />
+                          </IconButton>
+                          <Button
+                            size="small"
+                            startIcon={<ThumbUpIcon />}
+                            sx={{ minWidth: 'auto' }}
+                            onClick={() => handleLikeThread(thread._id)}
+                          >
+                            {thread.likes}
+                          </Button>
+                        </Box>
                       </Box>
                       
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Button
-                          size="small"
-                          startIcon={<ReplyIcon />}
-                          variant="outlined"
-                        >
-                          {thread.replies} Replies
-                        </Button>
-                        {thread.lastReply && (
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                        {thread.content}
+                      </Typography>
+                      
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 2 }}>
+                        {thread.tags.map((tag) => (
+                          <Chip key={tag} label={tag} size="small" variant="outlined" />
+                        ))}
+                      </Box>
+                      
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Avatar sx={{ width: 24, height: 24 }} src={thread.author.avatar}>
+                              {thread.author.name.charAt(0)}
+                            </Avatar>
+                            <Typography variant="body2" color="text.secondary">
+                              {thread.author.name}
+                            </Typography>
+                            {/* badge property removed as it does not exist on author */}
+                            {/* <Chip label={thread.author.badge} size="small" variant="outlined" /> */}
+                          </Box>
                           <Typography variant="caption" color="text.secondary">
-                            Last reply {thread.lastReply}
+                            {formatTimeAgo(thread.createdAt)}
                           </Typography>
-                        )}
+                        </Box>
+                        
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <Button
+                            size="small"
+                            startIcon={<ReplyIcon />}
+                            variant="outlined"
+                            onClick={() => handleThreadClick(thread._id)}
+                          >
+                            {thread.replies} Replies
+                          </Button>
+                        </Box>
                       </Box>
                     </Box>
                   </Box>
-                </Box>
-              </Paper>
-            </motion.div>
-          ))}
+                </Paper>
+              </motion.div>
+            ))
+          )}
         </Box>
-
-        {/* No Results */}
-        {filteredThreads.length === 0 && (
-          <Paper sx={{ p: 6, textAlign: 'center', borderRadius: 3 }}>
-            <SearchIcon sx={{ fontSize: 60, color: 'grey.300', mb: 2 }} />
-            <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
-              No discussions found
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Try adjusting your search terms or browse different categories
-            </Typography>
-          </Paper>
-        )}
 
         {/* Floating Action Button */}
         <Fab
@@ -610,7 +647,23 @@ export default function DiscussionPage() {
             </Button>
           </DialogActions>
         </Dialog>
+
+        {/* Snackbar for notifications */}
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
+          onClose={handleSnackbarClose}
+        >
+          <Alert
+            onClose={handleSnackbarClose}
+            severity={snackbar.severity}
+            variant="filled"
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
       </motion.div>
     </Container>
   );
 }
+

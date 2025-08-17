@@ -7,7 +7,6 @@ import {
   Button,
   Chip,
   Container,
-  LinearProgress,
   Paper,
   Typography,
 } from "@mui/material";
@@ -19,6 +18,8 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
+import { Helix } from "ldrs/react";
+import "ldrs/react/Helix.css";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -34,16 +35,16 @@ export default function Dashboard() {
 
   const handleQuickAction = (action: string) => {
     switch (action) {
-      case 'courses':
+      case "courses":
         // TODO: Navigate to courses page
         break;
-      case 'mentors':
-        router.push('/findmentor');
+      case "mentors":
+        router.push("/findmentor");
         break;
-      case 'messages':
-        router.push('/chat');
+      case "messages":
+        router.push("/chat");
         break;
-      case 'progress':
+      case "progress":
         // TODO: Navigate to progress page
         break;
       default:
@@ -52,14 +53,12 @@ export default function Dashboard() {
   };
 
   const handleGetStarted = () => {
-    router.push('/profile');
+    router.push("/profile");
   };
 
   if (isLoading) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <LinearProgress />
-      </Container>
+      <Helix size="45" speed="2.5" color="#007BFF" />
     );
   }
 
@@ -103,24 +102,35 @@ export default function Dashboard() {
             border: "1px solid rgba(0, 123, 255, 0.1)",
           }}
         >
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 3 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              mb: 3,
+            }}
+          >
             <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
               <Avatar
+                src={user.avatar || undefined}
                 sx={{
-                  width: 80,
-                  height: 80,
-                  background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
-                  fontSize: "2rem",
+                  width: 120,
+                  height: 120,
+                  background:
+                    "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                  fontSize: "3rem",
                   fontWeight: 700,
                 }}
-              >
-                {user.name.charAt(0).toUpperCase()}
-              </Avatar>
+              ></Avatar>
               <Box>
                 <Typography variant="h5" fontWeight="bold">
                   {user.name}
                 </Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  sx={{ mb: 1 }}
+                >
                   {user.email}
                 </Typography>
                 <Chip
@@ -141,7 +151,7 @@ export default function Dashboard() {
             <Button
               variant="outlined"
               size="small"
-              onClick={() => router.push('/profile')}
+              onClick={() => router.push("/profile")}
               sx={{ mt: 1 }}
             >
               Edit Profile
@@ -218,7 +228,7 @@ export default function Dashboard() {
         >
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Paper
-              onClick={() => handleQuickAction('courses')}
+              onClick={() => handleQuickAction("courses")}
               sx={{
                 p: 3,
                 textAlign: "center",
@@ -246,7 +256,7 @@ export default function Dashboard() {
 
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Paper
-              onClick={() => handleQuickAction('mentors')}
+              onClick={() => handleQuickAction("mentors")}
               sx={{
                 p: 3,
                 textAlign: "center",
@@ -267,14 +277,14 @@ export default function Dashboard() {
                 Find Mentors
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Connect with experienced peers
+                Connect with peers
               </Typography>
             </Paper>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Paper
-              onClick={() => handleQuickAction('messages')}
+              onClick={() => handleQuickAction("messages")}
               sx={{
                 p: 3,
                 textAlign: "center",
@@ -302,7 +312,7 @@ export default function Dashboard() {
 
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Paper
-              onClick={() => handleQuickAction('progress')}
+              onClick={() => handleQuickAction("progress")}
               sx={{
                 p: 3,
                 textAlign: "center",

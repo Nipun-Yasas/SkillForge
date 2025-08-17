@@ -1,5 +1,6 @@
 import Box from '@mui/material/Box';
-import Image from 'next/image';
+import Typography from '@mui/material/Typography';
+import {BookOpen} from 'lucide-react';
 
 
 export default function CustomAppTitle() {
@@ -14,12 +15,21 @@ export default function CustomAppTitle() {
         gap:5 
       }}
     >
-      <Image
-        src="/logo.svg"
-        alt="Company Logo"
-        width={90}
-        height={50}
-      />
+     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <BookOpen size={20} color="#007BFF" />
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 700,
+              background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            SkillForge
+          </Typography>
+        </Box>
     </Box>
   );
 }

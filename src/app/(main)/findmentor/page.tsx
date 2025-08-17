@@ -1,13 +1,22 @@
+"use client";
+
 import Header from "./_components/Header";
 import MentorsCards from "./_components/MentorsCards";
-import AISmartSearch from "./_components/AISmartSearch";
+import { useState } from "react";
 
 export default function FindingMentor() {
+  const [query, setQuery] = useState("");
+  const [filters, setFilters] = useState<string[]>([]);
+
   return (
     <>
-      <AISmartSearch />
-      <Header />
-      <MentorsCards />
+      <Header
+        onSearch={(q) => {
+          setQuery(q);
+        }}
+        onFilterChange={(f) => setFilters(f)}
+      />
+      <MentorsCards query={query} filters={filters} />
     </>
   );
 }

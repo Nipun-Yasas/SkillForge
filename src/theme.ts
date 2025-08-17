@@ -287,6 +287,7 @@ const theme = createTheme({
       fontWeight: 600,
       fontFamily: "Poppins, sans-serif",
       lineHeight: 1.4,
+      color:"#0056CC"
     },
     h5: {
       fontSize: "1.25rem",

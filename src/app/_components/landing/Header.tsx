@@ -4,30 +4,29 @@ import { useState } from "react";
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { BookOpen, LogOut, Settings, User, Users } from "lucide-react";
+import { BookOpen,Users } from "lucide-react";
 
 import { ThemeSwitcher } from "@toolpad/core";
 
 import AppBar from "@mui/material/AppBar";
-import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 
 import MenuIcon from "@mui/icons-material/Menu";
 
 import { useAuth } from "@/contexts/AuthContext";
+import UserMenu from "../main/UserMenu";
 
 const drawerWidth = 240;
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { user, logout } = useAuth();
 
@@ -35,9 +34,6 @@ export default function Header() {
     setMobileOpen((prevState) => !prevState);
   };
 
-  const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
 
   const handleUserMenuClose = () => {
     setAnchorEl(null);
@@ -315,72 +311,8 @@ export default function Header() {
 
             {/* Authentication Buttons */}
             {user ? (
-              <>
-                <IconButton onClick={handleUserMenuOpen} sx={{ p: 0, ml: 1 }}>
-                  <Avatar
-                    sx={{
-                      width: 40,
-                      height: 40,
-                      background:
-                        "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
-                      fontSize: "1rem",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {user.name.charAt(0).toUpperCase()}
-                  </Avatar>
-                </IconButton>
-
-                <Menu
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={handleUserMenuClose}
-                  anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "right",
-                  }}
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
-                >
-                  <MenuItem onClick={handleUserMenuClose}>
-                    <Link
-                      href="/dashboard"
-                      style={{
-                        textDecoration: "none",
-                        color: "inherit",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                      }}
-                    >
-                      <User size={16} />
-                      Dashboard
-                    </Link>
-                  </MenuItem>
-                  <MenuItem onClick={handleUserMenuClose}>
-                    <Link
-                      href="/profile"
-                      style={{
-                        textDecoration: "none",
-                        color: "inherit",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                      }}
-                    >
-                      <Settings size={16} />
-                      Profile
-                    </Link>
-                  </MenuItem>
-                  <Divider />
-                  <MenuItem onClick={handleLogout} sx={{ color: "error.main" }}>
-                    <LogOut size={16} />
-                    <Box sx={{ ml: 1 }}>Logout</Box>
-                  </MenuItem>
-                </Menu>
-              </>
+                <UserMenu/>
+                
             ) : (
               <>
                 <Link href="/login" passHref style={{ textDecoration: "none" }}>

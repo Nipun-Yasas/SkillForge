@@ -170,6 +170,7 @@ export default function MentorProfile() {
                 variant="contained"
                 size="large"
                 startIcon={<MessageIcon />}
+                onClick={() => router.push('/chat')}
                 sx={{
                   bgcolor: 'white',
                   color: 'primary.main',
@@ -347,6 +348,7 @@ export default function MentorProfile() {
                   fullWidth
                   size="large"
                   startIcon={<MessageIcon />}
+                  onClick={() => router.push('/chat')}
                   sx={{
                     py: 1.5,
                     background: 'linear-gradient(45deg, #007BFF 30%, #0056CC 90%)',

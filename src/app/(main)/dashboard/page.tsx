@@ -34,16 +34,16 @@ export default function Dashboard() {
 
   const handleQuickAction = (action: string) => {
     switch (action) {
-      case 'courses':
+      case "courses":
         // TODO: Navigate to courses page
         break;
-      case 'mentors':
-        router.push('/findmentor');
+      case "mentors":
+        router.push("/findmentor");
         break;
-      case 'messages':
-        router.push('/chat');
+      case "messages":
+        router.push("/chat");
         break;
-      case 'progress':
+      case "progress":
         // TODO: Navigate to progress page
         break;
       default:
@@ -52,7 +52,7 @@ export default function Dashboard() {
   };
 
   const handleGetStarted = () => {
-    router.push('/profile');
+    router.push("/profile");
   };
 
   if (isLoading) {
@@ -80,14 +80,12 @@ export default function Dashboard() {
             variant="h3"
             fontWeight="bold"
             sx={{
-              background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
-              backgroundClip: "text",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
+              background: "none",
               mb: 1,
             }}
           >
-            Welcome back, {user.name.split(" ")[0]}! 👋
+            <span style={{ color: "#007BFF" }}>Welcome back,</span>{" "}
+            <span style={{ color: "#222" }}>{user.name.split(" ")[0]}</span>! 👋
           </Typography>
           <Typography variant="h6" color="text.secondary">
             Ready to continue your learning journey?
@@ -103,13 +101,21 @@ export default function Dashboard() {
             border: "1px solid rgba(0, 123, 255, 0.1)",
           }}
         >
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 3 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              mb: 3,
+            }}
+          >
             <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
               <Avatar
                 sx={{
                   width: 80,
                   height: 80,
-                  background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                  background:
+                    "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
                   fontSize: "2rem",
                   fontWeight: 700,
                 }}
@@ -120,7 +126,11 @@ export default function Dashboard() {
                 <Typography variant="h5" fontWeight="bold">
                   {user.name}
                 </Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  sx={{ mb: 1 }}
+                >
                   {user.email}
                 </Typography>
                 <Chip
@@ -141,7 +151,7 @@ export default function Dashboard() {
             <Button
               variant="outlined"
               size="small"
-              onClick={() => router.push('/profile')}
+              onClick={() => router.push("/profile")}
               sx={{ mt: 1 }}
             >
               Edit Profile
@@ -218,7 +228,7 @@ export default function Dashboard() {
         >
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Paper
-              onClick={() => handleQuickAction('courses')}
+              onClick={() => handleQuickAction("courses")}
               sx={{
                 p: 3,
                 textAlign: "center",
@@ -246,7 +256,7 @@ export default function Dashboard() {
 
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Paper
-              onClick={() => handleQuickAction('mentors')}
+              onClick={() => handleQuickAction("mentors")}
               sx={{
                 p: 3,
                 textAlign: "center",
@@ -274,7 +284,7 @@ export default function Dashboard() {
 
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Paper
-              onClick={() => handleQuickAction('messages')}
+              onClick={() => handleQuickAction("messages")}
               sx={{
                 p: 3,
                 textAlign: "center",
@@ -302,7 +312,7 @@ export default function Dashboard() {
 
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Paper
-              onClick={() => handleQuickAction('progress')}
+              onClick={() => handleQuickAction("progress")}
               sx={{
                 p: 3,
                 textAlign: "center",

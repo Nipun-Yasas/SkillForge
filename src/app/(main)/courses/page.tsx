@@ -142,7 +142,7 @@ export default function CoursesPage() {
               background: 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              // WebkitTextFillColor: 'transparent',
               mb: 1,
             }}
           >

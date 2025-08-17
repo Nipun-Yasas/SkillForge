@@ -56,7 +56,16 @@ const UserSchema = new Schema<IUser>(
     },
     avatar: {
       type: String,
-      default: "",
+      trim: true,
+      maxlength: 2048,
+      default: undefined, 
+      validate: {
+        validator: (v: string | undefined) =>
+          !v ||
+          /^https?:\/\/.+/i.test(v) ||      
+          /^\/uploads\/[a-zA-Z0-9._-]+$/.test(v),
+        message: "Invalid avatar URL",
+      },
     },
     bio: {
       type: String,

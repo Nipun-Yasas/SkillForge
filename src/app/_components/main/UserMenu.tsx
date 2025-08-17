@@ -13,14 +13,18 @@ import {
 } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePathname } from "next/navigation";
 
 const UserMenu: React.FC = () => {
   const { user, logout } = useAuth();
-  
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+  const menuLinkHref = isHome ? "/dashboard" : "/profile";
+  const menuLabel = isHome ? "Dashboard" : "My Profile";
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -41,7 +45,6 @@ const UserMenu: React.FC = () => {
     return null;
   }
 
-
   return (
     <Stack direction="row" spacing={2} alignItems="center">
       <Divider orientation="vertical" flexItem />
@@ -52,15 +55,19 @@ const UserMenu: React.FC = () => {
       >
         <Stack direction="row" spacing={1} alignItems="center">
           <Avatar
-            sx={{ 
-              width: 44, 
+            src={user.avatar || undefined}
+            alt={user.name}
+            sx={{
+              width: 44,
               height: 44,
-              background: 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
-              fontSize: '1.2rem',
+              background:
+                "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+              fontSize: "1.2rem",
               fontWeight: 700,
             }}
           >
-            {user.name.charAt(0).toUpperCase()}
+            {/* Fallback icon only if no avatar */}
+            {!user.avatar && <PersonOutlineIcon fontSize="small" />}
           </Avatar>
           <Typography
             variant="body1"
@@ -68,7 +75,7 @@ const UserMenu: React.FC = () => {
             fontFamily="'Poppins-Medium', Helvetica"
             fontWeight={500}
           >
-            {user.name.split(' ')[0]}
+            {user.name.split(" ")[0]}
           </Typography>
           <KeyboardArrowDownIcon
             sx={{
@@ -103,33 +110,22 @@ const UserMenu: React.FC = () => {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <Link href="/profile" passHref legacyBehavior>
+        <Link href={menuLinkHref} passHref legacyBehavior>
           <MenuItem component="a">
             <ListItemIcon>
               <PersonOutlineIcon fontSize="small" sx={{ color: "#737791" }} />
             </ListItemIcon>
             <Typography variant="body2" color="text.primary">
-              My Profile
-            </Typography>
-          </MenuItem>
-        </Link>
-
-        <Link href="/settings" passHref legacyBehavior>
-          <MenuItem component="a">
-            <ListItemIcon>
-              <SettingsIcon fontSize="small" sx={{ color: "#737791" }} />
-            </ListItemIcon>
-            <Typography variant="body2" color="text.primary">
-              Settings
+              {menuLabel}
             </Typography>
           </MenuItem>
         </Link>
 
         <Divider sx={{ my: 1 }} />
 
-        <MenuItem onClick={handleLogout} sx={{ color: "#e80a4d" }}>
+        <MenuItem onClick={handleLogout} sx={{ color: "primary.main" }}>
           <ListItemIcon>
-            <LogoutIcon fontSize="small" sx={{ color: "#e80a4d" }} />
+            <LogoutIcon fontSize="small" sx={{ color: "primary.main" }} />
           </ListItemIcon>
           <Typography variant="body2">Log out</Typography>
         </MenuItem>

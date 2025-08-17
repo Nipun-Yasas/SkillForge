@@ -7,7 +7,6 @@ import {
   Button,
   Chip,
   Container,
-  LinearProgress,
   Paper,
   Typography,
 } from "@mui/material";
@@ -19,6 +18,8 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
+import { Helix } from "ldrs/react";
+import "ldrs/react/Helix.css";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -57,9 +58,7 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <LinearProgress />
-      </Container>
+      <Helix size="45" speed="2.5" color="#007BFF" />
     );
   }
 
@@ -111,17 +110,16 @@ export default function Dashboard() {
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
               <Avatar
+                src={user.avatar || undefined}
                 sx={{
-                  width: 80,
-                  height: 80,
+                  width: 120,
+                  height: 120,
                   background:
                     "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
-                  fontSize: "2rem",
+                  fontSize: "3rem",
                   fontWeight: 700,
                 }}
-              >
-                {user.name.charAt(0).toUpperCase()}
-              </Avatar>
+              ></Avatar>
               <Box>
                 <Typography variant="h5" fontWeight="bold">
                   {user.name}
@@ -277,7 +275,7 @@ export default function Dashboard() {
                 Find Mentors
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Connect with experienced peers
+                Connect with peers
               </Typography>
             </Paper>
           </motion.div>

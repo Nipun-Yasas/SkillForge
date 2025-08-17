@@ -47,11 +47,14 @@ interface Mentor {
   skills: string[];
   bio: string;
   image: string;
-  rating: number;
-  students: number;
-  experience: string;
-  hourlyRate: string;
-  availability: string;
+  rating?: number;
+  students?: number;
+  experience?: string;
+  hourlyRate?: string;
+  availability?: string;
+  location?: string;
+  university?: string;
+  major?: string;
 }
 
 export default function MentorProfile() {
@@ -72,21 +75,24 @@ export default function MentorProfile() {
   useEffect(() => {
     const fetchMentor = async () => {
       try {
-        const response = await fetch('/data/mentors.json');
-        const mentors = await response.json();
-        const foundMentor = mentors.find((m: Mentor) => m.id === params.id);
-        setMentor(foundMentor);
+        setLoading(true);
+        const id = String(params.id);
+        const res = await fetch(`/api/mentor?id=${encodeURIComponent(id)}`, { cache: "no-store" });
+        if (!res.ok) throw new Error(`Failed: ${res.status}`);
+        const data = await res.json();
+        setMentor(data.mentor);
       } catch (error) {
-        console.error('Error fetching mentor:', error);
+        console.error("Error fetching mentor:", error);
+        setMentor(null);
       } finally {
         setLoading(false);
       }
     };
 
-    if (params.id) {
+    if (params?.id) {
       fetchMentor();
     }
-  }, [params.id]);
+  }, [params?.id]);
 
   if (loading) {
     return (
@@ -159,7 +165,7 @@ export default function MentorProfile() {
         }}>
           <Box sx={{ minWidth: 120 }}>
             <Avatar
-              src={mentor.image}
+              src={mentor.image || undefined}
               alt={mentor.name}
               sx={{
                 width: 120,
@@ -170,15 +176,15 @@ export default function MentorProfile() {
               }}
             />
           </Box>
-          
+
           <Box sx={{ flex: 1 }}>
             <Typography variant="h3" fontWeight="bold" gutterBottom>
               {mentor.name}
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, justifyContent: { xs: 'center', md: 'flex-start' } }}>
-              <Rating value={mentor.rating} readOnly precision={0.1} />
+              <Rating value={mentor.rating ?? 0} readOnly precision={0.1} />
               <Typography variant="h6">
-                {mentor.rating} ({mentor.students} students)
+                {(mentor.rating ?? 0).toFixed(1)} ({mentor.students ?? 0} students)
               </Typography>
             </Box>
             <Typography variant="h6" sx={{ opacity: 0.9 }}>
@@ -229,7 +235,7 @@ export default function MentorProfile() {
                 🎯 Expertise &amp; Skills
               </Typography>
               <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
-                {mentor.skills.map((skill) => (
+                {(mentor.skills || []).map((skill) => (
                   <Chip
                     key={skill}
                     label={skill}
@@ -318,7 +324,7 @@ export default function MentorProfile() {
                       Experience
                     </Typography>
                     <Typography variant="h6" fontWeight="bold">
-                      {mentor.experience}
+                      {mentor.experience || "N/A"}
                     </Typography>
                   </Box>
                 </Box>
@@ -330,7 +336,7 @@ export default function MentorProfile() {
                       Hourly Rate
                     </Typography>
                     <Typography variant="h6" fontWeight="bold">
-                      {mentor.hourlyRate}
+                      {mentor.hourlyRate || "N/A"}
                     </Typography>
                   </Box>
                 </Box>
@@ -345,7 +351,7 @@ export default function MentorProfile() {
                 📅 Availability
               </Typography>
               <Chip
-                label={mentor.availability}
+                label={mentor.availability || "N/A"}
                 color="success"
                 variant="outlined"
                 sx={{ mb: 2 }}

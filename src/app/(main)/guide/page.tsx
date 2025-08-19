@@ -40,7 +40,7 @@ import {
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-const LearningCreditsGuide = () => {
+export default function CreditsGuide() {
   const router = useRouter();
   const [openConvertDialog, setOpenConvertDialog] = useState(false);
   const [openPurchaseDialog, setOpenPurchaseDialog] = useState(false);
@@ -184,7 +184,7 @@ const LearningCreditsGuide = () => {
         <Typography variant="body1" color="text.secondary">
           Learning credits are the currency you use to book sessions with teachers. Here are all the ways to get them:
         </Typography>
-        <Card sx={{ p: 2, backgroundColor: '#f8f9fa', border: '2px solid #4CAF50' }}>
+        <Card sx={{ p: 2, border: '2px solid #4CAF50' }}>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, textAlign: 'center' }}>
             Your Current Balance
           </Typography>
@@ -209,14 +209,13 @@ const LearningCreditsGuide = () => {
                 </Typography>
                 <Chip 
                   label={`#${index + 1}`} 
-                  size="small" 
-                  sx={{ backgroundColor: step.color, color: 'white' }}
+                  size="small"
                 />
               </Box>
               <Typography variant="body2" sx={{ mb: 2 }}>
                 {step.description}
               </Typography>
-              <Typography variant="caption" sx={{ color: step.color, fontWeight: 'bold' }}>
+              <Typography variant="caption" sx={{fontWeight: 'bold' }}>
                 {step.action}
               </Typography>
             </CardContent>
@@ -450,7 +449,7 @@ const LearningCreditsGuide = () => {
           </Box>
 
           <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 2, mb: 3 }}>
-            <Card sx={{ p: 2, border: '2px solid #4CAF50', backgroundColor: '#f8fff8' }}>
+            <Card sx={{ p: 2, border: '2px solid #4CAF50',}}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                 <Search sx={{ color: '#4CAF50', fontSize: 30 }} />
                 <Typography variant="h6" sx={{ color: '#4CAF50' }}>
@@ -473,7 +472,7 @@ const LearningCreditsGuide = () => {
               </List>
             </Card>
 
-            <Card sx={{ p: 2, border: '2px solid #2196F3', backgroundColor: '#f8fbff' }}>
+            <Card sx={{ p: 2, border: '2px solid #2196F3', }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                 <CalendarMonth sx={{ color: '#2196F3', fontSize: 30 }} />
                 <Typography variant="h6" sx={{ color: '#2196F3' }}>
@@ -496,7 +495,7 @@ const LearningCreditsGuide = () => {
               </List>
             </Card>
 
-            <Card sx={{ p: 2, border: '2px solid #9C27B0', backgroundColor: '#fdf8ff' }}>
+            <Card sx={{ p: 2, border: '2px solid #9C27B0' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                 <Chat sx={{ color: '#9C27B0', fontSize: 30 }} />
                 <Typography variant="h6" sx={{ color: '#9C27B0' }}>
@@ -520,7 +519,7 @@ const LearningCreditsGuide = () => {
             </Card>
           </Box>
 
-          <Box sx={{ textAlign: 'center', p: 3, backgroundColor: '#f5f5f5', borderRadius: 2 }}>
+          <Box sx={{ textAlign: 'center', p: 3, borderRadius: 2 }}>
             <Typography variant="body1" sx={{ mb: 2, fontWeight: 'bold' }}>
               💡 Ready to start your learning journey?
             </Typography>
@@ -558,4 +557,4 @@ const LearningCreditsGuide = () => {
   );
 };
 
-export default LearningCreditsGuide;
+

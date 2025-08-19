@@ -72,8 +72,8 @@ const NAVIGATION: Navigation = [
     icon: <EmojiEventsIcon />,
   },
   {
-    segment: 'sessions',
-    title: 'Book Sessions',
+    segment: 'guide',
+    title: 'Credit Guide',
     icon: <SchoolIcon />,
   },
   {

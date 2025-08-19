@@ -25,9 +25,9 @@ import {
 import { Input } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { BookOpen, Plus, X, Save, Camera, Edit, Target } from "lucide-react";
-import { Helix } from "ldrs/react";
-import "ldrs/react/Helix.css";
 import { useAuth } from "@/contexts/AuthContext";
+import ProfileSkeleton from "./components/ProfileSkeleton";
+
 import toast from "react-hot-toast";
 
 // Predefined skill categories with popular skills
@@ -366,7 +366,7 @@ export default function ProfilePage() {
   }, [user?._id, user, updateUser]);
 
   if (isLoading) {
-    return <Helix size="45" speed="2.5" color="black" />;
+    return <ProfileSkeleton />;
   }
 
   if (!user) {

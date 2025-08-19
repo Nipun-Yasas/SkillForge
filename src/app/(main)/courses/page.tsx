@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   Box,
   Container,
@@ -20,10 +20,9 @@ import {
   Avatar,
   LinearProgress,
   CircularProgress,
-  Alert,
   Pagination,
-} from '@mui/material';
-import { motion } from 'framer-motion';
+} from "@mui/material";
+import { motion } from "framer-motion";
 import {
   Search,
   PlayCircle,
@@ -32,11 +31,11 @@ import {
   BookOpen,
   TrendingUp,
   Award,
-  Star,
   CheckCircle,
-} from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import toast from 'react-hot-toast';
+} from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import CourseCardSkeleton from "./components/CourseCardSkeleton";
+import toast from "react-hot-toast";
 
 interface Course {
   _id: string;
@@ -51,7 +50,7 @@ interface Course {
   totalRatings: number;
   enrolledStudents: number;
   duration: string;
-  level: 'Beginner' | 'Intermediate' | 'Advanced';
+  level: "Beginner" | "Intermediate" | "Advanced";
   price: number;
   isPremium: boolean;
   image: string;
@@ -68,34 +67,33 @@ interface CoursesResponse {
   currentPage: number;
   totalPages: number;
 }
-    
 
 export default function CoursesPage() {
   const { user } = useAuth();
   const [courses, setCourses] = useState<Course[]>([]);
-  const [categories, setCategories] = useState<string[]>(['All Categories']);
+  const [categories, setCategories] = useState<string[]>(["All Categories"]);
   const [loading, setLoading] = useState(true);
   const [enrolling, setEnrolling] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All Categories');
-  const [selectedLevel, setSelectedLevel] = useState('All Levels');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All Categories");
+  const [selectedLevel, setSelectedLevel] = useState("All Levels");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
-  const levels = ['All Levels', 'Beginner', 'Intermediate', 'Advanced'];
+  const levels = ["All Levels", "Beginner", "Intermediate", "Advanced"];
 
   // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('/api/courses/categories');
+        const response = await fetch("/api/courses/categories");
         if (response.ok) {
           const data = await response.json();
           setCategories(data.categories);
         }
       } catch (error) {
-        console.error('Error fetching categories:', error);
+        console.error("Error fetching categories:", error);
       }
     };
 
@@ -108,12 +106,14 @@ export default function CoursesPage() {
       setLoading(true);
       try {
         const params = new URLSearchParams();
-        
-        if (searchTerm) params.append('search', searchTerm);
-        if (selectedCategory !== 'All Categories') params.append('category', selectedCategory);
-        if (selectedLevel !== 'All Levels') params.append('level', selectedLevel);
-        params.append('page', currentPage.toString());
-        params.append('limit', '12');
+
+        if (searchTerm) params.append("search", searchTerm);
+        if (selectedCategory !== "All Categories")
+          params.append("category", selectedCategory);
+        if (selectedLevel !== "All Levels")
+          params.append("level", selectedLevel);
+        params.append("page", currentPage.toString());
+        params.append("limit", "12");
 
         const response = await fetch(`/api/courses?${params}`);
         if (response.ok) {
@@ -122,11 +122,11 @@ export default function CoursesPage() {
           setTotalPages(data.totalPages);
           setTotalCount(data.totalCount);
         } else {
-          toast.error('Failed to load courses');
+          toast.error("Failed to load courses");
         }
       } catch (error) {
-        console.error('Error fetching courses:', error);
-        toast.error('Failed to load courses');
+        console.error("Error fetching courses:", error);
+        toast.error("Failed to load courses");
       } finally {
         setLoading(false);
       }
@@ -137,25 +137,25 @@ export default function CoursesPage() {
 
   const handleEnroll = async (courseId: string) => {
     if (!user) {
-      toast.error('Please login to enroll in courses');
+      toast.error("Please login to enroll in courses");
       return;
     }
 
     setEnrolling(courseId);
     try {
-      const response = await fetch('/api/courses/enroll', {
-        method: 'POST',
+      const response = await fetch("/api/courses/enroll", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ courseId }),
       });
 
       if (response.ok) {
-        toast.success('Successfully enrolled in course!');
+        toast.success("Successfully enrolled in course!");
         // Refresh courses to update enrollment status
-        setCourses(prevCourses =>
-          prevCourses.map(course =>
+        setCourses((prevCourses) =>
+          prevCourses.map((course) =>
             course._id === courseId
               ? { ...course, isEnrolled: true, progress: 0 }
               : course
@@ -163,22 +163,28 @@ export default function CoursesPage() {
         );
       } else {
         const error = await response.json();
-        toast.error(error.error || 'Failed to enroll in course');
+        toast.error(error.error || "Failed to enroll in course");
       }
     } catch (error) {
-      console.error('Enrollment error:', error);
-      toast.error('Failed to enroll in course');
+      console.error("Enrollment error:", error);
+      toast.error("Failed to enroll in course");
     } finally {
       setEnrolling(null);
     }
   };
 
-  const getLevelColor = (level: string): 'success' | 'warning' | 'error' | 'primary' => {
+  const getLevelColor = (
+    level: string
+  ): "success" | "warning" | "error" | "primary" => {
     switch (level) {
-      case 'Beginner': return 'success';
-      case 'Intermediate': return 'warning';
-      case 'Advanced': return 'error';
-      default: return 'primary';
+      case "Beginner":
+        return "success";
+      case "Intermediate":
+        return "warning";
+      case "Advanced":
+        return "error";
+      default:
+        return "primary";
     }
   };
 
@@ -195,9 +201,9 @@ export default function CoursesPage() {
             variant="h3"
             fontWeight="bold"
             sx={{
-              background: 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
+              background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
               // WebkitTextFillColor: 'transparent',
               mb: 1,
             }}
@@ -211,12 +217,12 @@ export default function CoursesPage() {
 
         {/* Search and Filters */}
         <Paper sx={{ p: 3, mb: 4, borderRadius: 3 }}>
-          <Box 
-            sx={{ 
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: '2fr 1fr 1fr' },
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "2fr 1fr 1fr" },
               gap: 3,
-              alignItems: 'center'
+              alignItems: "center",
             }}
           >
             <TextField
@@ -225,7 +231,12 @@ export default function CoursesPage() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               InputProps={{
-                startAdornment: <Search size={20} style={{ marginRight: '8px', color: '#666' }} />,
+                startAdornment: (
+                  <Search
+                    size={20}
+                    style={{ marginRight: "8px", color: "#666" }}
+                  />
+                ),
               }}
             />
             <FormControl fullWidth>
@@ -260,8 +271,15 @@ export default function CoursesPage() {
         </Paper>
 
         {/* Stats */}
-        <Box sx={{ mb: 4, display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: 2 }}>
-          <Paper sx={{ p: 2, textAlign: 'center', borderRadius: 2 }}>
+        <Box
+          sx={{
+            mb: 4,
+            display: "grid",
+            gridTemplateColumns: { xs: "repeat(2, 1fr)", md: "repeat(4, 1fr)" },
+            gap: 2,
+          }}
+        >
+          <Paper sx={{ p: 2, textAlign: "center", borderRadius: 2 }}>
             <BookOpen size={24} color="#007BFF" />
             <Typography variant="h6" fontWeight="bold" sx={{ mt: 1 }}>
               {totalCount}
@@ -270,16 +288,18 @@ export default function CoursesPage() {
               Total Courses
             </Typography>
           </Paper>
-          <Paper sx={{ p: 2, textAlign: 'center', borderRadius: 2 }}>
+          <Paper sx={{ p: 2, textAlign: "center", borderRadius: 2 }}>
             <Users size={24} color="#6A0DAD" />
             <Typography variant="h6" fontWeight="bold" sx={{ mt: 1 }}>
-              {courses.reduce((sum, course) => sum + course.enrolledStudents, 0).toLocaleString()}
+              {courses
+                .reduce((sum, course) => sum + course.enrolledStudents, 0)
+                .toLocaleString()}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Active Students
             </Typography>
           </Paper>
-          <Paper sx={{ p: 2, textAlign: 'center', borderRadius: 2 }}>
+          <Paper sx={{ p: 2, textAlign: "center", borderRadius: 2 }}>
             <TrendingUp size={24} color="#FF7A00" />
             <Typography variant="h6" fontWeight="bold" sx={{ mt: 1 }}>
               92%
@@ -288,7 +308,7 @@ export default function CoursesPage() {
               Completion Rate
             </Typography>
           </Paper>
-          <Paper sx={{ p: 2, textAlign: 'center', borderRadius: 2 }}>
+          <Paper sx={{ p: 2, textAlign: "center", borderRadius: 2 }}>
             <Award size={24} color="#28a745" />
             <Typography variant="h6" fontWeight="bold" sx={{ mt: 1 }}>
               1,245
@@ -301,17 +321,19 @@ export default function CoursesPage() {
 
         {/* Course Grid */}
         {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-            <CircularProgress size={60} />
-          </Box>
+          <CourseCardSkeleton />
         ) : (
           <>
-            <Box 
+            <Box
               sx={{
-                display: 'grid',
-                gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' },
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "1fr",
+                  sm: "repeat(2, 1fr)",
+                  lg: "repeat(3, 1fr)",
+                },
                 gap: 3,
-                mb: 4
+                mb: 4,
               }}
             >
               {courses.map((course, index) => (
@@ -324,32 +346,41 @@ export default function CoursesPage() {
                 >
                   <Card
                     sx={{
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
+                      height: "100%",
+                      display: "flex",
+                      flexDirection: "column",
                       borderRadius: 3,
-                      boxShadow: '0 4px 20px rgba(0, 123, 255, 0.1)',
-                      transition: 'all 0.3s ease',
-                      '&:hover': {
-                        boxShadow: '0 8px 30px rgba(0, 123, 255, 0.2)',
+                      boxShadow: "0 4px 20px rgba(0, 123, 255, 0.1)",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        boxShadow: "0 8px 30px rgba(0, 123, 255, 0.2)",
                       },
                     }}
                   >
-                    <Box sx={{ position: 'relative' }}>
+                    <Box sx={{ position: "relative" }}>
                       <CardMedia
                         component="div"
                         sx={{
                           height: 200,
-                          background: 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
+                          background:
+                            "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
                         }}
                       >
                         {course.isEnrolled ? (
-                          <CheckCircle size={60} color="white" style={{ opacity: 0.8 }} />
+                          <CheckCircle
+                            size={60}
+                            color="white"
+                            style={{ opacity: 0.8 }}
+                          />
                         ) : (
-                          <PlayCircle size={60} color="white" style={{ opacity: 0.8 }} />
+                          <PlayCircle
+                            size={60}
+                            color="white"
+                            style={{ opacity: 0.8 }}
+                          />
                         )}
                       </CardMedia>
                       <Chip
@@ -357,7 +388,7 @@ export default function CoursesPage() {
                         color={getLevelColor(course.level)}
                         size="small"
                         sx={{
-                          position: 'absolute',
+                          position: "absolute",
                           top: 12,
                           right: 12,
                           fontWeight: 600,
@@ -369,7 +400,7 @@ export default function CoursesPage() {
                           color="primary"
                           size="small"
                           sx={{
-                            position: 'absolute',
+                            position: "absolute",
                             top: 12,
                             left: 12,
                             fontWeight: 600,
@@ -377,20 +408,37 @@ export default function CoursesPage() {
                         />
                       )}
                     </Box>
-                    
-                    <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+
+                    <CardContent
+                      sx={{
+                        flexGrow: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                      }}
+                    >
                       <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
                         {course.title}
                       </Typography>
-                      
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mb: 2 }}
+                      >
                         {course.description}
                       </Typography>
-                      
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                        <Avatar 
+
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", mb: 1 }}
+                      >
+                        <Avatar
                           src={course.instructor.avatar}
-                          sx={{ width: 24, height: 24, mr: 1, fontSize: '0.75rem' }}
+                          sx={{
+                            width: 24,
+                            height: 24,
+                            mr: 1,
+                            fontSize: "0.75rem",
+                          }}
                         >
                           {course.instructor.name.charAt(0)}
                         </Avatar>
@@ -398,17 +446,34 @@ export default function CoursesPage() {
                           {course.instructor.name}
                         </Typography>
                       </Box>
-                      
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                        <Rating value={course.rating} precision={0.1} size="small" readOnly />
-                        <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", mb: 2 }}
+                      >
+                        <Rating
+                          value={course.rating}
+                          precision={0.1}
+                          size="small"
+                          readOnly
+                        />
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ ml: 1 }}
+                        >
                           {course.rating.toFixed(1)} ({course.totalRatings})
                         </Typography>
                       </Box>
-                      
+
                       {course.progress !== undefined && course.progress > 0 && (
                         <Box sx={{ mb: 2 }}>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              mb: 1,
+                            }}
+                          >
                             <Typography variant="body2" color="text.secondary">
                               Progress
                             </Typography>
@@ -416,22 +481,43 @@ export default function CoursesPage() {
                               {course.progress}%
                             </Typography>
                           </Box>
-                          <LinearProgress 
-                            variant="determinate" 
-                            value={course.progress} 
+                          <LinearProgress
+                            variant="determinate"
+                            value={course.progress}
                             sx={{ borderRadius: 1, height: 6 }}
                           />
                         </Box>
                       )}
-                      
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 2 }}>
+
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: 0.5,
+                          mb: 2,
+                        }}
+                      >
                         {course.tags.slice(0, 2).map((tag) => (
-                          <Chip key={tag} label={tag} size="small" variant="outlined" />
+                          <Chip
+                            key={tag}
+                            label={tag}
+                            size="small"
+                            variant="outlined"
+                          />
                         ))}
                       </Box>
-                      
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 'auto' }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          mt: "auto",
+                        }}
+                      >
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                        >
                           <Clock size={16} color="#666" />
                           <Typography variant="body2" color="text.secondary">
                             {course.duration}
@@ -441,24 +527,30 @@ export default function CoursesPage() {
                           variant="contained"
                           size="small"
                           disabled={enrolling === course._id}
-                          onClick={() => course.isEnrolled ? null : handleEnroll(course._id)}
+                          onClick={() =>
+                            course.isEnrolled ? null : handleEnroll(course._id)
+                          }
                           sx={{
-                            background: course.isEnrolled 
-                              ? 'linear-gradient(135deg, #28a745 0%, #20c997 100%)'
-                              : 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
-                            '&:hover': {
+                            background: course.isEnrolled
+                              ? "linear-gradient(135deg, #28a745 0%, #20c997 100%)"
+                              : "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                            "&:hover": {
                               background: course.isEnrolled
-                                ? 'linear-gradient(135deg, #218838 0%, #1ea085 100%)'
-                                : 'linear-gradient(135deg, #0056CC 0%, #4A0080 100%)',
+                                ? "linear-gradient(135deg, #218838 0%, #1ea085 100%)"
+                                : "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
                             },
                           }}
                         >
                           {enrolling === course._id ? (
                             <CircularProgress size={16} color="inherit" />
                           ) : course.isEnrolled ? (
-                            course.progress && course.progress > 0 ? 'Continue' : 'Start'
+                            course.progress && course.progress > 0 ? (
+                              "Continue"
+                            ) : (
+                              "Start"
+                            )
                           ) : (
-                            'Enroll Now'
+                            "Enroll Now"
                           )}
                         </Button>
                       </Box>
@@ -470,7 +562,7 @@ export default function CoursesPage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+              <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
                 <Pagination
                   count={totalPages}
                   page={currentPage}
@@ -484,7 +576,7 @@ export default function CoursesPage() {
         )}
 
         {!loading && courses.length === 0 && (
-          <Paper sx={{ p: 6, textAlign: 'center', borderRadius: 3 }}>
+          <Paper sx={{ p: 6, textAlign: "center", borderRadius: 3 }}>
             <BookOpen size={60} color="#ccc" />
             <Typography variant="h6" color="text.secondary" sx={{ mt: 2 }}>
               No courses found

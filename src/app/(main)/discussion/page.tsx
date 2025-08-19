@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import ThreadDetail from './_components/ThreadDetail';
+import ThreadDetail from './components/ThreadDetail';
 import {
   Box,
   Container,
@@ -24,7 +24,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  CircularProgress,
+  // CircularProgress,
   Alert,
   Snackbar
 } from '@mui/material';
@@ -52,6 +52,7 @@ import {
   Thread as ThreadType,
   CreateThreadData 
 } from '@/lib/forumService';
+import DiscussionSkeleton from "./components/DiscussionSkeleton";
 
 const forumCategories = [
   {
@@ -431,17 +432,15 @@ export default function DiscussionPage() {
         {/* Threads List */}
         <Box sx={{ mb: 4 }}>
           {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-              <CircularProgress />
-            </Box>
+            <DiscussionSkeleton items={6} />
           ) : error ? (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-              <Button onClick={loadThreads} sx={{ ml: 2 }}>
-                Retry
-              </Button>
-            </Alert>
-          ) : threads.length === 0 ? (
+             <Alert severity="error" sx={{ mb: 2 }}>
+               {error}
+               <Button onClick={loadThreads} sx={{ ml: 2 }}>
+                 Retry
+               </Button>
+             </Alert>
+           ) : threads.length === 0 ? (
             <Paper sx={{ p: 6, textAlign: 'center', borderRadius: 3 }}>
               <SearchIcon sx={{ fontSize: 60, color: 'grey.300', mb: 2 }} />
               <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>

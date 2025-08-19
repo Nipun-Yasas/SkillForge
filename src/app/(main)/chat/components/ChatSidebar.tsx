@@ -14,15 +14,15 @@ import {
   TextField,
   InputAdornment,
   Chip,
-  IconButton,
   Button
 } from '@mui/material';
 import {
   Search as SearchIcon,
-  Add as AddIcon,
   Circle as CircleIcon,
   Message as MessageIcon
 } from '@mui/icons-material';
+import ChatSidebarSkeleton from "./ChatSidebarSkeleton";
+import { useAuth } from "../../../../contexts/AuthContext";
 
 interface User {
   _id: string;
@@ -41,26 +41,26 @@ interface ChatUser {
   lastMessageSender?: any;
 }
 
-interface ChatSidebarProps {
+export default function ChatSidebar(props: {
   chats: ChatUser[];
   usersForNewConversation: User[];
   selectedChat: ChatUser | null;
   onChatSelect: (chat: ChatUser) => void;
-  onUserSelect: (user: User) => Promise<void>;
+  onUserSelect: (user: User) => void;
   isLoading: boolean;
-}
+}) {
+  const {
+    chats,
+    usersForNewConversation,
+    selectedChat,
+    onChatSelect,
+    onUserSelect,
+    isLoading
+  } = props;
 
-export default function ChatSidebar({ 
-  chats,
-  usersForNewConversation, 
-  selectedChat,
-  onChatSelect,
-  onUserSelect,
-  isLoading
-}: ChatSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<'conversations' | 'users'>('conversations');
-
+  const { user } = useAuth();
   const filteredChats = chats.filter(chat =>
     chat.user.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -68,6 +68,10 @@ export default function ChatSidebar({
   const filteredUsers = usersForNewConversation.filter(user =>
     user.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  if (isLoading) {
+    return <ChatSidebarSkeleton items={10} />;
+  }
 
   return (
     <Paper
@@ -86,18 +90,9 @@ export default function ChatSidebar({
       <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
           <Typography variant="h6" fontWeight="bold">
-            💬 Messages
+             {user ? `Hello, ${user.name}` : 'Chat'}
           </Typography>
-          <IconButton 
-            size="small" 
-            sx={{ 
-              bgcolor: 'primary.main', 
-              color: 'white',
-              '&:hover': { bgcolor: 'primary.dark' }
-            }}
-          >
-            <AddIcon fontSize="small" />
-          </IconButton>
+          
         </Box>
 
         {/* Search */}

@@ -1,6 +1,8 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
 import {
   Avatar,
   Box,
@@ -18,10 +20,9 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
-import { Helix } from "ldrs/react";
-import "ldrs/react/Helix.css";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+
+import { useAuth } from "../../../contexts/AuthContext";
+import DashboardSkeleton from "./components/DashboardSkeleton";
 
 export default function Dashboard() {
   const { user, isLoading } = useAuth();
@@ -55,13 +56,9 @@ export default function Dashboard() {
   const handleGetStarted = () => {
     router.push("/profile");
   };
-
   if (isLoading) {
-    return (
-      <Helix size="45" speed="2.5" color="#007BFF" />
-    );
+    return <DashboardSkeleton />;
   }
-
   if (!user) {
     return null;
   }
@@ -83,8 +80,19 @@ export default function Dashboard() {
               mb: 1,
             }}
           >
-            <span style={{ color: "#007BFF" }}>Welcome back,</span>{" "}
-            <span style={{ color: "#222" }}>{user.name.split(" ")[0]}</span>! 👋
+            <Typography
+              variant="h3"
+              fontWeight="bold"
+              sx={{ background: "none", mb: 1 }}
+            >
+              <Box component="span" sx={{ color: "#007BFF" }}>
+                Welcome back,
+              </Box>{" "}
+              <Box component="span" sx={{ color: "#222" }}>
+                {user.name.split(" ")[0]}
+              </Box>{" "}
+              👋
+            </Typography>
           </Typography>
           <Typography variant="h6" color="text.secondary">
             Ready to continue your learning journey?

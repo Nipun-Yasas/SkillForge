@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Container } from '@mui/material';
-import ChatSidebar from './_components/ChatSidebar';
-import ChatWelcome from './_components/ChatWelcome';
-import ChatInterface from './_components/ChatInterface';
+import { Box, Container } from '@mui/material';
+import ChatSidebar from './components/ChatSidebar';
+import ChatWelcome from './components/ChatWelcome';
+import ChatInterface from './components/ChatInterface';
 import { ChatAPI } from '@/lib/chatTestUtils';
 
 interface User {
@@ -39,8 +39,9 @@ export default function ChatPage() {
   const [usersForNewConversation, setUsersForNewConversation] = useState<User[]>([]);
   const [selectedChat, setSelectedChat] = useState<ChatUser | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); // sidebar/loading users
   const [lastMessageTime, setLastMessageTime] = useState<string>('');
+  const [messagesLoading, setMessagesLoading] = useState(false);
 
   // Load users and conversations
   const loadUsersAndConversations = async () => {
@@ -58,22 +59,30 @@ export default function ChatPage() {
   // Load messages for selected conversation
   const loadMessages = async (conversationId: string) => {
     try {
+      setMessagesLoading(true);
       const data = await ChatAPI.getMessages(conversationId);
       setMessages(data.messages || []);
       if (data.messages && data.messages.length > 0) {
         setLastMessageTime(data.messages[data.messages.length - 1].createdAt);
+      } else {
+        setLastMessageTime('');
       }
     } catch (error) {
       console.error('Error loading messages:', error);
+    } finally {
+      setMessagesLoading(false);
     }
   };
 
   // Handle selecting an existing chat
   const handleChatSelect = (chat: ChatUser) => {
     setSelectedChat(chat);
-    setMessages([]); // Clear previous messages
+    setMessages([]); // Clear previous messages so skeleton can show
+    setMessagesLoading(true);
     if (chat.conversationId) {
       loadMessages(chat.conversationId);
+    } else {
+      setMessagesLoading(false);
     }
   };
 
@@ -91,9 +100,11 @@ export default function ChatPage() {
       setChats(prev => [newChat, ...prev]);
       setUsersForNewConversation(prev => prev.filter(u => u._id !== user._id));
       setMessages([]); // Clear messages for new conversation
+      setMessagesLoading(true);
       loadMessages(conversation.conversationId);
     } catch (error) {
       console.error('Error creating conversation:', error);
+      setMessagesLoading(false);
     }
   };
 
@@ -157,9 +168,7 @@ export default function ChatPage() {
 
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
-      <Typography variant="h4" fontWeight="bold" sx={{ mb: 3 }}>
-        💬 Messages
-      </Typography>
+
 
       <Box sx={{ 
         display: 'flex', 
@@ -184,6 +193,7 @@ export default function ChatPage() {
           {selectedChat ? (
             <ChatInterface
               selectedChat={selectedChat}
+              isLoading={messagesLoading && messages.length === 0}
               messages={messages}
               onSendMessage={handleSendMessage}
             />

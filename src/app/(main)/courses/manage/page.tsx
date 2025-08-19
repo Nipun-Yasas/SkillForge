@@ -25,7 +25,6 @@ import {
   ListItem,
   ListItemText,
   ListItemSecondaryAction,
-  Divider,
   Switch,
   FormControlLabel,
   Accordion,
@@ -50,6 +49,7 @@ import {
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
+import ManageCoursesSkeleton from "./components/ManageCoursesSkeleton";
 import toast from 'react-hot-toast';
 
 interface Course {
@@ -223,7 +223,7 @@ export default function CourseManagementPage() {
     setNewOutcome('');
   };
 
-  const handleInputChange = (field: keyof CourseFormData, value: any) => {
+  const handleInputChange = (field: keyof CourseFormData, value: unknown) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -292,7 +292,7 @@ export default function CourseManagementPage() {
     }));
   };
 
-  const handleUpdateModule = (moduleIndex: number, field: string, value: any) => {
+  const handleUpdateModule = (moduleIndex: number, field: string, value: unknown) => {
     setFormData(prev => ({
       ...prev,
       modules: prev.modules.map((module, index) =>
@@ -457,9 +457,7 @@ export default function CourseManagementPage() {
 
         {/* Courses Grid */}
         {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-            <CircularProgress size={60} />
-          </Box>
+          <ManageCoursesSkeleton items={6} />
         ) : courses.length === 0 ? (
           <Paper sx={{ p: 6, textAlign: 'center', borderRadius: 3 }}>
             <Typography variant="h6" color="text.secondary" gutterBottom>
@@ -485,7 +483,7 @@ export default function CourseManagementPage() {
         ) : (
           <Grid container spacing={3}>
             {courses.map((course) => (
-              <Grid container spacing={2} sm={6} lg={4} key={course._id}>
+              <Grid size={{xs:12, sm:6, lg:4}} key={course._id}>
                 <Card
                   sx={{
                     height: '100%',

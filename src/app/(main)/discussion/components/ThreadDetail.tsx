@@ -12,9 +12,6 @@ import {
   IconButton,
   Card,
   CardContent,
-  CircularProgress,
-  Alert,
-  Snackbar
 } from '@mui/material';
 import {
   ThumbUp as ThumbUpIcon,
@@ -35,6 +32,8 @@ import {
   Thread,
   Reply 
 } from '@/lib/forumService';
+import ThreadDetailSkeleton from "./ThreadDetailSkeleton";
+import { toast } from 'react-hot-toast';
 
 interface ThreadDetailProps {
   threadId: string;
@@ -48,11 +47,6 @@ export default function ThreadDetail({ threadId, onBack }: ThreadDetailProps) {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: '',
-    severity: 'success' as 'success' | 'error'
-  });
 
   useEffect(() => {
     loadThread();
@@ -67,7 +61,9 @@ export default function ThreadDetail({ threadId, onBack }: ThreadDetailProps) {
       setReplies(response.replies);
     } catch (err) {
       console.error('Error loading thread:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load thread');
+      const message = err instanceof Error ? err.message : 'Failed to load thread';
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -81,11 +77,7 @@ export default function ThreadDetail({ threadId, onBack }: ThreadDetailProps) {
       const reply = await createReply(threadId, newReply);
       setReplies(prev => [...prev, reply]);
       setNewReply('');
-      setSnackbar({
-        open: true,
-        message: 'Reply posted successfully!',
-        severity: 'success'
-      });
+      toast.success('Reply posted successfully!');
       
       // Update thread reply count
       if (thread) {
@@ -93,11 +85,7 @@ export default function ThreadDetail({ threadId, onBack }: ThreadDetailProps) {
       }
     } catch (err) {
       console.error('Error creating reply:', err);
-      setSnackbar({
-        open: true,
-        message: err instanceof Error ? err.message : 'Failed to post reply',
-        severity: 'error'
-      });
+      toast.error(err instanceof Error ? err.message : 'Failed to post reply');
     } finally {
       setSubmitting(false);
     }
@@ -111,11 +99,7 @@ export default function ThreadDetail({ threadId, onBack }: ThreadDetailProps) {
       setThread({ ...thread, likes: response.likesCount });
     } catch (err) {
       console.error('Error liking thread:', err);
-      setSnackbar({
-        open: true,
-        message: 'Failed to like thread',
-        severity: 'error'
-      });
+      toast.error('Failed to like thread');
     }
   };
 
@@ -131,11 +115,7 @@ export default function ThreadDetail({ threadId, onBack }: ThreadDetailProps) {
       );
     } catch (err) {
       console.error('Error liking reply:', err);
-      setSnackbar({
-        open: true,
-        message: 'Failed to like reply',
-        severity: 'error'
-      });
+      toast.error('Failed to like reply');
     }
   };
 
@@ -144,23 +124,11 @@ export default function ThreadDetail({ threadId, onBack }: ThreadDetailProps) {
     
     try {
       await bookmarkThread(threadId);
-      setSnackbar({
-        open: true,
-        message: 'Thread bookmark updated!',
-        severity: 'success'
-      });
+      toast.success('Thread bookmark updated!');
     } catch (err) {
       console.error('Error bookmarking thread:', err);
-      setSnackbar({
-        open: true,
-        message: 'Failed to bookmark thread',
-        severity: 'error'
-      });
+      toast.error('Failed to bookmark thread');
     }
-  };
-
-  const handleSnackbarClose = () => {
-    setSnackbar({ ...snackbar, open: false });
   };
 
   const formatTimeAgo = (dateString: string) => {
@@ -178,19 +146,15 @@ export default function ThreadDetail({ threadId, onBack }: ThreadDetailProps) {
   };
 
   if (loading) {
-    return (
-      <Box sx={{ maxWidth: 800, mx: 'auto', p: 3, display: 'flex', justifyContent: 'center' }}>
-        <CircularProgress />
-      </Box>
-    );
+    return <ThreadDetailSkeleton />;
   }
 
   if (error || !thread) {
     return (
-      <Box sx={{ maxWidth: 800, mx: 'auto', p: 3 }}>
-        <Alert severity="error" sx={{ mb: 2 }}>
+      <Box sx={{ width: '100%', p: 0 }}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           {error || 'Thread not found'}
-        </Alert>
+        </Typography>
         <Button onClick={onBack} startIcon={<ArrowBackIcon />}>
           Back to Forum
         </Button>
@@ -199,7 +163,7 @@ export default function ThreadDetail({ threadId, onBack }: ThreadDetailProps) {
   }
 
   return (
-    <Box sx={{ maxWidth: 800, mx: 'auto', p: 3 }}>
+    <Box sx={{ width: '100%', p: 0 }}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -217,13 +181,13 @@ export default function ThreadDetail({ threadId, onBack }: ThreadDetailProps) {
         </Box>
 
         {/* Main Thread */}
-        <Paper sx={{ p: 4, mb: 4, borderRadius: 3 }}>
+        <Paper sx={{ p: 4, mb: 4, borderRadius: 3, width: '100%' }}>
           <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 3 }}>
             <Avatar 
               sx={{ width: 64, height: 64 }} 
               src={thread.author.avatar}
             >
-              {thread.author.name.charAt(0)}
+              {!thread.author.avatar && thread.author.name.charAt(0)}
             </Avatar>
             
             <Box sx={{ flex: 1 }}>
@@ -289,13 +253,13 @@ export default function ThreadDetail({ threadId, onBack }: ThreadDetailProps) {
         </Paper>
 
         {/* Replies Section */}
-        <Paper sx={{ p: 4, borderRadius: 3 }}>
+        <Paper sx={{ p: 4, borderRadius: 3, width: '100%' }}>
           <Typography variant="h6" fontWeight="bold" sx={{ mb: 3 }}>
             Replies ({replies.length})
           </Typography>
           
           {/* Reply Input */}
-          <Card sx={{ mb: 4, bgcolor: 'grey.50' }}>
+          <Card sx={{ mb: 4 }}>
             <CardContent>
               <Typography variant="subtitle2" sx={{ mb: 2 }}>
                 Add your reply
@@ -371,28 +335,13 @@ export default function ThreadDetail({ threadId, onBack }: ThreadDetailProps) {
               </Box>
             </motion.div>
           ))}
-          
+
           {replies.length === 0 && (
             <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
               No replies yet. Be the first to respond!
             </Typography>
           )}
         </Paper>
-
-        {/* Snackbar for notifications */}
-        <Snackbar
-          open={snackbar.open}
-          autoHideDuration={6000}
-          onClose={handleSnackbarClose}
-        >
-          <Alert
-            onClose={handleSnackbarClose}
-            severity={snackbar.severity}
-            variant="filled"
-          >
-            {snackbar.message}
-          </Alert>
-        </Snackbar>
       </motion.div>
     </Box>
   );

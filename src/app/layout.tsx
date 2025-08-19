@@ -10,6 +10,8 @@ import { NextAppProvider } from "@toolpad/core/nextjs";
 import { Toaster } from "react-hot-toast";
 import NAVIGATION from "./_utils/navigation";
 import theme from "../theme";
+import { Suspense } from "react";
+import Loading from "./loading";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -37,11 +39,12 @@ export default function RootLayout({
       >
         <AuthProvider>
           <AppRouterCacheProvider>
-            <NextAppProvider navigation={NAVIGATION} theme={theme}>
-              {children}
-              <Toaster
-                position="top-right"
-                toastOptions={{
+            <Suspense fallback={<Loading />}>
+              <NextAppProvider navigation={NAVIGATION} theme={theme}>
+                {children}
+                <Toaster
+                  position="top-right"
+                  toastOptions={{
                   duration: 4000,
                   style: {
                     background: "#fff",
@@ -63,6 +66,7 @@ export default function RootLayout({
                 }}
               />
             </NextAppProvider>
+            </Suspense>
           </AppRouterCacheProvider>
         </AuthProvider>
       </body>

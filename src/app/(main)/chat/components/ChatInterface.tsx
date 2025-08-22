@@ -20,6 +20,7 @@ import {
   EmojiEmotions as EmojiIcon,
   Circle as CircleIcon,
   MoreVert as MoreVertIcon,
+  ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 import MessageBubblesSkeleton from './MessageBubblesSkeleton';
 
@@ -55,6 +56,8 @@ interface ChatInterfaceProps {
   messages: Message[];
   onSendMessage: (content: string) => Promise<void>;
   isLoading?: boolean;
+  onBackToSidebar?: () => void;
+  isMobile?: boolean;
 }
 
 export default function ChatInterface({ 
@@ -62,6 +65,8 @@ export default function ChatInterface({
   messages: propMessages,
   onSendMessage,
   isLoading = false,
+  onBackToSidebar,
+  isMobile = false,
 }: ChatInterfaceProps) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>(propMessages || []);
@@ -113,6 +118,22 @@ export default function ChatInterface({
       >
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {/* Back button for mobile */}
+            {isMobile && onBackToSidebar && (
+              <IconButton 
+                onClick={onBackToSidebar}
+                sx={{ 
+                  color: 'primary.main',
+                  '&:hover': {
+                    backgroundColor: 'primary.main',
+                    color: 'white',
+                  }
+                }}
+              >
+                <ArrowBackIcon />
+              </IconButton>
+            )}
+            
             <Badge
               overlap="circular"
               anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}

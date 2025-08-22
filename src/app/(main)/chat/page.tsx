@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Box, Container } from '@mui/material';
+import { Box, Container, useTheme, useMediaQuery } from '@mui/material';
 import ChatSidebar from './components/ChatSidebar';
 import ChatWelcome from './components/ChatWelcome';
 import ChatInterface from './components/ChatInterface';
@@ -42,6 +42,11 @@ export default function ChatPage() {
   const [isLoading, setIsLoading] = useState(true); // sidebar/loading users
   const [lastMessageTime, setLastMessageTime] = useState<string>('');
   const [messagesLoading, setMessagesLoading] = useState(false);
+  
+  // Mobile responsive state
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [isSidebarOpen, setIsSidebarOpen] = useState(!isMobile);
 
   // Load users and conversations
   const loadUsersAndConversations = async () => {
@@ -84,6 +89,11 @@ export default function ChatPage() {
     } else {
       setMessagesLoading(false);
     }
+    
+    // Close sidebar on mobile when chat is selected
+    if (isMobile) {
+      setIsSidebarOpen(false);
+    }
   };
 
   // Handle selecting a user for new conversation
@@ -102,13 +112,26 @@ export default function ChatPage() {
       setMessages([]); // Clear messages for new conversation
       setMessagesLoading(true);
       loadMessages(conversation.conversationId);
+      
+      // Close sidebar on mobile when chat is selected
+      if (isMobile) {
+        setIsSidebarOpen(false);
+      }
     } catch (error) {
       console.error('Error creating conversation:', error);
       setMessagesLoading(false);
     }
   };
 
-  // Send message
+  // Handle going back to sidebar on mobile
+  const handleBackToSidebar = () => {
+    if (isMobile) {
+      setIsSidebarOpen(true);
+      setSelectedChat(null);
+    }
+  };
+
+  // Handle sending message
   const handleSendMessage = async (content: string) => {
     if (!selectedChat?.conversationId) return;
 
@@ -168,39 +191,82 @@ export default function ChatPage() {
 
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
-
-
       <Box sx={{ 
         display: 'flex', 
         height: '75vh',
         border: '1px solid #e0e0e0',
         borderRadius: 2,
         overflow: 'hidden',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+        position: 'relative'
       }}>
         {/* Sidebar */}
-        <ChatSidebar
-          chats={chats}
-          usersForNewConversation={usersForNewConversation}
-          selectedChat={selectedChat}
-          onChatSelect={handleChatSelect}
-          onUserSelect={handleUserSelect}
-          isLoading={isLoading}
-        />
+        <Box
+          sx={{
+            width: { xs: '100%', md: '350px' },
+            height: '100%',
+            position: { xs: 'absolute', md: 'relative' },
+            left: { xs: isSidebarOpen ? 0 : '-100%', md: 0 },
+            top: 0,
+            zIndex: { xs: 1000, md: 1 },
+            transition: { xs: 'left 0.3s ease-in-out', md: 'none' },
+            display: { xs: isSidebarOpen || !selectedChat ? 'block' : 'none', md: 'block' }
+          }}
+        >
+          <ChatSidebar
+            chats={chats}
+            usersForNewConversation={usersForNewConversation}
+            selectedChat={selectedChat}
+            onChatSelect={handleChatSelect}
+            onUserSelect={handleUserSelect}
+            isLoading={isLoading}
+          />
+        </Box>
 
         {/* Chat Interface */}
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <Box 
+          sx={{ 
+            flex: 1, 
+            display: 'flex', 
+            flexDirection: 'column',
+            width: { xs: '100%', md: 'calc(100% - 350px)' },
+            position: { xs: 'absolute', md: 'relative' },
+            left: { xs: isSidebarOpen ? '100%' : 0, md: 0 },
+            top: 0,
+            height: '100%',
+            transition: { xs: 'left 0.3s ease-in-out', md: 'none' },
+            zIndex: { xs: 999, md: 1 }
+          }}
+        >
           {selectedChat ? (
             <ChatInterface
               selectedChat={selectedChat}
               isLoading={messagesLoading && messages.length === 0}
               messages={messages}
               onSendMessage={handleSendMessage}
+              onBackToSidebar={isMobile ? handleBackToSidebar : undefined}
+              isMobile={isMobile}
             />
           ) : (
             <ChatWelcome />
           )}
         </Box>
+
+        {/* Mobile backdrop */}
+        {isMobile && isSidebarOpen && selectedChat && (
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              zIndex: 999,
+            }}
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
       </Box>
     </Container>
   );

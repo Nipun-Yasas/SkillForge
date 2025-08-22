@@ -77,13 +77,13 @@ export default function ChatSidebar(props: {
     <Paper
       elevation={2}
       sx={{
-        width: 350,
+        width: { xs: '100%', md: 350 },
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
         borderRadius: 0,
-        borderRight: '1px solid',
-        borderColor: 'divider'
+        borderRight: { xs: 'none', md: '1px solid' },
+        borderRightColor: { xs: 'transparent', md: 'divider' }
       }}
     >
       {/* Header */}

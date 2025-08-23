@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Box, Container, useTheme, useMediaQuery } from '@mui/material';
+import { Box, Container, useTheme, useMediaQuery, Typography } from '@mui/material';
 import ChatSidebar from './components/ChatSidebar';
 import ChatWelcome from './components/ChatWelcome';
 import ChatInterface from './components/ChatInterface';
@@ -46,7 +46,8 @@ export default function ChatPage() {
   // Mobile responsive state
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [isSidebarOpen, setIsSidebarOpen] = useState(!isMobile);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Start with sidebar open
+  const [isClient, setIsClient] = useState(false);
 
   // Load users and conversations
   const loadUsersAndConversations = async () => {
@@ -153,6 +154,24 @@ export default function ChatPage() {
     }
   };
 
+  // Ensure proper hydration and mobile detection
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Handle sidebar state based on mobile and selected chat
+  useEffect(() => {
+    if (isClient) {
+      if (isMobile) {
+        // On mobile: show sidebar when no chat is selected
+        setIsSidebarOpen(!selectedChat);
+      } else {
+        // On desktop: always show sidebar
+        setIsSidebarOpen(true);
+      }
+    }
+  }, [isMobile, selectedChat, isClient]);
+
   // Polling for real-time updates
   useEffect(() => {
     if (isLoading) return; // Don't start polling until initial load is done
@@ -189,6 +208,27 @@ export default function ChatPage() {
     loadUsersAndConversations();
   }, []);
 
+  // Don't render until client-side to prevent hydration mismatches
+  if (!isClient) {
+    return (
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          height: '75vh',
+          border: '1px solid #e0e0e0',
+          borderRadius: 2,
+          overflow: 'hidden',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          position: 'relative',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <Typography>Loading chat...</Typography>
+        </Box>
+      </Container>
+    );
+  }
+
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
       <Box sx={{ 
@@ -210,7 +250,12 @@ export default function ChatPage() {
             top: 0,
             zIndex: { xs: 1000, md: 1 },
             transition: { xs: 'left 0.3s ease-in-out', md: 'none' },
-            display: { xs: isSidebarOpen || !selectedChat ? 'block' : 'none', md: 'block' }
+            // Show sidebar on mobile when no chat is selected or sidebar is open
+            // Always show on desktop
+            display: { 
+              xs: (isSidebarOpen || !selectedChat) ? 'block' : 'none', 
+              md: 'block' 
+            }
           }}
         >
           <ChatSidebar
@@ -227,7 +272,6 @@ export default function ChatPage() {
         <Box 
           sx={{ 
             flex: 1, 
-            display: 'flex', 
             flexDirection: 'column',
             width: { xs: '100%', md: 'calc(100% - 350px)' },
             position: { xs: 'absolute', md: 'relative' },
@@ -235,7 +279,12 @@ export default function ChatPage() {
             top: 0,
             height: '100%',
             transition: { xs: 'left 0.3s ease-in-out', md: 'none' },
-            zIndex: { xs: 999, md: 1 }
+            zIndex: { xs: 999, md: 1 },
+            // Hide chat interface on mobile when sidebar is open or no chat selected
+            display: { 
+              xs: (isSidebarOpen || !selectedChat) ? 'none' : 'flex', 
+              md: 'flex' 
+            }
           }}
         >
           {selectedChat ? (
@@ -248,11 +297,12 @@ export default function ChatPage() {
               isMobile={isMobile}
             />
           ) : (
-            <ChatWelcome />
+            // Only show welcome screen on desktop when no chat is selected
+            !isMobile && <ChatWelcome />
           )}
         </Box>
 
-        {/* Mobile backdrop */}
+        {/* Mobile backdrop - only show when sidebar is open on mobile and there's a selected chat */}
         {isMobile && isSidebarOpen && selectedChat && (
           <Box
             sx={{

@@ -205,7 +205,6 @@ export default function ProfilePage() {
       return;
     }
 
-    // Initialize form data when user data is available
     if (user) {
       setFormData({
         name: user.name || "",
@@ -222,22 +221,21 @@ export default function ProfilePage() {
     }
   }, [user, isLoading, router]);
 
-  // Additional effect to handle user data updates
+  // Keep form in sync when user changes
   useEffect(() => {
-    if (user) {
-      setFormData((prev) => ({
-        name: user.name || prev.name,
-        email: user.email || prev.email,
-        bio: user.bio || prev.bio,
-        role: user.role || prev.role,
-        location: user.location || prev.location,
-        experience: user.experience || prev.experience,
-        skillsLearning: user.skills?.learning || prev.skillsLearning,
-        skillsTeaching: user.skills?.teaching || prev.skillsTeaching,
-        learningGoals: user.learningGoals || prev.learningGoals,
-        availability: user.availability || prev.availability,
-      }));
-    }
+    if (!user) return;
+    setFormData((prev) => ({
+      name: user.name ?? prev.name,
+      email: user.email ?? prev.email,
+      bio: user.bio ?? prev.bio,
+      role: user.role ?? prev.role,
+      location: user.location ?? prev.location,
+      experience: user.experience ?? prev.experience,
+      skillsLearning: user.skills?.learning ?? prev.skillsLearning,
+      skillsTeaching: user.skills?.teaching ?? prev.skillsTeaching,
+      learningGoals: user.learningGoals ?? prev.learningGoals,
+      availability: user.availability ?? prev.availability,
+    }));
   }, [user]);
 
   const handleInputChange = (
@@ -302,7 +300,6 @@ export default function ProfilePage() {
         updateUser(updatedUser.user);
         await refreshUser();
         setIsEditing(false);
-        toast.success("Profile updated successfully!");
       } else {
         throw new Error("Failed to update profile");
       }
@@ -347,23 +344,30 @@ export default function ProfilePage() {
     }
   };
 
+  // Fetch profile once per user id to avoid infinite update loop
+  const hasFetchedProfile = useRef<string | null>(null);
   useEffect(() => {
-    const load = async () => {
-      if (!user) return;
+    if (!user?._id) return;
+    if (hasFetchedProfile.current === user._id) return;
+    hasFetchedProfile.current = user._id;
+
+    const controller = new AbortController();
+    (async () => {
       try {
         const res = await fetch("/api/profile", {
           headers: { "x-user-id": user._id },
+          signal: controller.signal,
         });
         if (res.ok) {
           const data = await res.json();
-          updateUser(data.user);
+          updateUser(data.user); // single update; ref prevents re-fetch
         }
       } catch {
         // ignore
       }
-    };
-    if (user?._id) load();
-  }, [user?._id, user, updateUser]);
+    })();
+    return () => controller.abort();
+  }, [user?._id]); // do not depend on `user` or `updateUser`
 
   if (isLoading) {
     return <ProfileSkeleton />;

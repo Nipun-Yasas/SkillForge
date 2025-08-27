@@ -1,6 +1,9 @@
 "use client";
 
-import { Box, CardContent, Card, Skeleton } from "@mui/material";
+import Box from "@mui/material/Box";
+import CardContent from "@mui/material/CardContent";
+import Card from "@mui/material/Card";
+import Skeleton from "@mui/material/Skeleton";
 
 export default function CourseCardSkeleton() {
   return (

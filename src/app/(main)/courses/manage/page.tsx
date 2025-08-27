@@ -1,83 +1,66 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import {
-  Box,
-  Container,
-  Typography,
-  Paper,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Card,
-  CardContent,
-  CardActions,
-  Chip,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
-  Switch,
-  FormControlLabel,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  CircularProgress,
-  Alert,
-} from '@mui/material';
-import { Grid } from '@mui/material';
-import {
-  Add,
-  Edit,
-  Delete,
-  ExpandMore,
-  Save,
-  Cancel,
-  Visibility,
-  VisibilityOff,
-  PlayCircle,
-  People,
-  Star,
-} from '@mui/icons-material';
-import { motion } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState, useEffect, useCallback } from "react";
+import toast from "react-hot-toast";
+
+import { useRouter } from "next/navigation";
+
+import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import TextField from "@mui/material/TextField";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardActions from "@mui/material/CardActions";
+import Chip from "@mui/material/Chip";
+import IconButton from "@mui/material/IconButton";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import Switch from "@mui/material/Switch";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import CardMedia from "@mui/material/CardMedia";
+import CircularProgress from "@mui/material/CircularProgress";
+import Alert from "@mui/material/Alert";
+import Grid from "@mui/material/Grid";
+
+import Add from "@mui/icons-material/Add";
+import Edit from "@mui/icons-material/Edit";
+import Delete from "@mui/icons-material/Delete";
+import Save from "@mui/icons-material/Save";
+import Cancel from "@mui/icons-material/Cancel";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import People from "@mui/icons-material/People";
+import Star from "@mui/icons-material/Star";
+import { motion } from "framer-motion";
+
+import { useAuth } from "@/contexts/AuthContext";
 import ManageCoursesSkeleton from "./components/ManageCoursesSkeleton";
-import toast from 'react-hot-toast';
 
 interface Course {
   _id: string;
   title: string;
   description: string;
-  longDescription?: string;
-  duration: string;
-  level: 'Beginner' | 'Intermediate' | 'Advanced';
-  price: number;
-  isPremium: boolean;
+  level: "Beginner" | "Intermediate" | "Advanced";
   image: string;
   tags: string[];
   category: string;
-  prerequisites: string[];
+  prerequisites?: string[];
   learningOutcomes: string[];
-  modules: {
-    id: string;
-    title: string;
-    description: string;
-    duration: string;
-    resources?: {
-      title: string;
-      url: string;
-      type: 'video' | 'pdf' | 'link' | 'quiz';
-    }[];
-  }[];
+  totalDuration: number;
   isPublished: boolean;
+  credit: number;
+  youtubeLinks: string[];
   rating: number;
   totalRatings: number;
   enrolledStudents: number;
@@ -87,58 +70,56 @@ interface Course {
 interface CourseFormData {
   title: string;
   description: string;
-  longDescription: string;
-  duration: string;
-  level: 'Beginner' | 'Intermediate' | 'Advanced';
-  price: number;
-  isPremium: boolean;
+  level: "Beginner" | "Intermediate" | "Advanced";
   image: string;
   tags: string[];
   category: string;
   prerequisites: string[];
   learningOutcomes: string[];
-  modules: {
-    id: string;
-    title: string;
-    description: string;
-    duration: string;
-    resources?: {
-      title: string;
-      url: string;
-      type: 'video' | 'pdf' | 'link' | 'quiz';
-    }[];
-  }[];
+  totalDuration: number;
   isPublished: boolean;
+  credit: number;
+  youtubeLinks: string[];
 }
 
 const initialFormData: CourseFormData = {
-  title: '',
-  description: '',
-  longDescription: '',
-  duration: '',
-  level: 'Beginner',
-  price: 0,
-  isPremium: false,
-  image: '',
+  title: "",
+  description: "",
+  level: "Beginner",
+  image: "",
   tags: [],
-  category: '',
+  category: "",
   prerequisites: [],
   learningOutcomes: [],
-  modules: [],
+  totalDuration: 0,
   isPublished: false,
+  credit: 0,
+  youtubeLinks: [],
+};
+
+// simple YouTube URL validator
+const isValidYouTubeUrl = (url: string) => {
+  try {
+    const u = new URL(url);
+    return (
+      u.hostname.includes("youtube.com") || u.hostname.includes("youtu.be")
+    );
+  } catch {
+    return false;
+  }
 };
 
 const categories = [
-  'Programming',
-  'Design',
-  'Data Science',
-  'Marketing',
-  'Business',
-  'Languages',
-  'Photography',
-  'Music',
-  'Health & Fitness',
-  'Cooking',
+  "Programming",
+  "Design",
+  "Data Science",
+  "Marketing",
+  "Business",
+  "Languages",
+  "Photography",
+  "Music",
+  "Health & Fitness",
+  "Cooking",
 ];
 
 export default function CourseManagementPage() {
@@ -149,41 +130,50 @@ export default function CourseManagementPage() {
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [formData, setFormData] = useState<CourseFormData>(initialFormData);
   const [saving, setSaving] = useState(false);
-  const [newTag, setNewTag] = useState('');
-  const [newPrerequisite, setNewPrerequisite] = useState('');
-  const [newOutcome, setNewOutcome] = useState('');
+  const [newTag, setNewTag] = useState("");
+  const [newPrerequisite, setNewPrerequisite] = useState("");
+  const [newOutcome, setNewOutcome] = useState("");
+  const [newYoutubeLink, setNewYoutubeLink] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const router = useRouter();
 
   // Check if user is authorized
   useEffect(() => {
-    if (user && !['mentor', 'both', 'admin'].includes(user.role)) {
-      toast.error('Access denied. Only mentors can manage courses.');
-      window.location.href = '/courses';
+    if (user && !["mentor", "both", "admin"].includes(user.role)) {
+      toast.error("Access denied. Only mentors can manage courses.");
+      window.location.href = "/courses";
     }
   }, [user]);
+
+  const fetchCourses = useCallback(async () => {
+    setLoading(true);
+    if (!user?._id) return;
+    try {
+      const res = await fetch(`/api/courses?instructor=${user._id}`);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Failed to load courses");
+      }
+      const data = await res.json();
+      setCourses(Array.isArray(data.courses) ? data.courses : []);
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        console.error("Fetch courses error:", e);
+        toast.error(e.message || "Failed to load courses");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [user?._id]);
 
   // Fetch user's courses
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const response = await fetch(`/api/courses?instructor=${user?._id}`);
-        if (response.ok) {
-          const data = await response.json();
-          setCourses(data.courses);
-        } else {
-          toast.error('Failed to load courses');
-        }
-      } catch (error) {
-        console.error('Error fetching courses:', error);
-        toast.error('Failed to load courses');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (user) {
-      fetchCourses();
+    if (!user?._id) {
+      return;
     }
-  }, [user]);
+    fetchCourses();
+  }, [user?._id, fetchCourses]);
 
   const handleOpenDialog = (course?: Course) => {
     if (course) {
@@ -191,25 +181,24 @@ export default function CourseManagementPage() {
       setFormData({
         title: course.title,
         description: course.description,
-        longDescription: course.longDescription || '',
-        duration: course.duration,
         level: course.level,
-        price: course.price,
-        isPremium: course.isPremium,
         image: course.image,
-        tags: course.tags,
+        tags: course.tags || [],
         category: course.category,
-        prerequisites: course.prerequisites,
-        learningOutcomes: course.learningOutcomes,
-        modules: course.modules.map(module => ({
-          ...module,
-          resources: module.resources || []
-        })),
-        isPublished: course.isPublished,
+        prerequisites: course.prerequisites || [],
+        learningOutcomes: course.learningOutcomes || [],
+        totalDuration: course.totalDuration || 0,
+        isPublished: course.isPublished ?? false,
+        credit: course.credit ?? 0,
+        youtubeLinks: course.youtubeLinks || [],
       });
+      setImageFile(null);
+      setImagePreview(course.image || null);
     } else {
       setEditingCourse(null);
       setFormData(initialFormData);
+      setImageFile(null);
+      setImagePreview(null);
     }
     setDialogOpen(true);
   };
@@ -218,203 +207,270 @@ export default function CourseManagementPage() {
     setDialogOpen(false);
     setEditingCourse(null);
     setFormData(initialFormData);
-    setNewTag('');
-    setNewPrerequisite('');
-    setNewOutcome('');
+    setNewTag("");
+    setNewPrerequisite("");
+    setNewOutcome("");
+    setNewYoutubeLink("");
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    setImagePreview(null);
+    setImageFile(null);
   };
 
   const handleInputChange = (field: keyof CourseFormData, value: unknown) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleAddTag = () => {
     if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        tags: [...prev.tags, newTag.trim()]
+        tags: [...prev.tags, newTag.trim()],
       }));
-      setNewTag('');
+      setNewTag("");
     }
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove)
+      tags: prev.tags.filter((tag) => tag !== tagToRemove),
     }));
   };
 
   const handleAddPrerequisite = () => {
-    if (newPrerequisite.trim() && !formData.prerequisites.includes(newPrerequisite.trim())) {
-      setFormData(prev => ({
+    if (
+      newPrerequisite.trim() &&
+      !formData.prerequisites.includes(newPrerequisite.trim())
+    ) {
+      setFormData((prev) => ({
         ...prev,
-        prerequisites: [...prev.prerequisites, newPrerequisite.trim()]
+        prerequisites: [...prev.prerequisites, newPrerequisite.trim()],
       }));
-      setNewPrerequisite('');
+      setNewPrerequisite("");
     }
   };
 
   const handleRemovePrerequisite = (prerequisiteToRemove: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      prerequisites: prev.prerequisites.filter(p => p !== prerequisiteToRemove)
+      prerequisites: prev.prerequisites.filter(
+        (p) => p !== prerequisiteToRemove
+      ),
     }));
   };
 
   const handleAddOutcome = () => {
-    if (newOutcome.trim() && !formData.learningOutcomes.includes(newOutcome.trim())) {
-      setFormData(prev => ({
+    if (
+      newOutcome.trim() &&
+      !formData.learningOutcomes.includes(newOutcome.trim())
+    ) {
+      setFormData((prev) => ({
         ...prev,
-        learningOutcomes: [...prev.learningOutcomes, newOutcome.trim()]
+        learningOutcomes: [...prev.learningOutcomes, newOutcome.trim()],
       }));
-      setNewOutcome('');
+      setNewOutcome("");
     }
   };
 
   const handleRemoveOutcome = (outcomeToRemove: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      learningOutcomes: prev.learningOutcomes.filter(o => o !== outcomeToRemove)
+      learningOutcomes: prev.learningOutcomes.filter(
+        (o) => o !== outcomeToRemove
+      ),
     }));
   };
 
-  const handleAddModule = () => {
-    const newModule = {
-      id: `module-${Date.now()}`,
-      title: '',
-      description: '',
-      duration: '',
-      resources: [],
-    };
-    setFormData(prev => ({
+  const handleAddYoutubeLink = () => {
+    const link = newYoutubeLink.trim();
+    if (!link) return;
+    if (!isValidYouTubeUrl(link)) {
+      toast.error("Enter a valid YouTube URL");
+      return;
+    }
+    setFormData((prev) => ({
       ...prev,
-      modules: [...prev.modules, newModule]
+      youtubeLinks: [...prev.youtubeLinks, link],
+    }));
+    setNewYoutubeLink("");
+  };
+
+  const handleRemoveYoutubeLink = (linkToRemove: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      youtubeLinks: prev.youtubeLinks.filter((l) => l !== linkToRemove),
     }));
   };
 
-  const handleUpdateModule = (moduleIndex: number, field: string, value: unknown) => {
-    setFormData(prev => ({
-      ...prev,
-      modules: prev.modules.map((module, index) =>
-        index === moduleIndex ? { ...module, [field]: value } : module
-      )
-    }));
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    // Optional: size/type validations
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select a valid image file");
+      return;
+    }
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
   };
 
-  const handleRemoveModule = (moduleIndex: number) => {
-    setFormData(prev => ({
-      ...prev,
-      modules: prev.modules.filter((_, index) => index !== moduleIndex)
-    }));
+  const uploadImage = async (file: File): Promise<string> => {
+    const form = new FormData();
+    form.append("file", file);
+    const res = await fetch("/api/upload", {
+      method: "POST",
+      body: form,
+    });
+    if (!res.ok) {
+      throw new Error("Image upload failed");
+    }
+    const data = await res.json();
+    return data.url as string;
   };
 
   const handleSaveCourse = async () => {
-    // Validation
-    if (!formData.title || !formData.description || !formData.duration || !formData.category) {
-      toast.error('Please fill in all required fields');
+    if (!formData.title || !formData.description || !formData.category) {
+      toast.error("Please fill in required fields");
       return;
     }
-
     if (formData.learningOutcomes.length === 0) {
-      toast.error('Please add at least one learning outcome');
+      toast.error("Please add at least one learning outcome");
       return;
     }
 
     setSaving(true);
     try {
-      const url = editingCourse 
-        ? `/api/courses/${editingCourse._id}` 
-        : '/api/courses';
-      
-      const method = editingCourse ? 'PUT' : 'POST';
+      // 1) Upload image if a new file is selected
+      let imageUrl = formData.image || "";
+      if (imageFile) {
+        try {
+          imageUrl = await uploadImage(imageFile);
+        } catch (err) {
+          console.error(err);
+          toast.error("Failed to upload image");
+          setSaving(false);
+          return;
+        }
+      }
+
+      const url = editingCourse
+        ? `/api/courses/${editingCourse._id}`
+        : "/api/courses";
+      const method = editingCourse ? "PUT" : "POST";
+
+      const payload = {
+        title: formData.title,
+        description: formData.description,
+        level: formData.level,
+        image: imageUrl,
+        tags: formData.tags,
+        category: formData.category,
+        prerequisites: formData.prerequisites,
+        learningOutcomes: formData.learningOutcomes,
+        totalDuration: Number(formData.totalDuration) || 0,
+        isPublished: formData.isPublished,
+        credit: Number(formData.credit) || 0,
+        youtubeLinks: formData.youtubeLinks,
+      };
 
       const response = await fetch(url, {
         method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
         const data = await response.json();
-        toast.success(editingCourse ? 'Course updated successfully' : 'Course created successfully');
-        
-        // Update courses list
+        toast.success(
+          editingCourse
+            ? "Course updated successfully"
+            : "Course created successfully"
+        );
         if (editingCourse) {
-          setCourses(prev => prev.map(course => 
-            course._id === editingCourse._id ? data.course : course
-          ));
+          setCourses((prev) =>
+            prev.map((c) => (c._id === editingCourse._id ? data.course : c))
+          );
         } else {
-          setCourses(prev => [data.course, ...prev]);
+          setCourses((prev) => [data.course, ...prev]);
         }
-        
         handleCloseDialog();
       } else {
         const error = await response.json();
-        toast.error(error.error || 'Failed to save course');
+        toast.error(error.error || "Failed to save course");
       }
-    } catch (error) {
-      console.error('Save course error:', error);
-      toast.error('Failed to save course');
+    } catch (err) {
+      console.error("Save course error:", err);
+      toast.error("Failed to save course");
     } finally {
       setSaving(false);
     }
   };
 
   const handleDeleteCourse = async (courseId: string) => {
-    if (!confirm('Are you sure you want to delete this course?')) {
+    if (!confirm("Are you sure you want to delete this course?")) {
       return;
     }
 
     try {
       const response = await fetch(`/api/courses/${courseId}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (response.ok) {
-        toast.success('Course deleted successfully');
-        setCourses(prev => prev.filter(course => course._id !== courseId));
+        toast.success("Course deleted successfully");
+        setCourses((prev) => prev.filter((course) => course._id !== courseId));
       } else {
         const error = await response.json();
-        toast.error(error.error || 'Failed to delete course');
+        toast.error(error.error || "Failed to delete course");
       }
     } catch (error) {
-      console.error('Delete course error:', error);
-      toast.error('Failed to delete course');
+      console.error("Delete course error:", error);
+      toast.error("Failed to delete course");
     }
   };
 
   const handleTogglePublish = async (course: Course) => {
     try {
       const response = await fetch(`/api/courses/${course._id}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ isPublished: !course.isPublished }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        toast.success(course.isPublished ? 'Course unpublished' : 'Course published');
-        setCourses(prev => prev.map(c => 
-          c._id === course._id ? data.course : c
-        ));
+        toast.success(
+          course.isPublished ? "Course unpublished" : "Course published"
+        );
+        setCourses((prev) =>
+          prev.map((c) => (c._id === course._id ? data.course : c))
+        );
       } else {
         const error = await response.json();
-        toast.error(error.error || 'Failed to update course');
+        toast.error(error.error || "Failed to update course");
       }
     } catch (error) {
-      console.error('Toggle publish error:', error);
-      toast.error('Failed to update course');
+      console.error("Toggle publish error:", error);
+      toast.error("Failed to update course");
     }
   };
 
-  if (!user || !['mentor', 'both', 'admin'].includes(user.role)) {
+  const formatMinutes = (mins: number) => {
+    const m = Number(mins) || 0;
+    const h = Math.floor(m / 60);
+    const r = m % 60;
+    return h ? `${h}h ${r}m` : `${r}m`;
+  };
+
+  if (!user || !["mentor", "both", "admin"].includes(user.role)) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Alert severity="error">Access denied. Only mentors can manage courses.</Alert>
+        <Alert severity="error">
+          Access denied. Only mentors can manage courses.
+        </Alert>
       </Container>
     );
   }
@@ -427,15 +483,22 @@ export default function CourseManagementPage() {
         transition={{ duration: 0.6 }}
       >
         {/* Header */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 4,
+          }}
+        >
           <Typography
             variant="h3"
             fontWeight="bold"
             sx={{
-              background: 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
             }}
           >
             📚 My Courses
@@ -445,9 +508,9 @@ export default function CourseManagementPage() {
             startIcon={<Add />}
             onClick={() => handleOpenDialog()}
             sx={{
-              background: 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
-              '&:hover': {
-                background: 'linear-gradient(135deg, #0056CC 0%, #4A0080 100%)',
+              background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+              "&:hover": {
+                background: "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
               },
             }}
           >
@@ -459,60 +522,37 @@ export default function CourseManagementPage() {
         {loading ? (
           <ManageCoursesSkeleton items={6} />
         ) : courses.length === 0 ? (
-          <Paper sx={{ p: 6, textAlign: 'center', borderRadius: 3 }}>
-            <Typography variant="h6" color="text.secondary" gutterBottom>
-              No courses created yet
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              Create your first course to start teaching
-            </Typography>
-            <Button
-              variant="contained"
-              startIcon={<Add />}
-              onClick={() => handleOpenDialog()}
-              sx={{
-                background: 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #0056CC 0%, #4A0080 100%)',
-                },
-              }}
-            >
-              Create Course
-            </Button>
-          </Paper>
+          <Box sx={{ textAlign: "center", py: 6 }}>No courses yet.</Box>
         ) : (
           <Grid container spacing={3}>
             {courses.map((course) => (
-              <Grid size={{xs:12, sm:6, lg:4}} key={course._id}>
+              <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={course._id}>
                 <Card
                   sx={{
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
                     borderRadius: 3,
-                    boxShadow: '0 4px 20px rgba(0, 123, 255, 0.1)',
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      boxShadow: '0 8px 30px rgba(0, 123, 255, 0.2)',
+                    boxShadow: "0 4px 20px rgba(0, 123, 255, 0.1)",
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      boxShadow: "0 8px 30px rgba(0, 123, 255, 0.2)",
                     },
                   }}
                 >
                   {/* Course Image */}
-                  <Box
-                    sx={{
-                      height: 200,
-                      background: 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      position: 'relative',
-                    }}
-                  >
-                    <PlayCircle sx={{ fontSize: 60, color: 'white', opacity: 0.8 }} />
-                    <Box sx={{ position: 'absolute', top: 12, right: 12 }}>
+                  <Box sx={{ position: "relative" }}>
+                    <CardMedia
+                      component="img"
+                      image={course.image || "/images/course-placeholder.jpg"}
+                      alt={course.title}
+                      sx={{ height: 200, objectFit: "cover" }}
+                    />
+
+                    <Box sx={{ position: "absolute", top: 12, right: 12 }}>
                       <Chip
-                        label={course.isPublished ? 'Published' : 'Draft'}
-                        color={course.isPublished ? 'success' : 'warning'}
+                        label={course.isPublished ? "Published" : "Draft"}
+                        color={course.isPublished ? "success" : "warning"}
                         size="small"
                       />
                     </Box>
@@ -522,19 +562,33 @@ export default function CourseManagementPage() {
                     <Typography variant="h6" fontWeight="bold" gutterBottom>
                       {course.title}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 2 }}
+                    >
                       {course.description}
                     </Typography>
 
                     {/* Stats */}
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        mb: 1.5,
+                      }}
+                    >
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                      >
                         <People sx={{ fontSize: 16 }} />
                         <Typography variant="body2" color="text.secondary">
                           {course.enrolledStudents}
                         </Typography>
                       </Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                      >
                         <Star sx={{ fontSize: 16 }} />
                         <Typography variant="body2" color="text.secondary">
                           {course.rating.toFixed(1)} ({course.totalRatings})
@@ -542,21 +596,50 @@ export default function CourseManagementPage() {
                       </Box>
                     </Box>
 
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        mb: 1.5,
+                      }}
+                    >
+                      <Typography variant="caption" color="text.secondary">
+                        Videos: {course.youtubeLinks?.length || 0}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Credit: {course.credit}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Duration: {formatMinutes(course.totalDuration)}
+                      </Typography>
+                    </Box>
+
+                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                       {course.tags.slice(0, 2).map((tag) => (
-                        <Chip key={tag} label={tag} size="small" variant="outlined" />
+                        <Chip
+                          key={tag}
+                          label={tag}
+                          size="small"
+                          variant="outlined"
+                        />
                       ))}
                     </Box>
                   </CardContent>
 
-                  <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
+                  <CardActions
+                    sx={{ justifyContent: "space-between", px: 2, pb: 2 }}
+                  >
                     <Box>
                       <IconButton
                         onClick={() => handleTogglePublish(course)}
-                        color={course.isPublished ? 'success' : 'warning'}
+                        color={course.isPublished ? "success" : "warning"}
                         size="small"
                       >
-                        {course.isPublished ? <Visibility /> : <VisibilityOff />}
+                        {course.isPublished ? (
+                          <Visibility />
+                        ) : (
+                          <VisibilityOff />
+                        )}
                       </IconButton>
                       <IconButton
                         onClick={() => handleOpenDialog(course)}
@@ -572,6 +655,16 @@ export default function CourseManagementPage() {
                       >
                         <Delete />
                       </IconButton>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        sx={{ ml: 1 }}
+                        onClick={() =>
+                          router.push(`/courses/manage/${course._id}/quizzes`)
+                        }
+                      >
+                        Quizzes
+                      </Button>
                     </Box>
                     <Typography variant="body2" color="text.secondary">
                       {course.level}
@@ -589,31 +682,33 @@ export default function CourseManagementPage() {
           onClose={handleCloseDialog}
           maxWidth="md"
           fullWidth
-          PaperProps={{ sx: { borderRadius: 3 } }}
+          slotProps={{
+            paper: { sx: { borderRadius: 3 } },
+          }}
         >
-          <DialogTitle>
-            {editingCourse ? 'Edit Course' : 'Create New Course'}
+          <DialogTitle sx={{ display: "flex", justifyContent: "center" }}>
+            {editingCourse ? "Edit Course" : "Create New Course"}
           </DialogTitle>
           <DialogContent>
             <Grid container spacing={3} sx={{ mt: 1 }}>
-              {/* Basic Info */}
-              <Grid container spacing={2}>
+              {/* Basic info */}
+              <Grid size={{ xs: 12 }}>
                 <Typography variant="h6" gutterBottom>
                   Basic Information
                 </Typography>
               </Grid>
-              
-              <Grid container spacing={2}>
+
+              <Grid size={{ xs: 12 }}>
                 <TextField
                   fullWidth
                   label="Course Title"
                   required
                   value={formData.title}
-                  onChange={(e) => handleInputChange('title', e.target.value)}
+                  onChange={(e) => handleInputChange("title", e.target.value)}
                 />
               </Grid>
-              
-              <Grid container spacing={2}>
+
+              <Grid size={{ xs: 12 }}>
                 <TextField
                   fullWidth
                   label="Short Description"
@@ -621,38 +716,19 @@ export default function CourseManagementPage() {
                   multiline
                   rows={3}
                   value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                />
-              </Grid>
-              
-              <Grid container spacing={2}>
-                <TextField
-                  fullWidth
-                  label="Long Description"
-                  multiline
-                  rows={5}
-                  value={formData.longDescription}
-                  onChange={(e) => handleInputChange('longDescription', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("description", e.target.value)
+                  }
                 />
               </Grid>
 
-              <Grid container spacing={2}>
-                <TextField
-                  fullWidth
-                  label="Duration (e.g., 8 weeks)"
-                  required
-                  value={formData.duration}
-                  onChange={(e) => handleInputChange('duration', e.target.value)}
-                />
-              </Grid>
-
-              <Grid container spacing={2} >
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth required>
                   <InputLabel>Level</InputLabel>
                   <Select
                     value={formData.level}
                     label="Level"
-                    onChange={(e) => handleInputChange('level', e.target.value)}
+                    onChange={(e) => handleInputChange("level", e.target.value)}
                   >
                     <MenuItem value="Beginner">Beginner</MenuItem>
                     <MenuItem value="Intermediate">Intermediate</MenuItem>
@@ -661,13 +737,15 @@ export default function CourseManagementPage() {
                 </FormControl>
               </Grid>
 
-              <Grid container spacing={2}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth required>
                   <InputLabel>Category</InputLabel>
                   <Select
                     value={formData.category}
                     label="Category"
-                    onChange={(e) => handleInputChange('category', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("category", e.target.value)
+                    }
                   >
                     {categories.map((category) => (
                       <MenuItem key={category} value={category}>
@@ -678,52 +756,117 @@ export default function CourseManagementPage() {
                 </FormControl>
               </Grid>
 
-              <Grid container spacing={2}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   fullWidth
-                  label="Price"
+                  label="Total Duration (minutes)"
                   type="number"
-                  value={formData.price}
-                  onChange={(e) => handleInputChange('price', parseFloat(e.target.value) || 0)}
+                  value={formData.totalDuration}
+                  onChange={(e) =>
+                    handleInputChange(
+                      "totalDuration",
+                      Number(e.target.value) || ""
+                    )
+                  }
                 />
               </Grid>
 
-              <Grid container spacing={2}>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={formData.isPremium}
-                      onChange={(e) => handleInputChange('isPremium', e.target.checked)}
-                    />
+              <Grid size={{ xs: 12 }}>
+                <TextField
+                  fullWidth
+                  label="Credit Cost"
+                  type="number"
+                  value={formData.credit}
+                  onChange={(e) =>
+                    handleInputChange("credit", Number(e.target.value) || "")
                   }
-                  label="Premium Course"
                 />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={formData.isPublished}
-                      onChange={(e) => handleInputChange('isPublished', e.target.checked)}
+              </Grid>
+
+              {/* Cover Image Upload */}
+              <Grid size={{ xs: 12 }}>
+                <Typography variant="h6" gutterBottom>
+                  Cover Image
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: { xs: "stretch", sm: "center" },
+                    gap: 2,
+                    flexDirection: { xs: "column", sm: "row" },
+                  }}
+                >
+                  <Button variant="outlined" component="label">
+                    Choose Image
+                    <input
+                      hidden
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
                     />
-                  }
-                  label="Publish Course"
-                />
+                  </Button>
+                  {imagePreview ? (
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <CardMedia
+                        component="img"
+                        alt="Cover preview"
+                        image={imagePreview}
+                        sx={{
+                          width: 160,
+                          height: 100,
+                          objectFit: "cover",
+                          borderRadius: 1,
+                        }}
+                      />
+                      <Button
+                        color="error"
+                        onClick={() => {
+                          if (imagePreview) URL.revokeObjectURL(imagePreview);
+                          setImagePreview(null);
+                          setImageFile(null);
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    </Box>
+                  ) : (
+                    formData.image && (
+                      <CardMedia
+                        component="img"
+                        alt="Current cover"
+                        image={formData.image}
+                        sx={{
+                          width: 160,
+                          height: 100,
+                          objectFit: "cover",
+                          borderRadius: 1,
+                        }}
+                      />
+                    )
+                  )}
+                </Box>
+                <Typography variant="caption" color="text.secondary">
+                  JPG, PNG, or WEBP. Max ~5MB is recommended.
+                </Typography>
               </Grid>
 
               {/* Tags */}
-              <Grid container spacing={2}>
+              <Grid size={{ xs: 12 }}>
                 <Typography variant="h6" gutterBottom>
                   Tags
                 </Typography>
-                <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                <Box sx={{ display: "flex", gap: 1, mb: 1 }}>
                   <TextField
                     label="Add tag"
                     value={newTag}
                     onChange={(e) => setNewTag(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
+                    onKeyDown={(e) =>
+                      e.key === "Enter" && (e.preventDefault(), handleAddTag())
+                    }
                   />
                   <Button onClick={handleAddTag}>Add</Button>
                 </Box>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                   {formData.tags.map((tag) => (
                     <Chip
                       key={tag}
@@ -735,128 +878,136 @@ export default function CourseManagementPage() {
               </Grid>
 
               {/* Prerequisites */}
-              <Grid container spacing={2}>
+              <Grid size={{ xs: 12 }}>
                 <Typography variant="h6" gutterBottom>
                   Prerequisites
                 </Typography>
-                <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                <Box sx={{ display: "flex", gap: 1, mb: 1 }}>
                   <TextField
                     fullWidth
                     label="Add prerequisite"
                     value={newPrerequisite}
                     onChange={(e) => setNewPrerequisite(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAddPrerequisite()}
+                    onKeyDown={(e) =>
+                      e.key === "Enter" &&
+                      (e.preventDefault(), handleAddPrerequisite())
+                    }
                   />
                   <Button onClick={handleAddPrerequisite}>Add</Button>
                 </Box>
                 <List>
-                  {formData.prerequisites.map((prerequisite, index) => (
-                    <ListItem key={index}>
-                      <ListItemText primary={prerequisite} />
-                      <ListItemSecondaryAction>
+                  {formData.prerequisites.map((p, i) => (
+                    <ListItem
+                      key={i}
+                      secondaryAction={
                         <IconButton
                           edge="end"
-                          onClick={() => handleRemovePrerequisite(prerequisite)}
+                          onClick={() => handleRemovePrerequisite(p)}
                         >
                           <Delete />
                         </IconButton>
-                      </ListItemSecondaryAction>
+                      }
+                    >
+                      <ListItemText primary={p} />
                     </ListItem>
                   ))}
                 </List>
               </Grid>
 
               {/* Learning Outcomes */}
-              <Grid container spacing={2}>
+              <Grid size={{ xs: 12 }}>
                 <Typography variant="h6" gutterBottom>
                   Learning Outcomes *
                 </Typography>
-                <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                <Box sx={{ display: "flex", gap: 1, mb: 1 }}>
                   <TextField
                     fullWidth
                     label="Add learning outcome"
                     value={newOutcome}
                     onChange={(e) => setNewOutcome(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAddOutcome()}
+                    onKeyDown={(e) =>
+                      e.key === "Enter" &&
+                      (e.preventDefault(), handleAddOutcome())
+                    }
                   />
                   <Button onClick={handleAddOutcome}>Add</Button>
                 </Box>
                 <List>
-                  {formData.learningOutcomes.map((outcome, index) => (
-                    <ListItem key={index}>
-                      <ListItemText primary={outcome} />
-                      <ListItemSecondaryAction>
+                  {formData.learningOutcomes.map((o, i) => (
+                    <ListItem
+                      key={i}
+                      secondaryAction={
                         <IconButton
                           edge="end"
-                          onClick={() => handleRemoveOutcome(outcome)}
+                          onClick={() => handleRemoveOutcome(o)}
                         >
                           <Delete />
                         </IconButton>
-                      </ListItemSecondaryAction>
+                      }
+                    >
+                      <ListItemText primary={o} />
                     </ListItem>
                   ))}
                 </List>
               </Grid>
 
-              {/* Course Modules */}
-              <Grid container spacing={2}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                  <Typography variant="h6">
-                    Course Modules
-                  </Typography>
-                  <Button startIcon={<Add />} onClick={handleAddModule}>
-                    Add Module
-                  </Button>
+              {/* YouTube Links */}
+              <Grid size={{ xs: 12 }}>
+                <Typography variant="h6" gutterBottom>
+                  YouTube Links (Course Materials)
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 1,
+                    mb: 1,
+                    flexDirection: { xs: "column", sm: "row" },
+                  }}
+                >
+                  <TextField
+                    fullWidth
+                    label="https://youtu.be/... or https://www.youtube.com/watch?v=..."
+                    value={newYoutubeLink}
+                    onChange={(e) => setNewYoutubeLink(e.target.value)}
+                    onKeyDown={(e) =>
+                      e.key === "Enter" &&
+                      (e.preventDefault(), handleAddYoutubeLink())
+                    }
+                  />
+                  <Button onClick={handleAddYoutubeLink}>Add</Button>
                 </Box>
-                
-                {formData.modules.map((module, index) => (
-                  <Accordion key={module.id} sx={{ mb: 1 }}>
-                    <AccordionSummary expandIcon={<ExpandMore />}>
-                      <Typography>
-                        Module {index + 1}: {module.title || 'Untitled Module'}
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Grid container spacing={2}>
-                        <Grid container spacing={2}>
-                          <TextField
-                            fullWidth
-                            label="Module Title"
-                            value={module.title}
-                            onChange={(e) => handleUpdateModule(index, 'title', e.target.value)}
-                          />
-                        </Grid>
-                        <Grid container spacing={2}>
-                          <TextField
-                            fullWidth
-                            label="Module Description"
-                            multiline
-                            rows={3}
-                            value={module.description}
-                            onChange={(e) => handleUpdateModule(index, 'description', e.target.value)}
-                          />
-                        </Grid>
-                        <Grid container spacing={2}>
-                          <TextField
-                            fullWidth
-                            label="Duration (e.g., 120 minutes)"
-                            value={module.duration}
-                            onChange={(e) => handleUpdateModule(index, 'duration', e.target.value)}
-                          />
-                        </Grid>
-                        <Grid container spacing={2}>
-                          <Button
-                            color="error"
-                            onClick={() => handleRemoveModule(index)}
-                            startIcon={<Delete />}
-                          >
-                            Remove Module
-                          </Button>
-                        </Grid>
-                      </Grid>
-                    </AccordionDetails>
-                  </Accordion>
-                ))}
+                <List>
+                  {formData.youtubeLinks.map((link, i) => (
+                    <ListItem
+                      key={link + i}
+                      secondaryAction={
+                        <IconButton
+                          edge="end"
+                          onClick={() => handleRemoveYoutubeLink(link)}
+                        >
+                          <Delete />
+                        </IconButton>
+                      }
+                    >
+                      <ListItemText primary={link} />
+                    </ListItem>
+                  ))}
+                </List>
+              </Grid>
+
+              {/* Publish */}
+              <Grid size={{ xs: 12 }}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={formData.isPublished}
+                      onChange={(e) =>
+                        handleInputChange("isPublished", e.target.checked)
+                      }
+                    />
+                  }
+                  label="Publish Course"
+                />
               </Grid>
             </Grid>
           </DialogContent>
@@ -870,13 +1021,14 @@ export default function CourseManagementPage() {
               disabled={saving}
               startIcon={saving ? <CircularProgress size={20} /> : <Save />}
               sx={{
-                background: 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #0056CC 0%, #4A0080 100%)',
+                background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                "&:hover": {
+                  background:
+                    "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
                 },
               }}
             >
-              {saving ? 'Saving...' : 'Save Course'}
+              {saving ? "Saving..." : "Save Course"}
             </Button>
           </DialogActions>
         </Dialog>

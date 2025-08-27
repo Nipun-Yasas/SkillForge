@@ -4,7 +4,6 @@ export interface ICourse extends Document {
   _id: string;
   title: string;
   description: string;
-  longDescription?: string;
   instructor: {
     id: string;
     name: string;
@@ -14,30 +13,16 @@ export interface ICourse extends Document {
   rating: number;
   totalRatings: number;
   enrolledStudents: number;
-  duration: string;
   level: "Beginner" | "Intermediate" | "Advanced";
-  price: number;
-  isPremium: boolean;
+  credit: number;
   image: string;
   tags: string[];
   category: string;
   prerequisites?: string[];
   learningOutcomes: string[];
-  modules: {
-    id: string;
-    title: string;
-    description: string;
-    duration: string;
-    videoUrl?: string;
-    resources?: {
-      title: string;
-      url: string;
-      type: "video" | "pdf" | "link" | "quiz";
-    }[];
-    isCompleted?: boolean;
-  }[];
-  totalDuration: number; // in minutes
+  totalDuration: number;
   isPublished: boolean;
+  youtubeLinks: string[];
   publishedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -57,10 +42,6 @@ const CourseSchema = new Schema<ICourse>(
       required: [true, "Course description is required"],
       trim: true,
       maxlength: [500, "Description cannot exceed 500 characters"],
-    },
-    longDescription: {
-      type: String,
-      maxlength: [2000, "Long description cannot exceed 2000 characters"],
     },
     instructor: {
       id: {
@@ -88,27 +69,29 @@ const CourseSchema = new Schema<ICourse>(
       type: Number,
       default: 0,
     },
-    duration: {
-      type: String,
-      required: [true, "Course duration is required"],
-    },
     level: {
       type: String,
       enum: ["Beginner", "Intermediate", "Advanced"],
       required: [true, "Course level is required"],
     },
-    price: {
+    credit: {
       type: Number,
       default: 0,
       min: 0,
     },
-    isPremium: {
-      type: Boolean,
-      default: false,
-    },
     image: {
       type: String,
-      default: "/api/placeholder/300/200",
+      trim: true,
+      maxlength: 2048,
+      default: undefined,
+      validate: {
+        validator: (v: string | undefined) =>
+          !v ||
+          /^https?:\/\/.+/i.test(v) ||
+          /^\/uploads\/[a-zA-Z0-9._-]+$/.test(v) ||
+          /^\/api\/images\/[a-f0-9]{24}$/i.test(v), // allow GridFS served URLs
+        message: "Invalid image URL",
+      },
     },
     tags: [
       {
@@ -128,48 +111,6 @@ const CourseSchema = new Schema<ICourse>(
         required: true,
       },
     ],
-    modules: [
-      {
-        id: {
-          type: String,
-          required: true,
-        },
-        title: {
-          type: String,
-          required: true,
-        },
-        description: {
-          type: String,
-          required: true,
-        },
-        duration: {
-          type: String,
-          required: true,
-        },
-        videoUrl: String,
-        resources: [
-          {
-            title: {
-              type: String,
-              required: true,
-            },
-            url: {
-              type: String,
-              required: true,
-            },
-            type: {
-              type: String,
-              enum: ["video", "pdf", "link", "quiz"],
-              required: true,
-            },
-          },
-        ],
-        isCompleted: {
-          type: Boolean,
-          default: false,
-        },
-      },
-    ],
     totalDuration: {
       type: Number,
       default: 0,
@@ -178,6 +119,12 @@ const CourseSchema = new Schema<ICourse>(
       type: Boolean,
       default: false,
     },
+    youtubeLinks: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
     publishedAt: Date,
   },
   {

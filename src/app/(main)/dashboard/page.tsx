@@ -72,14 +72,7 @@ export default function Dashboard() {
       >
         {/* Welcome Section */}
         <Box sx={{ mb: 4 }}>
-          <Typography
-            variant="h3"
-            fontWeight="bold"
-            sx={{
-              background: "none",
-              mb: 1,
-            }}
-          >
+          
             <Typography
               variant="h3"
               fontWeight="bold"
@@ -93,7 +86,6 @@ export default function Dashboard() {
               </Box>{" "}
               👋
             </Typography>
-          </Typography>
           <Typography variant="h6" color="text.secondary">
             Ready to continue your learning journey?
           </Typography>

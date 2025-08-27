@@ -71,6 +71,8 @@ export default function AISmartSearch() {
     setRecommendations([]);
     setMessage("");
 
+    console.log('🔍 Starting AI search with prompt:', prompt);
+
     try {
       const response = await fetch('/api/recommend', {
         method: 'POST',
@@ -80,20 +82,32 @@ export default function AISmartSearch() {
         body: JSON.stringify({ query: prompt }),
       });
 
+      console.log('📡 API Response status:', response.status);
+
       if (!response.ok) {
-        throw new Error('Failed to get recommendations');
+        const errorText = await response.text();
+        console.error('❌ API Error:', errorText);
+        throw new Error(`Failed to get recommendations: ${response.status}`);
       }
 
       const data: AIRecommendationResponse = await response.json();
+      console.log('✅ API Response data:', data);
       
       setRecommendations(data.recommendations);
       setMessage(data.message);
       setAiGenerated(data.aiGenerated);
 
+      // Success toast for debugging
+      if (data.aiGenerated) {
+        console.log('🤖 AI-powered recommendations received!');
+      } else {
+        console.log('🔧 Fallback recommendations received');
+      }
+
     } catch (err) {
+      console.error('❌ AI search error:', err);
       setMessage('Unable to get recommendations right now. Please try again later.');
       setAiGenerated(false);
-      console.error('AI search error:', err);
     } finally {
       setLoading(false);
     }
@@ -226,7 +240,19 @@ export default function AISmartSearch() {
               sx={{ mb: 2, borderRadius: 2 }}
               icon={aiGenerated ? <AIIcon /> : undefined}
             >
-              {message}
+              <Box>
+                {message}
+                {aiGenerated && (
+                  <Typography variant="caption" display="block" sx={{ mt: 0.5, fontStyle: 'italic' }}>
+                    ✨ Powered by Gemini AI
+                  </Typography>
+                )}
+                {!aiGenerated && (
+                  <Typography variant="caption" display="block" sx={{ mt: 0.5, fontStyle: 'italic' }}>
+                    🔧 Smart keyword matching
+                  </Typography>
+                )}
+              </Box>
             </Alert>
           </Box>
         </Fade>

@@ -105,6 +105,9 @@ export default function LearnVideoPage() {
   const [answers, setAnswers] = useState<Record<string, number[]>>({});
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<{ score: number; passed: boolean } | null>(null);
+  const [prevResult, setPrevResult] = useState<{ score: number; passed: boolean } | null>(null);
+  const [marking, setMarking] = useState(false);
+  const [completed, setCompleted] = useState(false);
   const playerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -136,6 +139,8 @@ export default function LearnVideoPage() {
   const embed = toYouTubeEmbedUrl(videoUrl);
   const hasNext = videoIndex < (links.length - 1);
   const hasPrev = videoIndex > 0;
+  // Enable Next if: current result passed, previous attempt passed, or already completed
+  const canGoNext = hasNext && ((result?.passed ?? false) || (prevResult?.passed ?? false) || completed);
 
   // Load quizzes for this video after user clicks "Mark as done"
   useEffect(() => {
@@ -166,6 +171,82 @@ export default function LearnVideoPage() {
     return () => { abort = true; };
   }, [showQuiz, course?._id, videoUrl]);
 
+  // After course + videoUrl known, fetch progress to decide if quiz should show
+  useEffect(() => {
+    if (!courseId || !videoUrl) return;
+    let abort = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/courses/${courseId}/progress`, { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (abort) return;
+        const done = Array.isArray(data.completedVideos) && data.completedVideos.includes(videoUrl);
+        setCompleted(done);
+        // Show quiz if this video is either completed or was the last unlocked
+        const unlocked = data.lastVideoUrl === videoUrl || done;
+        setShowQuiz(unlocked);
+      } catch {
+        // ignore
+      }
+    })();
+    return () => {
+      abort = true;
+    };
+  }, [courseId, videoUrl]);
+
+  // Fetch last submission for this video (if any)
+  useEffect(() => {
+    if (!courseId || !videoUrl) return;
+    let abort = false;
+    (async () => {
+      try {
+        const res = await fetch(
+          `/api/courses/${courseId}/quizzes/submission?videoUrl=${encodeURIComponent(videoUrl)}`,
+          { cache: 'no-store' }
+        );
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!abort && data?.submission) {
+          setPrevResult({ score: data.submission.score, passed: data.submission.passed });
+        } else if (!abort) {
+          setPrevResult(null);
+        }
+      } catch {
+        // ignore
+      }
+    })();
+    return () => {
+      abort = true;
+    };
+  }, [courseId, videoUrl]);
+
+  const handleMarkAsDone = async () => {
+    if (!courseId || !videoUrl) return;
+    setMarking(true);
+    try {
+      const res = await fetch(`/api/courses/${courseId}/unlock`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ videoUrl }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to unlock quiz");
+      setShowQuiz(true);
+      toast.success("Quiz unlocked for this video");
+      setTimeout(() => playerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        toast.error(e.message || "Failed to unlock quiz");
+      } else {
+        toast.error("Failed to unlock quiz");
+      }
+    } finally {
+      setMarking(false);
+    }
+  };
+
+  // Update on submit to reflect new result
   const onSubmit = async () => {
     if (!course?._id || !videoUrl || quizzes.length === 0) return;
     setSubmitting(true);
@@ -182,6 +263,11 @@ export default function LearnVideoPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Submit failed');
       setResult({ score: data.score, passed: data.passed });
+      setPrevResult({ score: data.score, passed: data.passed }); // keep previous-attempt panel in sync
+      if (data.passed) {
+        setCompleted(true);
+        fetch(`/api/courses/${courseId}/progress`, { cache: 'no-store' }).catch(() => {});
+      }
       if (!data.passed) toast('Score < 70%. Try again.', { icon: '📝' });
       if (data.passed && hasNext) {
         // Optionally auto-advance after a short delay
@@ -258,15 +344,13 @@ export default function LearnVideoPage() {
         )}
 
         {/* Mark as done -> reveals quiz */}
-        <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+        <Stack direction="row" spacing={2} sx={{ mb: 2, alignItems: 'center', flexWrap: 'wrap' }}>
           <Button
             variant="contained"
-            onClick={() => {
-              setShowQuiz(true);
-              setTimeout(() => playerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
-            }}
+            onClick={handleMarkAsDone}
+            disabled={marking || showQuiz}
           >
-            Mark as done
+            {marking ? <CircularProgress size={20} color="inherit" /> : (showQuiz ? "Quiz unlocked" : "Mark as done")}
           </Button>
           <Button
             variant="outlined"
@@ -277,11 +361,17 @@ export default function LearnVideoPage() {
           </Button>
           <Button
             variant="outlined"
-            disabled={!hasNext || !result?.passed}
+            disabled={!canGoNext}
             onClick={() => router.push(`/courses/${courseId}/learn/${videoIndex + 1}`)}
           >
             Next
           </Button>
+
+          {prevResult && (
+            <Typography variant="body2" sx={{ ml: { xs: 0, sm: 1 } }} color={prevResult.passed ? 'success.main' : 'warning.main'}>
+              Last attempt: {prevResult.score}% — {prevResult.passed ? 'Passed' : 'Not passed'}
+            </Typography>
+          )}
         </Stack>
 
         {/* Quiz */}

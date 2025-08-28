@@ -22,7 +22,7 @@ export async function GET(req: NextRequest, context: RouteContext) {
     await ensureDB();
     const { id: courseId } = await Promise.resolve(context.params);
 
-    const quizzes = await Quiz.find({ courseId })
+    const quizzes = await Quiz.find({ courseId: String(courseId) })
       .sort({ videoUrl: 1, order: 1, createdAt: 1 })
       .lean();
 
@@ -44,7 +44,10 @@ export async function POST(req: NextRequest, context: RouteContext) {
     const { id: courseId } = await Promise.resolve(context.params);
     const course = await Course.findById(courseId).lean();
     if (!course) return NextResponse.json({ error: "Course not found" }, { status: 404 });
-    if (course.instructor?.id !== String(user._id) && user.role !== "admin") {
+
+    // Only instructor (owner) or admin can create quizzes
+    const ownerId = String((course as any).instructor?.id ?? (course as any).instructor ?? "");
+    if (ownerId && ownerId !== String(user._id) && user.role !== "admin") {
       return NextResponse.json({ error: "Not authorized" }, { status: 403 });
     }
 
@@ -54,8 +57,11 @@ export async function POST(req: NextRequest, context: RouteContext) {
     if (!videoUrl || !Array.isArray(course.youtubeLinks) || !course.youtubeLinks.includes(videoUrl)) {
       return NextResponse.json({ error: "Invalid video URL for this course" }, { status: 400 });
     }
-    if (!question || !Array.isArray(answers) || answers.length !== 5) {
-      return NextResponse.json({ error: "Question and exactly 5 answers are required" }, { status: 400 });
+    if (!question || typeof question !== "string") {
+      return NextResponse.json({ error: "Question is required" }, { status: 400 });
+    }
+    if (!Array.isArray(answers) || answers.length !== 5) {
+      return NextResponse.json({ error: "Exactly 5 answers are required" }, { status: 400 });
     }
     if (!answers.some((a: any) => a?.correct === true)) {
       return NextResponse.json({ error: "At least one answer must be correct" }, { status: 400 });
@@ -63,7 +69,7 @@ export async function POST(req: NextRequest, context: RouteContext) {
 
     const quiz = await Quiz.create({
       courseId: String(courseId),
-      videoUrl,
+      videoUrl: String(videoUrl),
       question: String(question),
       answers: answers.map((a: any) => ({ text: String(a.text || ""), correct: !!a.correct })),
       order: Number.isFinite(order) ? Number(order) : 0,

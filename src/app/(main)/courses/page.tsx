@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import toast from "react-hot-toast";
 
 import { useRouter } from "next/navigation";
@@ -22,7 +22,6 @@ import MenuItem from "@mui/material/MenuItem";
 import Rating from "@mui/material/Rating";
 import Avatar from "@mui/material/Avatar";
 import LinearProgress from "@mui/material/LinearProgress";
-import CircularProgress from "@mui/material/CircularProgress";
 import Pagination from "@mui/material/Pagination";
 
 import { motion } from "framer-motion";
@@ -36,7 +35,6 @@ import {
   Award,
 } from "lucide-react";
 
-import { useAuth } from "@/contexts/AuthContext";
 import CourseCardSkeleton from "./components/CourseCardSkeleton";
 
 interface Course {
@@ -51,7 +49,7 @@ interface Course {
   rating: number;
   totalRatings: number;
   enrolledStudents: number;
-  duration?: string; // legacy string, fallback
+  duration?: string;
   level: "Beginner" | "Intermediate" | "Advanced";
   price: number;
   isPremium: boolean;
@@ -61,8 +59,8 @@ interface Course {
   progress?: number;
   isEnrolled?: boolean;
   enrollmentId?: string;
-  youtubeLinks?: string[];           // new
-  totalDuration?: number | string;   // minutes; may arrive as number or string
+  youtubeLinks?: string[];           
+  totalDuration?: number | string;  
 }
 
 interface CoursesResponse {
@@ -73,18 +71,17 @@ interface CoursesResponse {
 }
 
 export default function CoursesPage() {
-  const { user } = useAuth();
   const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
   const [categories, setCategories] = useState<string[]>(["All Categories"]);
   const [loading, setLoading] = useState(true);
-  const [enrolling, setEnrolling] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [selectedLevel, setSelectedLevel] = useState("All Levels");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [activeStudents, setActiveStudents] = useState(0);
 
   const levels = ["All Levels", "Beginner", "Intermediate", "Advanced"];
 
@@ -116,6 +113,9 @@ export default function CoursesPage() {
         if (selectedLevel !== "All Levels") params.append("level", selectedLevel);
         params.append("page", currentPage.toString());
         params.append("limit", "12");
+        // Ask API to exclude current user's own courses
+        params.append("excludeOwn", "1");
+
         const response = await fetch(`/api/courses?${params}`);
         if (response.ok) {
           const data: CoursesResponse = await response.json();
@@ -135,41 +135,19 @@ export default function CoursesPage() {
     fetchCourses();
   }, [searchTerm, selectedCategory, selectedLevel, currentPage]);
 
-  const handleEnroll = async (courseId: string) => {
-    if (!user) {
-      toast.error("Please login to enroll in courses");
-      return;
-    }
-
-    setEnrolling(courseId);
-    try {
-      const response = await fetch("/api/courses/enroll", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ courseId }),
-      });
-
-      if (response.ok) {
-        toast.success("Successfully enrolled in course!");
-        setCourses((prevCourses) =>
-          prevCourses.map((course) =>
-            course._id === courseId
-              ? { ...course, isEnrolled: true, progress: 0 }
-              : course
-          )
-        );
-        router.push(`/courses/${courseId}?start=1`);
-      } else {
-        const error = await response.json();
-        toast.error(error.error || "Failed to enroll in course");
+  // Fetch unique active students (distinct enrolled users)
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/courses/active-students", { cache: "no-store" });
+        if (!res.ok) return;
+        const data = await res.json();
+        setActiveStudents(Number(data.activeStudents) || 0);
+      } catch {
+        // ignore
       }
-    } catch (error) {
-      console.error("Enrollment error:", error);
-      toast.error("Failed to enroll in course");
-    } finally {
-      setEnrolling(null);
-    }
-  };
+    })();
+  }, []);
 
   const getLevelColor = (
     level: string
@@ -207,6 +185,16 @@ export default function CoursesPage() {
     return Number.isFinite(n) ? Math.round(n as number) : 0;
   };
 
+  // Average progress across courses that have a numeric progress
+  const completionRate = useMemo(() => {
+    const nums = courses
+      .map((c) => (typeof c.progress === "number" ? Math.min(100, Math.max(0, Number(c.progress))) : null))
+      .filter((v): v is number => v !== null);
+    if (!nums.length) return 0;
+    const avg = nums.reduce((a, b) => a + b, 0) / nums.length;
+    return Math.round(avg);
+  }, [courses]);
+
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <motion.div
@@ -216,18 +204,6 @@ export default function CoursesPage() {
       >
         {/* Header */}
         <Box sx={{ mb: 4 }}>
-          <Typography
-            variant="h3"
-            fontWeight="bold"
-            sx={{
-              background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
-              backgroundClip: "text",
-              WebkitBackgroundClip: "text",
-              mb: 1,
-            }}
-          >
-            📚 Courses
-          </Typography>
           <Typography variant="h6" color="text.secondary">
             Discover and learn new skills with our curated courses
           </Typography>
@@ -309,9 +285,7 @@ export default function CoursesPage() {
           <Paper sx={{ p: 2, textAlign: "center", borderRadius: 2 }}>
             <Users size={24} color="#6A0DAD" />
             <Typography variant="h6" fontWeight="bold" sx={{ mt: 1 }}>
-              {courses
-                .reduce((sum, course) => sum + course.enrolledStudents, 0)
-                .toLocaleString()}
+              {activeStudents.toLocaleString()}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Active Students
@@ -320,7 +294,7 @@ export default function CoursesPage() {
           <Paper sx={{ p: 2, textAlign: "center", borderRadius: 2 }}>
             <TrendingUp size={24} color="#FF7A00" />
             <Typography variant="h6" fontWeight="bold" sx={{ mt: 1 }}>
-              92%
+              {completionRate}%
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Completion Rate
@@ -538,32 +512,15 @@ export default function CoursesPage() {
                         <Button
                           variant="contained"
                           size="small"
-                          disabled={enrolling === course._id}
-                          onClick={() => {
-                            if (course.isEnrolled) {
-                              router.push(`/courses/${course._id}?start=1`);
-                            } else {
-                              handleEnroll(course._id);
-                            }
-                          }}
+                          onClick={() => router.push(`/courses/${course._id}`)}
                           sx={{
-                            background: course.isEnrolled
-                              ? "linear-gradient(135deg, #28a745 0%, #20c997 100%)"
-                              : "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                            background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
                             "&:hover": {
-                              background: course.isEnrolled
-                                ? "linear-gradient(135deg, #218838 0%, #1ea085 100%)"
-                                : "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
+                              background: "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
                             },
                         }}
                         >
-                          {enrolling === course._id ? (
-                            <CircularProgress size={16} color="inherit" />
-                          ) : course.isEnrolled ? (
-                            course.progress && course.progress > 0 ? "Continue" : "Start"
-                          ) : (
-                            "Enroll Now"
-                          )}
+                          View
                         </Button>
                       </Box>
                     </CardContent>

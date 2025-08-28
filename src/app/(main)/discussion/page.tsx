@@ -322,19 +322,7 @@ export default function DiscussionPage() {
       >
         {/* Header */}
         <Box sx={{ mb: 4 }}>
-          <Typography
-            variant="h3"
-            fontWeight="bold"
-            sx={{
-              background: 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              mb: 1,
-            }}
-          >
-            💬 Community Forum
-          </Typography>
+          
           <Typography variant="h6" color="text.secondary">
             Connect, learn, and grow together with the SkillForge community
           </Typography>

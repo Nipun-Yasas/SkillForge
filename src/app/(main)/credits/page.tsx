@@ -197,15 +197,6 @@ const CreditDashboard = () => {
         </Alert>
       )}
 
-      <Typography
-        variant="h4"
-        gutterBottom
-        sx={{ display: "flex", alignItems: "center", gap: 1 }}
-      >
-        <AccountBalanceWallet sx={{ color: "#2196F3" }} />
-        Credit Dashboard
-      </Typography>
-
       {/* Credit Overview */}
       <Box
         sx={{

@@ -201,15 +201,6 @@ export default function RewardDashboard(){
         </Alert>
       )}
 
-      <Typography
-        variant="h4"
-        gutterBottom
-        sx={{ display: "flex", alignItems: "center", gap: 1 }}
-      >
-        <EmojiEvents sx={{ color: "#FF9800" }} />
-        Teacher Rewards
-      </Typography>
-
       {/* Rewards Overview */}
       <Box
         sx={{

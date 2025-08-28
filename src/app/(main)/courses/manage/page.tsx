@@ -30,8 +30,8 @@ import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import CardMedia from "@mui/material/CardMedia";
 import CircularProgress from "@mui/material/CircularProgress";
-import Alert from "@mui/material/Alert";
 import Grid from "@mui/material/Grid";
+import DeleteDialog from "@/app/_components/dialogs/DeleteDialog";
 
 import Add from "@mui/icons-material/Add";
 import Edit from "@mui/icons-material/Edit";
@@ -136,13 +136,16 @@ export default function CourseManagementPage() {
   const [newYoutubeLink, setNewYoutubeLink] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
   const router = useRouter();
 
   // Check if user is authorized
   useEffect(() => {
     if (user && !["mentor", "both", "admin"].includes(user.role)) {
-      toast.error("Access denied. Only mentors can manage courses.");
-      window.location.href = "/courses";
+      // toast.error("Access denied. Only mentors can manage courses.");
+      // window.location.href = "/courses";
     }
   }, [user]);
 
@@ -407,28 +410,29 @@ export default function CourseManagementPage() {
     }
   };
 
-  const handleDeleteCourse = async (courseId: string) => {
-    if (!confirm("Are you sure you want to delete this course?")) {
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/courses/${courseId}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        toast.success("Course deleted successfully");
-        setCourses((prev) => prev.filter((course) => course._id !== courseId));
-      } else {
-        const error = await response.json();
-        toast.error(error.error || "Failed to delete course");
-      }
-    } catch (error) {
-      console.error("Delete course error:", error);
-      toast.error("Failed to delete course");
-    }
+  const openDeleteDialog = (course: Course) => {
+    setDeleteTarget({ id: course._id, title: course.title });
+    setDeleteOpen(true);
   };
+
+  const handleDeleteCourse = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      const response = await fetch(`/api/courses/${deleteTarget.id}`, { method: "DELETE" });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "Failed to delete course");
+      toast.success("Course deleted successfully");
+      setCourses((prev) => prev.filter((c) => c._id !== deleteTarget.id));
+      setDeleteOpen(false);
+      setDeleteTarget(null);
+    } catch (error: unknown) {
+      console.error("Delete course error:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to delete course");
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   const handleTogglePublish = async (course: Course) => {
     try {
@@ -467,10 +471,10 @@ export default function CourseManagementPage() {
 
   if (!user || !["mentor", "both", "admin"].includes(user.role)) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Alert severity="error">
-          Access denied. Only mentors can manage courses.
-        </Alert>
+      <Container maxWidth="lg" sx={{ py: 8, display: "flex", justifyContent: "center" }}>
+        <Typography variant="h6" color="text.secondary">
+          You are not a mentor.
+        </Typography>
       </Container>
     );
   }
@@ -486,23 +490,12 @@ export default function CourseManagementPage() {
         <Box
           sx={{
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "flex-end",
             alignItems: "center",
             mb: 4,
           }}
         >
-          <Typography
-            variant="h3"
-            fontWeight="bold"
-            sx={{
-              background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
-              backgroundClip: "text",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            📚 My Courses
-          </Typography>
+          
           <Button
             variant="contained"
             startIcon={<Add />}
@@ -649,7 +642,7 @@ export default function CourseManagementPage() {
                         <Edit />
                       </IconButton>
                       <IconButton
-                        onClick={() => handleDeleteCourse(course._id)}
+                        onClick={() => openDeleteDialog(course)}
                         color="error"
                         size="small"
                       >
@@ -1033,6 +1026,24 @@ export default function CourseManagementPage() {
           </DialogActions>
         </Dialog>
       </motion.div>
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteDialog
+        open={deleteOpen}
+        onClose={() => {
+          if (deleting) return;
+          setDeleteOpen(false);
+          setDeleteTarget(null);
+        }}
+        onConfirm={handleDeleteCourse}
+        loading={deleting}
+        title="Delete course"
+        message={
+          deleteTarget
+            ? `Are you sure you want to delete "${deleteTarget.title}"? This action cannot be undone.`
+            : "Are you sure you want to delete this course? This action cannot be undone."
+        }
+      />
     </Container>
   );
 }

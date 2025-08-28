@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
@@ -20,11 +20,8 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import CircularProgress from '@mui/material/CircularProgress';
-import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Radio from '@mui/material/Radio';
+import Rating from '@mui/material/Rating';
 
 import {
   Clock,
@@ -38,7 +35,7 @@ import {
 import { motion } from 'framer-motion';
 
 import { useAuth } from '@/contexts/AuthContext';
-import CourseDetailSkeleton from '../components/CourseDetailSkeleton';
+import CourseDetailSkeleton from "@/app/(main)/courses/components/CourseDetailSkeleton";
 
 interface Course {
   _id: string;
@@ -76,17 +73,14 @@ const formatMinutes = (mins: number) => {
   return h ? `${h}h ${r}m` : `${r}m`;
 };
 
-type Quiz = {
-  _id: string;
-  videoUrl: string;
-  question: string;
-  answers: { text: string; correct?: boolean }[];
-};
-function toYouTubeEmbedUrl(url?: string) {
-  if (!url) return null;
-  const videoId = url.split('v=')[1]?.split('&')[0];
-  return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
-}
+const getLevelColor = (level: string): 'success' | 'warning' | 'error' => {
+    switch (level) {
+      case 'Beginner': return 'success';
+      case 'Intermediate': return 'warning';
+      case 'Advanced': return 'error';
+      default: return 'success';
+    }
+  };
 
 export default function CourseDetailPage() {
   const params = useParams();
@@ -99,64 +93,95 @@ export default function CourseDetailPage() {
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
   const [enrolling, setEnrolling] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
-  const [answers, setAnswers] = useState<Record<string, number[]>>({}); // quizId -> selected index(es)
-  const [submitting, setSubmitting] = useState(false);
-  const [lastResult, setLastResult] = useState<{ score: number; passed: boolean } | null>(null);
+  const [isEnrolled, setIsEnrolled] = useState<boolean>(false);
+  const [userRating, setUserRating] = useState<number | null>(null);
+  const [savingRating, setSavingRating] = useState(false);
   const searchParams = useSearchParams();
-  const videoRef = useRef<HTMLDivElement | null>(null);
-  const [showPlayer, setShowPlayer] = useState(false);
 
   const links = course?.youtubeLinks || [];
-  const activeUrl = links[activeIndex];
-  const activeEmbed = toYouTubeEmbedUrl(activeUrl);
 
   useEffect(() => {
-    const fetchCourse = async () => {
+    if (!courseId) return;
+    let ignore = false;
+    setLoading(true);
+    (async () => {
       try {
-        const response = await fetch(`/api/courses/${courseId}`);
-        if (response.ok) {
-          const data = await response.json();
-          setCourse(data.course);
-        } else if (response.status === 404) {
-          toast.error('Course not found');
-          router.push('/courses');
-        } else {
-          toast.error('Failed to load course');
-        }
-      } catch (error) {
-        console.error('Error fetching course:', error);
-        toast.error('Failed to load course');
-      } finally {
-        setLoading(false);
-      }
-    };
+        // Load course and enrollment in parallel
+        const courseReq = fetch(`/api/courses/${courseId}`, { cache: "no-store" });
+        const progressReq = user
+          ? fetch(`/api/courses/${courseId}/progress`, { cache: "no-store" })
+          : Promise.resolve(null as any);
 
-    if (courseId) {
-      fetchCourse();
+        const [courseRes, progressRes] = await Promise.all([courseReq, progressReq]);
+
+        if (!courseRes.ok) {
+          if (courseRes.status === 404) {
+            if (!ignore) router.push("/courses");
+            return;
+          }
+          throw new Error("Failed to load course");
+        }
+        const { course: courseData } = await courseRes.json();
+        if (!ignore) setCourse(courseData);
+
+        if (progressRes && progressRes.ok) {
+          const progressData = await progressRes.json();
+          if (!ignore) {
+            setIsEnrolled(true);
+            setCourse((prev) =>
+              prev
+                ? { ...prev, isEnrolled: true, progress: progressData.progress ?? prev.progress }
+                : prev
+            );
+            if (typeof progressData.rating === 'number') {
+              setUserRating(progressData.rating);
+            }
+          }
+        } else if (!ignore) {
+          setIsEnrolled(false);
+        }
+      } catch (e) {
+        console.error(e);
+        if (!ignore) toast.error("Failed to load course");
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    })();
+    return () => { ignore = true; };
+  }, [courseId, user?.id]);
+  
+  // Block render until both course and enrollment state are resolved
+  if (loading || !course) {
+    return <CourseDetailSkeleton />;
+  }
+
+  const enrolled = (isEnrolled ?? course.isEnrolled) || false;
+
+  const handleStartLearning = () => {
+    if (!links.length || !courseId) return;
+    if (!enrolled) {
+      handleEnroll();
+      return;
     }
-  }, [courseId, router]);
+    router.push(`/courses/${courseId}/learn/0`);
+  };
 
   const handleEnroll = async () => {
     if (!user) {
       toast.error('Please login to enroll in courses');
       return;
     }
-
     setEnrolling(true);
     try {
       const response = await fetch('/api/courses/enroll', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ courseId }),
       });
-
       if (response.ok) {
         toast.success('Successfully enrolled in course!');
-        setCourse(prev => prev ? { ...prev, isEnrolled: true, progress: 0 } : null);
+        setIsEnrolled(true);
+        setCourse(prev => (prev ? { ...prev, isEnrolled: true, progress: 0 } : prev));
       } else {
         const error = await response.json();
         toast.error(error.error || 'Failed to enroll in course');
@@ -169,89 +194,30 @@ export default function CourseDetailPage() {
     }
   };
 
-  useEffect(() => {
-    if (searchParams?.get("start") === "1" && links.length) {
-      handleStartLearning();
-    }
-  }, [searchParams, links.length]);
-
-  const handleStartLearning = () => {
-    if (!links.length || !courseId) return;
-    router.push(`/courses/${courseId}/learn/0`);
-  };
-
-  const getLevelColor = (level: string): 'success' | 'warning' | 'error' => {
-    switch (level) {
-      case 'Beginner': return 'success';
-      case 'Intermediate': return 'warning';
-      case 'Advanced': return 'error';
-      default: return 'success';
-    }
-  };
-
-  // Load quizzes for current video
-  useEffect(() => {
-    if (!course?._id || !activeUrl) return;
-    (async () => {
-      setLastResult(null);
-      setAnswers({});
-      const res = await fetch(`/api/courses/${course._id}/quizzes`);
-      if (res.ok) {
-        const data = await res.json();
-        const list: Quiz[] = (data.quizzes || []).filter((q: Quiz) => q.videoUrl === activeUrl);
-        setQuizzes(list);
-      } else {
-        setQuizzes([]);
-      }
-    })();
-  }, [course?._id, activeUrl]);
-
-  const handleSelect = (quizId: string, idx: number) => {
-    setAnswers(prev => ({ ...prev, [quizId]: [idx] })); // single-choice
-  };
-
-  const handleSubmitQuiz = async () => {
-    if (!course?._id || !activeUrl || quizzes.length === 0) return;
-    setSubmitting(true);
+  const handleSubmitRating = async () => {
+    if (!courseId || !userRating) return;
+    setSavingRating(true);
     try {
-      const responses = quizzes.map(q => ({
-        quizId: q._id,
-        selected: answers[q._id] || [],
-      }));
-      const res = await fetch(`/api/courses/${course._id}/quizzes/submit`, {
+      const res = await fetch(`/api/courses/${courseId}/rate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ videoUrl: activeUrl, responses }),
+        body: JSON.stringify({ rating: userRating }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Submit failed');
-      setLastResult({ score: data.score, passed: data.passed });
-      if (data.passed) {
-        // Optionally advance automatically or show Next button
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Failed to save rating');
+      toast.success('Rating saved');
+      if (typeof data.courseRating === 'number') {
+        setCourse(prev => prev ? { ...prev, rating: data.courseRating, totalRatings: data.totalRatings ?? prev.totalRatings } : prev);
       }
     } catch (e: unknown) {
       if (e instanceof Error) {
-        toast.error(e.message || 'Failed to submit');
+        toast.error(e.message || 'Failed to save rating');
       } else {
-        toast.error('Failed to submit');
+        toast.error('Failed to save rating');
       }
     } finally {
-      setSubmitting(false);
+      setSavingRating(false);
     }
-  };
-
-  if (loading) {
-    return (
-      <CourseDetailSkeleton />
-    );
-  }
-
-  if (!course) {
-    return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Alert severity="error">Course not found</Alert>
-      </Container>
-    );
   };
 
   return (
@@ -260,7 +226,7 @@ export default function CourseDetailPage() {
         {/* Back Button */}
         <Button
           startIcon={<ArrowLeft />}
-          onClick={() => router.back()}
+          onClick={() => router.push("/courses")}
           sx={{ mb: 3 }}
         >
           Back to Courses
@@ -381,27 +347,50 @@ export default function CourseDetailPage() {
               </Box>
             )}
 
+            {/* Enroll/Start button */}
             <Button
               variant="contained"
               fullWidth
               size="large"
               disabled={enrolling}
-              onClick={course.isEnrolled ? handleStartLearning : handleEnroll}
+              onClick={enrolled ? handleStartLearning : handleEnroll}
               sx={{
                 py: 2,
                 mb: 3,
-                background: course.isEnrolled
-                  ? 'linear-gradient(135deg, #28a745 0%, #20c997 100%)'
-                  : 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
-                '&:hover': {
-                  background: course.isEnrolled
-                    ? 'linear-gradient(135deg, #218838 0%, #1ea085 100%)'
-                    : 'linear-gradient(135deg, #0056CC 0%, #4A0080 100%)',
+                background: enrolled
+                  ? "linear-gradient(135deg, #28a745 0%, #20c997 100%)"
+                  : "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                "&:hover": {
+                  background: enrolled
+                    ? "linear-gradient(135deg, #218838 0%, #1ea085 100%)"
+                    : "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
                 },
               }}
             >
-              {enrolling ? <CircularProgress size={24} color="inherit" /> : course.isEnrolled ? 'Start Learning' : 'Enroll Now'}
+              {enrolling ? <CircularProgress size={24} color="inherit" /> : enrolled ? "Start Learning" : "Enroll Now"}
             </Button>
+
+            {/* Rating: only when course completed */}
+            {enrolled && (course.progress ?? 0) >= 100 && (
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="subtitle1" sx={{ mb: 1 }}>Rate this course</Typography>
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Rating
+                    name="course-rating"
+                    value={userRating ?? 0}
+                    onChange={(_, v) => setUserRating(v)}
+                    precision={1}
+                  />
+                  <Button
+                    variant="outlined"
+                    onClick={handleSubmitRating}
+                    disabled={!userRating || savingRating}
+                  >
+                    {savingRating ? <CircularProgress size={20} color="inherit" /> : 'Submit rating'}
+                  </Button>
+                </Stack>
+              </Box>
+            )}
 
             <Box sx={{ space: 2 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', py: 1 }}>
@@ -426,70 +415,7 @@ export default function CourseDetailPage() {
             </Box>
           </Paper>
 
-          {/* Video Player and Quiz Section */}
-          <Paper sx={{ p: 3, borderRadius: 3 }}>
-            {/* Video Player (YouTube Embed) */}
-            {showPlayer && activeEmbed ? (
-              <Box ref={videoRef} sx={{ position: "relative", pb: "56.25%", borderRadius: 2, overflow: "hidden", mb: 3 }}>
-                <Box
-                  component="iframe"
-                  src={`${activeEmbed}?rel=0&autoplay=1`}
-                  title={course.title}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                  sx={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
-                />
-              </Box>
-            ) : null}
-
-            {/* Quiz Section */}
-            {activeEmbed && (
-              <Box sx={{ mt: 2 }}>
-                <Typography variant="h6" sx={{ mb: 1 }}>Quiz</Typography>
-                {quizzes.length === 0 ? (
-                  <Typography variant="body2" color="text.secondary">No quiz for this video.</Typography>
-                ) : (
-                  <Stack spacing={2}>
-                    {quizzes.map(q => (
-                      <Paper key={q._id} sx={{ p: 2, borderRadius: 2 }}>
-                        <Typography variant="subtitle1" sx={{ mb: 1 }}>{q.question}</Typography>
-                        <RadioGroup
-                          value={(answers[q._id]?.[0] ?? -1).toString()}
-                          onChange={(_, v) => handleSelect(q._id, Number(v))}
-                        >
-                          {q.answers.map((a, i) => (
-                            <FormControlLabel
-                              key={i}
-                              value={i.toString()}
-                              control={<Radio />}
-                              label={a.text}
-                            />
-                          ))}
-                        </RadioGroup>
-                      </Paper>
-                    ))}
-                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                      <Button variant="contained" onClick={handleSubmitQuiz} disabled={submitting}>
-                        {submitting ? 'Submitting...' : 'Submit Quiz'}
-                      </Button>
-                      {lastResult && (
-                        <Typography variant="body2">
-                          Score: {lastResult.score}% — {lastResult.passed ? 'Passed' : 'Try again'}
-                        </Typography>
-                      )}
-                      <Button
-                        variant="outlined"
-                        onClick={() => setActiveIndex(i => Math.min(i + 1, links.length - 1))}
-                        disabled={!lastResult?.passed || activeIndex >= links.length - 1}
-                      >
-                        Next video
-                      </Button>
-                    </Box>
-                  </Stack>
-                )}
-              </Box>
-            )}
-          </Paper>
+          
         </Stack>
       </motion.div>
     </Container>

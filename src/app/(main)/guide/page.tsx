@@ -97,38 +97,24 @@ export default function CreditsGuide() {
 
   const handlePurchaseCredits = async () => {
     try {
-      // In a real app, you'd integrate with a payment processor here
-      const mockPaymentData = {
-        amount: parseInt(purchaseAmount),
-        paymentMethod: 'stripe',
-        transactionId: `tx_${Date.now()}`,
-        amountPaid: parseInt(purchaseAmount) * 2, // $2 per credit
-      };
-
-      const response = await fetch('/api/credits/purchase', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(mockPaymentData),
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        // Fetch updated total credits
-        const creditsResponse = await fetch('/api/credits');
-        const creditsData = await creditsResponse.json();
-        
-        if (creditsData.success) {
-          setTotalCredits(creditsData.data.creditInfo.learningCredits || 0);
-        }
-        
-        setOpenPurchaseDialog(false);
-        setPurchaseAmount('');
-        setOpenSuccessDialog(true);
-      } else {
-        setAlert({ type: 'error', message: data.error });
-      }
-    } catch {
-      setAlert({ type: 'error', message: 'Failed to purchase credits' });
+      // Calculate total amount in LKR (assuming $2 per credit = ~600 LKR per credit)
+      const creditsRequested = parseInt(purchaseAmount);
+      const totalAmountLKR = creditsRequested * 600; // 600 LKR per credit (approximately $2)
+      
+      // Store purchase details in localStorage to handle after payment
+      localStorage.setItem('pendingCreditPurchase', JSON.stringify({
+        credits: creditsRequested,
+        amount: totalAmountLKR,
+        timestamp: Date.now()
+      }));
+      
+      // Redirect to your existing Stripe checkout page with the credit purchase amount
+      const checkoutUrl = `/?amount=${totalAmountLKR}&type=credits&credits=${creditsRequested}`;
+      window.location.href = checkoutUrl;
+      
+    } catch (error) {
+      console.error('Error initiating payment:', error);
+      setAlert({ type: 'error', message: 'Failed to initiate payment' });
     }
   };
 
@@ -157,8 +143,7 @@ export default function CreditsGuide() {
     {
       label: 'Purchase Credits',
       icon: <AttachMoney sx={{ color: '#9C27B0' }} />,
-      description: 'Buy learning credits with real money for instant access',
-      action: 'Premium feature - $2 per credit',
+      description: 'Buy learning credits with real money for instant access',              action: 'Premium feature - 600 LKR per credit',
       color: '#9C27B0',
     },
   ];
@@ -303,7 +288,7 @@ export default function CreditsGuide() {
                   Need credits immediately? Purchase them with real money for instant access to any session you want.
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
-                  <Chip label="$2 per credit" size="small" />
+                  <Chip label="600 LKR per credit" size="small" />
                   <Chip label="Bulk discounts available" size="small" />
                   <Chip label="Instant delivery" size="small" />
                 </Box>
@@ -393,35 +378,33 @@ export default function CreditsGuide() {
       {/* Purchase Credits Dialog */}
       <Dialog open={openPurchaseDialog} onClose={() => setOpenPurchaseDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Purchase Learning Credits</DialogTitle>
-        <DialogContent>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Purchase learning credits for instant access. $2 per credit.
-          </Typography>
-          <TextField
-            fullWidth
-            label="Number of Credits"
-            type="number"
-            value={purchaseAmount}
-            onChange={(e) => setPurchaseAmount(e.target.value)}
-            inputProps={{ min: 1 }}
-            sx={{ mt: 1 }}
-          />
-          {purchaseAmount && (
-            <Typography variant="body2" sx={{ mt: 2, color: '#9C27B0', fontWeight: 'bold' }}>
-              Total: ${parseInt(purchaseAmount) * 2}
+        <DialogContent>            <Typography variant="body2" sx={{ mb: 2 }}>
+              Purchase learning credits for instant access. 600 LKR per credit.
             </Typography>
-          )}
+            <TextField
+              fullWidth
+              label="Number of Credits"
+              type="number"
+              value={purchaseAmount}
+              onChange={(e) => setPurchaseAmount(e.target.value)}
+              inputProps={{ min: 1 }}
+              sx={{ mt: 1 }}
+            />
+            {purchaseAmount && (
+              <Typography variant="body2" sx={{ mt: 2, color: '#9C27B0', fontWeight: 'bold' }}>
+                Total: LKR {parseInt(purchaseAmount) * 600}
+              </Typography>
+            )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenPurchaseDialog(false)}>Cancel</Button>
-          <Button 
-            onClick={handlePurchaseCredits}
-            variant="contained"
-            disabled={!purchaseAmount || parseInt(purchaseAmount) < 1}
-            sx={{ backgroundColor: '#9C27B0' }}
-          >
-            Purchase for ${purchaseAmount ? parseInt(purchaseAmount) * 2 : 0}
-          </Button>
+          <Button onClick={() => setOpenPurchaseDialog(false)}>Cancel</Button>            <Button 
+              onClick={handlePurchaseCredits}
+              variant="contained"
+              disabled={!purchaseAmount || parseInt(purchaseAmount) < 1}
+              sx={{ backgroundColor: '#9C27B0' }}
+            >
+              Purchase for LKR {purchaseAmount ? parseInt(purchaseAmount) * 600 : 0}
+            </Button>
         </DialogActions>
       </Dialog>
 

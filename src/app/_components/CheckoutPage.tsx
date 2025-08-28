@@ -8,7 +8,15 @@ import {
 } from "@stripe/react-stripe-js";
 import convertToSubcurrency from "@/lib/convertToSubcurrency";
 
-const CheckoutPage = ({ amount }: { amount: number }) => {
+const CheckoutPage = ({ 
+  amount, 
+  isCreditsPayment = false, 
+  credits 
+}: { 
+  amount: number;
+  isCreditsPayment?: boolean;
+  credits?: number;
+}) => {
   const stripe = useStripe();
   const elements = useElements();
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -62,7 +70,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
       elements,
       clientSecret,
       confirmParams: {
-        return_url: `${window.location.origin}/payment-success?amount=${amount}`,
+        return_url: `${window.location.origin}/payment-success?amount=${amount}${isCreditsPayment ? `&type=credits&credits=${credits}` : ''}`,
       },
     });
 

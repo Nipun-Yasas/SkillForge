@@ -232,20 +232,8 @@ export default function QuestionsPage() {
         transition={{ duration: 0.6 }}
       >
         {/* Header */}
-        <Box sx={{ mb: 4, textAlign: 'center' }}>
-          <Typography
-            variant="h3"
-            fontWeight="bold"
-            sx={{
-              background: 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              mb: 1,
-            }}
-          >
-            ❓ Help & Q&A
-          </Typography>
+        <Box sx={{ mb: 4 }}>
+          
           <Typography variant="h6" color="text.secondary">
             Find answers to common questions and get help from our community
           </Typography>

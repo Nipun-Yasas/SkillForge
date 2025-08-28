@@ -1,43 +1,61 @@
 import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
+import CourseModel from "@/models/Course";
 import { authenticateUser } from "@/lib/middleware";
-import CourseService, { CourseFilters } from "@/lib/courseService";
+
+async function ensureDB() {
+  if (mongoose.connection.readyState === 0) {
+    await mongoose.connect(process.env.MONGODB_URI as string);
+  }
+}
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    
-    // Get optional user authentication
-    const { user } = await authenticateUser(request);
-    const userId = user?._id?.toString();
+    await ensureDB();
+    const url = new URL(request.url);
+    const excludeOwn = url.searchParams.get("excludeOwn") === "1";
 
-    // Parse query parameters
-    const filters: CourseFilters = {
-      search: searchParams.get("search") || undefined,
-      category: searchParams.get("category") || undefined,
-      level: searchParams.get("level") || undefined,
-      tags: searchParams.get("tags")?.split(",") || undefined,
-      instructor: searchParams.get("instructor") || undefined,
-      isPremium: searchParams.get("isPremium") === "true" ? true : 
-                 searchParams.get("isPremium") === "false" ? false : undefined,
-      minRating: searchParams.get("minRating") ? 
-                 parseFloat(searchParams.get("minRating")!) : undefined,
-      page: searchParams.get("page") ? 
-            parseInt(searchParams.get("page")!) : 1,
-      limit: searchParams.get("limit") ? 
-             parseInt(searchParams.get("limit")!) : 12,
-      sortBy: (searchParams.get("sortBy") as any) || "enrolledStudents",
-      sortOrder: (searchParams.get("sortOrder") as "asc" | "desc") || "desc",
-    };
+    // Build your existing filter (search/category/level/isPublished, etc.)
+    const filter: Record<string, any> = {};
 
-    const result = await CourseService.getCourses(filters, userId);
+    // If requested and user is authenticated, exclude their own courses
+    if (excludeOwn) {
+      const { user } = await authenticateUser(request);
+      if (user) {
+        const uid = String(user._id);
+        // Handle both embedded instructor { id } and plain instructor string
+        filter.$and = [
+          ...(filter.$and || []),
+          {
+            $and: [
+              { $or: [{ "instructor.id": { $ne: uid } }, { instructor: { $ne: uid } }] },
+            ],
+          },
+        ];
+      }
+    }
 
-    return NextResponse.json(result, { status: 200 });
-  } catch (error) {
-    console.error("Get courses error:", error);
+    // Pagination
+    const page = Math.max(1, Number(url.searchParams.get("page") || 1));
+    const limit = Math.min(50, Math.max(1, Number(url.searchParams.get("limit") || 12)));
+    const skip = (page - 1) * limit;
+
+    const [totalCount, courses] = await Promise.all([
+      CourseModel.countDocuments(filter),
+      CourseModel.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+    ]);
+
     return NextResponse.json(
-      { error: "Failed to fetch courses" },
-      { status: 500 }
+      { courses, totalCount, currentPage: page, totalPages: Math.max(1, Math.ceil(totalCount / limit)) },
+      { status: 200 }
     );
+  } catch (error) {
+    console.error("GET /api/courses error:", error);
+    return NextResponse.json({ error: "Failed to load courses" }, { status: 500 });
   }
 }
 
@@ -45,89 +63,56 @@ export async function POST(request: NextRequest) {
   try {
     // Require authentication for creating courses
     const { user, error } = await authenticateUser(request);
-    
     if (error || !user) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
-
-    // Only mentors and admins can create courses
     if (user.role !== "mentor" && user.role !== "both" && user.role !== "admin") {
-      return NextResponse.json(
-        { error: "Only mentors can create courses" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Only mentors can create courses" }, { status: 403 });
     }
 
     const body = await request.json();
     const {
       title,
       description,
-      longDescription,
-      duration,
       level,
-      price = 0,
-      isPremium = false,
       image,
       tags = [],
       category,
       prerequisites = [],
       learningOutcomes = [],
-      modules = [],
+      totalDuration = 0,
       isPublished = false,
+      credit = 0,
+      youtubeLinks = [],
     } = body;
 
     // Validation
-    if (!title || !description || !duration || !level || !category) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
+    if (!title || !description || !level || !category) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    if (!learningOutcomes.length) {
-      return NextResponse.json(
-        { error: "At least one learning outcome is required" },
-        { status: 400 }
-      );
+    if (!Array.isArray(learningOutcomes) || learningOutcomes.length === 0) {
+      return NextResponse.json({ error: "At least one learning outcome is required" }, { status: 400 });
     }
-
-    // Calculate total duration from modules
-    let totalDuration = 0;
-    modules.forEach((module: any) => {
-      if (module.duration) {
-        const minutes = parseInt(module.duration.replace(/\D/g, '')) || 0;
-        totalDuration += minutes;
-      }
-    });
-
     const courseData = {
       title,
       description,
-      longDescription,
       instructor: {
         id: user._id.toString(),
         name: user.name,
         avatar: user.avatar,
         bio: user.bio,
       },
-      duration,
       level,
-      price,
-      isPremium,
-      image: image || "/api/placeholder/300/200",
+      image: image || "",
       tags,
       category,
       prerequisites,
       learningOutcomes,
-      modules: modules.map((module: any, index: number) => ({
-        ...module,
-        id: module.id || `module-${index + 1}`,
-      })),
-      totalDuration,
+      totalDuration: Number(totalDuration) || 0,
       isPublished,
+      credit: Number(credit) || 0,
+      youtubeLinks: Array.isArray(youtubeLinks) ? youtubeLinks : [],
       publishedAt: isPublished ? new Date() : undefined,
     };
 
@@ -135,18 +120,9 @@ export async function POST(request: NextRequest) {
     const course = new Course(courseData);
     await course.save();
 
-    return NextResponse.json(
-      {
-        message: "Course created successfully",
-        course,
-      },
-      { status: 201 }
-    );
+    return NextResponse.json({ message: "Course created successfully", course }, { status: 201 });
   } catch (error) {
     console.error("Create course error:", error);
-    return NextResponse.json(
-      { error: "Failed to create course" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create course" }, { status: 500 });
   }
 }

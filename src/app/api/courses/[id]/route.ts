@@ -1,179 +1,150 @@
 import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
 import { authenticateUser } from "@/lib/middleware";
-import CourseService from "@/lib/courseService";
+import Course from "@/models/Course";
+import CourseEnrollment from "@/models/CourseEnrollment";
+import Quiz from "@/models/Quiz";
+import QuizSubmission from "@/models/QuizSubmission";
 
-interface RouteParams {
-  params: { id: string };
-}
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-export async function GET(
-  request: NextRequest,
-  { params }: RouteParams
-) {
-  try {
-    const { id: courseId } = params;
-    
-    // Get optional user authentication
-    const { user } = await authenticateUser(request);
-    const userId = user?._id?.toString();
+type RouteContext =
+  | { params: { id: string } }
+  | { params: Promise<{ id: string }> };
 
-    const course = await CourseService.getCourseById(courseId, userId);
-
-    if (!course) {
-      return NextResponse.json(
-        { error: "Course not found" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({ course }, { status: 200 });
-  } catch (error) {
-    console.error("Get course error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch course" },
-      { status: 500 }
-    );
+async function ensureDB() {
+  if (mongoose.connection.readyState === 0) {
+    await mongoose.connect(process.env.MONGODB_URI as string);
   }
 }
 
-export async function PUT(
-  request: NextRequest,
-  { params }: RouteParams
-) {
+export async function GET(request: NextRequest, context: RouteContext) {
   try {
-    const { id: courseId } = params;
-    
-    // Require authentication
+    await ensureDB();
+    const { id } = await Promise.resolve(context.params);
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ error: "Invalid course id" }, { status: 400 });
+    }
+    const course = await Course.findById(id).lean();
+    if (!course) return NextResponse.json({ error: "Course not found" }, { status: 404 });
+    return NextResponse.json({ course }, { status: 200 });
+  } catch (err) {
+    console.error("GET /api/courses/[id] error:", err);
+    return NextResponse.json({ error: "Failed to fetch course" }, { status: 500 });
+  }
+}
+
+export async function PUT(request: NextRequest, context: RouteContext) {
+  try {
+    await ensureDB();
+    const { id: courseId } = await Promise.resolve(context.params);
+    if (!mongoose.Types.ObjectId.isValid(courseId)) {
+      return NextResponse.json({ error: "Invalid course id" }, { status: 400 });
+    }
+
     const { user, error } = await authenticateUser(request);
-    
-    if (error || !user) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 }
-      );
-    }
+    if (error || !user) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
 
-    const Course = (await import("@/models/Course")).default;
     const course = await Course.findById(courseId);
+    if (!course) return NextResponse.json({ error: "Course not found" }, { status: 404 });
 
-    if (!course) {
-      return NextResponse.json(
-        { error: "Course not found" },
-        { status: 404 }
-      );
-    }
-
-    // Check if user is the instructor or admin
-    if (course.instructor.id !== user._id.toString() && user.role !== "admin") {
-      return NextResponse.json(
-        { error: "Not authorized to edit this course" },
-        { status: 403 }
-      );
+    const ownerId = String((course as any).instructor?.id ?? (course as any).instructor ?? "");
+    if (ownerId && ownerId !== String(user._id) && user.role !== "admin") {
+      return NextResponse.json({ error: "Not authorized to edit this course" }, { status: 403 });
     }
 
     const body = await request.json();
-    const updates = { ...body };
+    const updates: any = { ...body };
 
-    // Update instructor info if it changed
-    if (user.name !== course.instructor.name || user.avatar !== course.instructor.avatar) {
+    // Accept both published and isPublished from client
+    if (typeof updates.published === "boolean" && updates.isPublished === undefined) {
+      updates.isPublished = updates.published;
+      delete updates.published;
+    }
+
+    if (updates.totalDuration != null) updates.totalDuration = Number(updates.totalDuration) || 0;
+    if (updates.credit != null) updates.credit = Number(updates.credit) || 0;
+
+    // Only keep youtubeLinks if it's an array; otherwise ignore
+    if ("youtubeLinks" in updates && !Array.isArray(updates.youtubeLinks)) {
+      delete updates.youtubeLinks;
+    }
+
+    // Optional: keep instructor info in sync
+    if (user.name || user.avatar || user.bio) {
       updates.instructor = {
-        ...course.instructor,
-        name: user.name,
-        avatar: user.avatar,
-        bio: user.bio,
+        ...(course as any).instructor,
+        id: ownerId || String(user._id),
+        name: user.name ?? (course as any).instructor?.name,
+        avatar: user.avatar ?? (course as any).instructor?.avatar,
+        bio: user.bio ?? (course as any).instructor?.bio,
       };
     }
 
-    // Recalculate total duration if modules changed
-    if (updates.modules) {
+    // Recompute totalDuration from modules if modules provided
+    if (Array.isArray(updates.modules)) {
       let totalDuration = 0;
-      updates.modules.forEach((module: any) => {
-        if (module.duration) {
-          const minutes = parseInt(module.duration.replace(/\D/g, '')) || 0;
-          totalDuration += minutes;
-        }
-      });
+      for (const m of updates.modules) {
+        const minutes = parseInt(String(m?.duration ?? "").replace(/\D/g, ""), 10) || 0;
+        totalDuration += minutes;
+      }
       updates.totalDuration = totalDuration;
     }
 
-    // Set publishedAt if publishing for the first time
-    if (updates.isPublished && !course.publishedAt) {
-      updates.publishedAt = new Date();
+    // Publish / Unpublish
+    if (typeof updates.isPublished === "boolean") {
+      if (updates.isPublished && !course.publishedAt) {
+        updates.publishedAt = new Date();
+      }
+      if (!updates.isPublished) {
+        updates.publishedAt = undefined;
+      }
     }
 
     const updatedCourse = await Course.findByIdAndUpdate(
       courseId,
       { $set: updates },
       { new: true, runValidators: true }
-    );
+    ).lean();
 
-    return NextResponse.json(
-      {
-        message: "Course updated successfully",
-        course: updatedCourse,
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("Update course error:", error);
-    return NextResponse.json(
-      { error: "Failed to update course" },
-      { status: 500 }
-    );
+    return NextResponse.json({ course: updatedCourse }, { status: 200 });
+  } catch (err) {
+    console.error("PUT /api/courses/[id] error:", err);
+    return NextResponse.json({ error: "Failed to update course" }, { status: 500 });
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: RouteParams
-) {
+export async function DELETE(req: NextRequest, context: RouteContext) {
   try {
-    const { id: courseId } = params;
-    
-    // Require authentication
-    const { user, error } = await authenticateUser(request);
-    
+    await ensureDB();
+    const { user, error } = await authenticateUser(req);
     if (error || !user) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
-    const Course = (await import("@/models/Course")).default;
+    const { id: courseId } = await Promise.resolve(context.params);
     const course = await Course.findById(courseId);
+    if (!course) return NextResponse.json({ error: "Course not found" }, { status: 404 });
 
-    if (!course) {
-      return NextResponse.json(
-        { error: "Course not found" },
-        { status: 404 }
-      );
+    // Only instructor (owner) or admin can delete
+    const ownerId = String((course as any).instructor?.id ?? (course as any).instructor ?? "");
+    if (ownerId && ownerId !== String(user._id) && user.role !== "admin") {
+      return NextResponse.json({ error: "Not authorized" }, { status: 403 });
     }
 
-    // Check if user is the instructor or admin
-    if (course.instructor.id !== user._id.toString() && user.role !== "admin") {
-      return NextResponse.json(
-        { error: "Not authorized to delete this course" },
-        { status: 403 }
-      );
-    }
+    // Cascade delete related data
+    await Promise.all([
+      Quiz.deleteMany({ courseId: String(courseId) }),
+      QuizSubmission.deleteMany({ courseId: String(courseId) }),
+      CourseEnrollment.deleteMany({ courseId: String(courseId) }),
+    ]);
 
-    // Soft delete by unpublishing instead of hard delete
-    // This preserves enrollment data and student progress
-    await Course.findByIdAndUpdate(courseId, {
-      isPublished: false,
-      deletedAt: new Date(),
-    });
+    await course.deleteOne();
 
-    return NextResponse.json(
-      { message: "Course deleted successfully" },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("Delete course error:", error);
-    return NextResponse.json(
-      { error: "Failed to delete course" },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: true }, { status: 200 });
+  } catch (err) {
+    console.error("Delete course error:", err);
+    return NextResponse.json({ error: "Failed to delete course" }, { status: 500 });
   }
 }

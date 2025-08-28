@@ -6,10 +6,9 @@ export interface ICourseEnrollment extends Document {
   courseId: string;
   enrolledAt: Date;
   completedAt?: Date;
-  progress: number; // percentage (0-100)
-  completedModules: string[]; // array of module IDs
-  currentModule?: string;
-  timeSpent: number; // in minutes
+  completedVideos: string[]; 
+  progress: number;         
+  lastVideoUrl?: string;  
   rating?: number;
   review?: string;
   isActive: boolean;
@@ -35,22 +34,9 @@ const CourseEnrollmentSchema = new Schema<ICourseEnrollment>(
       default: Date.now,
     },
     completedAt: Date,
-    progress: {
-      type: Number,
-      default: 0,
-      min: 0,
-      max: 100,
-    },
-    completedModules: [
-      {
-        type: String,
-      },
-    ],
-    currentModule: String,
-    timeSpent: {
-      type: Number,
-      default: 0,
-    },
+    completedVideos: { type: [String], default: [] },
+    progress: { type: Number, default: 0, min: 0, max: 100 },
+    lastVideoUrl: { type: String, default: undefined },
     rating: {
       type: Number,
       min: 1,
@@ -69,9 +55,7 @@ const CourseEnrollmentSchema = new Schema<ICourseEnrollment>(
       default: Date.now,
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 // Compound index to ensure one enrollment per user per course

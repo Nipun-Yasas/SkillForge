@@ -1,6 +1,10 @@
 "use client";
 
-import { Box, Card, CardContent, Grid, Skeleton } from "@mui/material";
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Grid from "@mui/material/Grid";
+import Skeleton from "@mui/material/Skeleton";
 
 export default function ManageCoursesSkeleton({ items = 6 }: { items?: number }) {
   return (

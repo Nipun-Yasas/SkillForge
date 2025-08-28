@@ -1,27 +1,29 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import {
-  Box,
-  Container,
-  Typography,
-  Paper,
-  Card,
-  CardContent,
-  CardMedia,
-  Chip,
-  Button,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Rating,
-  Avatar,
-  LinearProgress,
-  CircularProgress,
-  Pagination,
-} from "@mui/material";
+import { useState, useEffect, useMemo } from "react";
+import toast from "react-hot-toast";
+
+import { useRouter } from "next/navigation";
+
+import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
+import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
+import Chip from "@mui/material/Chip";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import Rating from "@mui/material/Rating";
+import Avatar from "@mui/material/Avatar";
+import LinearProgress from "@mui/material/LinearProgress";
+import Pagination from "@mui/material/Pagination";
+
 import { motion } from "framer-motion";
 import {
   Search,
@@ -31,11 +33,9 @@ import {
   BookOpen,
   TrendingUp,
   Award,
-  CheckCircle,
 } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+
 import CourseCardSkeleton from "./components/CourseCardSkeleton";
-import toast from "react-hot-toast";
 
 interface Course {
   _id: string;
@@ -49,7 +49,7 @@ interface Course {
   rating: number;
   totalRatings: number;
   enrolledStudents: number;
-  duration: string;
+  duration?: string;
   level: "Beginner" | "Intermediate" | "Advanced";
   price: number;
   isPremium: boolean;
@@ -59,6 +59,8 @@ interface Course {
   progress?: number;
   isEnrolled?: boolean;
   enrollmentId?: string;
+  youtubeLinks?: string[];           
+  totalDuration?: number | string;  
 }
 
 interface CoursesResponse {
@@ -69,17 +71,17 @@ interface CoursesResponse {
 }
 
 export default function CoursesPage() {
-  const { user } = useAuth();
+  const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
   const [categories, setCategories] = useState<string[]>(["All Categories"]);
   const [loading, setLoading] = useState(true);
-  const [enrolling, setEnrolling] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [selectedLevel, setSelectedLevel] = useState("All Levels");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [activeStudents, setActiveStudents] = useState(0);
 
   const levels = ["All Levels", "Beginner", "Intermediate", "Advanced"];
 
@@ -106,14 +108,13 @@ export default function CoursesPage() {
       setLoading(true);
       try {
         const params = new URLSearchParams();
-
         if (searchTerm) params.append("search", searchTerm);
-        if (selectedCategory !== "All Categories")
-          params.append("category", selectedCategory);
-        if (selectedLevel !== "All Levels")
-          params.append("level", selectedLevel);
+        if (selectedCategory !== "All Categories") params.append("category", selectedCategory);
+        if (selectedLevel !== "All Levels") params.append("level", selectedLevel);
         params.append("page", currentPage.toString());
         params.append("limit", "12");
+        // Ask API to exclude current user's own courses
+        params.append("excludeOwn", "1");
 
         const response = await fetch(`/api/courses?${params}`);
         if (response.ok) {
@@ -131,47 +132,22 @@ export default function CoursesPage() {
         setLoading(false);
       }
     };
-
     fetchCourses();
   }, [searchTerm, selectedCategory, selectedLevel, currentPage]);
 
-  const handleEnroll = async (courseId: string) => {
-    if (!user) {
-      toast.error("Please login to enroll in courses");
-      return;
-    }
-
-    setEnrolling(courseId);
-    try {
-      const response = await fetch("/api/courses/enroll", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ courseId }),
-      });
-
-      if (response.ok) {
-        toast.success("Successfully enrolled in course!");
-        // Refresh courses to update enrollment status
-        setCourses((prevCourses) =>
-          prevCourses.map((course) =>
-            course._id === courseId
-              ? { ...course, isEnrolled: true, progress: 0 }
-              : course
-          )
-        );
-      } else {
-        const error = await response.json();
-        toast.error(error.error || "Failed to enroll in course");
+  // Fetch unique active students (distinct enrolled users)
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/courses/active-students", { cache: "no-store" });
+        if (!res.ok) return;
+        const data = await res.json();
+        setActiveStudents(Number(data.activeStudents) || 0);
+      } catch {
+        // ignore
       }
-    } catch (error) {
-      console.error("Enrollment error:", error);
-      toast.error("Failed to enroll in course");
-    } finally {
-      setEnrolling(null);
-    }
-  };
+    })();
+  }, []);
 
   const getLevelColor = (
     level: string
@@ -188,6 +164,37 @@ export default function CoursesPage() {
     }
   };
 
+  // Format minutes to "Xh Ym"
+  const formatMinutes = (mins: number) => {
+    if (!mins || mins < 0) return "0m";
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    if (h && m) return `${h}h ${m}m`;
+    if (h) return `${h}h`;
+    return `${m}m`;
+  };
+  
+  // Safely parse totalDuration (number | string) to minutes number
+  const toMinutes = (v?: number | string) => {
+    const n =
+      typeof v === "number"
+        ? v
+        : typeof v === "string"
+        ? parseFloat(v)
+        : NaN;
+    return Number.isFinite(n) ? Math.round(n as number) : 0;
+  };
+
+  // Average progress across courses that have a numeric progress
+  const completionRate = useMemo(() => {
+    const nums = courses
+      .map((c) => (typeof c.progress === "number" ? Math.min(100, Math.max(0, Number(c.progress))) : null))
+      .filter((v): v is number => v !== null);
+    if (!nums.length) return 0;
+    const avg = nums.reduce((a, b) => a + b, 0) / nums.length;
+    return Math.round(avg);
+  }, [courses]);
+
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <motion.div
@@ -197,19 +204,6 @@ export default function CoursesPage() {
       >
         {/* Header */}
         <Box sx={{ mb: 4 }}>
-          <Typography
-            variant="h3"
-            fontWeight="bold"
-            sx={{
-              background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
-              backgroundClip: "text",
-              WebkitBackgroundClip: "text",
-              // WebkitTextFillColor: 'transparent',
-              mb: 1,
-            }}
-          >
-            📚 Courses
-          </Typography>
           <Typography variant="h6" color="text.secondary">
             Discover and learn new skills with our curated courses
           </Typography>
@@ -291,9 +285,7 @@ export default function CoursesPage() {
           <Paper sx={{ p: 2, textAlign: "center", borderRadius: 2 }}>
             <Users size={24} color="#6A0DAD" />
             <Typography variant="h6" fontWeight="bold" sx={{ mt: 1 }}>
-              {courses
-                .reduce((sum, course) => sum + course.enrolledStudents, 0)
-                .toLocaleString()}
+              {activeStudents.toLocaleString()}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Active Students
@@ -302,7 +294,7 @@ export default function CoursesPage() {
           <Paper sx={{ p: 2, textAlign: "center", borderRadius: 2 }}>
             <TrendingUp size={24} color="#FF7A00" />
             <Typography variant="h6" fontWeight="bold" sx={{ mt: 1 }}>
-              92%
+              {completionRate}%
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Completion Rate
@@ -358,31 +350,8 @@ export default function CoursesPage() {
                     }}
                   >
                     <Box sx={{ position: "relative" }}>
-                      <CardMedia
-                        component="div"
-                        sx={{
-                          height: 200,
-                          background:
-                            "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        {course.isEnrolled ? (
-                          <CheckCircle
-                            size={60}
-                            color="white"
-                            style={{ opacity: 0.8 }}
-                          />
-                        ) : (
-                          <PlayCircle
-                            size={60}
-                            color="white"
-                            style={{ opacity: 0.8 }}
-                          />
-                        )}
-                      </CardMedia>
+                      <CardMedia component="img" image={course.image || "/images/course-placeholder.jpg"} alt={course.title} sx={{ height: 200, objectFit: 'cover' }} />
+                  
                       <Chip
                         label={course.level}
                         color={getLevelColor(course.level)}
@@ -515,43 +484,43 @@ export default function CoursesPage() {
                           mt: "auto",
                         }}
                       >
-                        <Box
-                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                        >
-                          <Clock size={16} color="#666" />
-                          <Typography variant="body2" color="text.secondary">
-                            {course.duration}
-                          </Typography>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                          {/* Videos count */}
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                            <PlayCircle size={16} color="#666" />
+                            <Typography variant="body2" color="text.secondary">
+                              {(course.youtubeLinks?.length ?? 0)} videos
+                            </Typography>
+                          </Box>
+                          {/* Students enrolled */}
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                            <Users size={16} color="#666" />
+                            <Typography variant="body2" color="text.secondary">
+                              {course.enrolledStudents?.toLocaleString?.() ?? 0}
+                            </Typography>
+                          </Box>
+                          {/* Total duration */}
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                            <Clock size={16} color="#666" />
+                            <Typography variant="body2" color="text.secondary">
+                              {toMinutes(course.totalDuration)
+                                ? formatMinutes(toMinutes(course.totalDuration))
+                                : (course.duration || "—")}
+                            </Typography>
+                          </Box>
                         </Box>
                         <Button
                           variant="contained"
                           size="small"
-                          disabled={enrolling === course._id}
-                          onClick={() =>
-                            course.isEnrolled ? null : handleEnroll(course._id)
-                          }
+                          onClick={() => router.push(`/courses/${course._id}`)}
                           sx={{
-                            background: course.isEnrolled
-                              ? "linear-gradient(135deg, #28a745 0%, #20c997 100%)"
-                              : "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                            background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
                             "&:hover": {
-                              background: course.isEnrolled
-                                ? "linear-gradient(135deg, #218838 0%, #1ea085 100%)"
-                                : "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
+                              background: "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
                             },
-                          }}
+                        }}
                         >
-                          {enrolling === course._id ? (
-                            <CircularProgress size={16} color="inherit" />
-                          ) : course.isEnrolled ? (
-                            course.progress && course.progress > 0 ? (
-                              "Continue"
-                            ) : (
-                              "Start"
-                            )
-                          ) : (
-                            "Enroll Now"
-                          )}
+                          View
                         </Button>
                       </Box>
                     </CardContent>

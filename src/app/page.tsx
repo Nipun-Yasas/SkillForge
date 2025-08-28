@@ -1,80 +1,38 @@
-'use client';
+"use client";
 
-import About from "./_components/landing/About";
-import Features from "./_components/landing/Features";
-import Header from "./_components/landing/Header";
-import Hero from "./_components/landing/Hero";
-import Stats from "./_components/landing/Stats";
-import Testimonials from "./_components/landing/Testimonial";
-import CallToAction from "./_components/landing/CallToAction";
-import Footer from "./_components/landing/Footer";
-import { Box } from "@mui/material";
-import Image from "next/image";
-import { useEffect, useState } from "react";
+import CheckoutPage from "@/app/_components/CheckoutPage";
+import convertToSubcurrency from "@/lib/convertToSubcurrency";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+
+if (process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY === undefined) {
+  throw new Error("NEXT_PUBLIC_STRIPE_PUBLIC_KEY is not defined");
+}
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
 
 export default function Home() {
-  const [pageLoaded, setPageLoaded] = useState(false);
-  const [minDelayPassed, setMinDelayPassed] = useState(false);
-  const isReady = pageLoaded && minDelayPassed;
-
-  useEffect(() => {
-    const t = window.setTimeout(() => setMinDelayPassed(true), 4000);
-    return () => window.clearTimeout(t);
-  }, []);
-
-  useEffect(() => {
-    const onLoad = () => setPageLoaded(true);
-
-    if (document.readyState === "complete") {
-      setPageLoaded(true);
-      return;
-    }
-    window.addEventListener("load", onLoad);
-    return () => window.removeEventListener("load", onLoad);
-  }, []);
-
-  if (!isReady) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-          flexDirection: 'column',
-          gap: 2,
-          backgroundColor: '#f8f9fa',
-          padding: { xs: 2, sm: 3, md: 4 },
-        }}
-      >
-        <Image 
-          src="/loader.gif" 
-          alt="Loading..." 
-          width={0}
-          height={0}
-          style={{ 
-            width: 'auto',
-            height: 'auto',
-            maxWidth: '80vw',
-            maxHeight: '30vh',
-            borderRadius: '10px',
-          }}
-          unoptimized
-        />
-      </Box>
-    );
-  }
+  const amount = 1500; // Increased to 1500 LKR (~$5 USD) to meet Stripe's minimum requirement
 
   return (
-    <>
-      <Header />
-      <Hero />
-      <Stats />
-      <About />
-      <Features />
-      <Testimonials />
-      <CallToAction />
-      <Footer />
-    </>
+    <main className="max-w-6xl mx-auto p-10 text-white text-center border m-10 rounded-md bg-gradient-to-tr from-blue-500 to-purple-500">
+      <div className="mb-10">
+        <h1 className="text-4xl font-extrabold mb-2">Sonny</h1>
+        <h2 className="text-2xl">
+          has requested
+          <span className="font-bold"> LKR {amount}</span>
+        </h2>
+      </div>
+
+      <Elements
+        stripe={stripePromise}
+        options={{
+          mode: "payment",
+          amount: convertToSubcurrency(amount),
+          currency: "lkr",
+        }}
+      >
+        <CheckoutPage amount={amount} />
+      </Elements>
+    </main>
   );
 }

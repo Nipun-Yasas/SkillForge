@@ -388,12 +388,14 @@ export default function ProfilePage() {
         <Box
           sx={{
             mb: 4,
+          }}
+        >
+          <Box sx={{
+            mb: 4,
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-          }}
-        >
-          <Box>
+          }}>
             <Typography
               variant="h3"
               fontWeight="bold"
@@ -407,12 +409,7 @@ export default function ProfilePage() {
             >
               My Profile
             </Typography>
-            <Typography variant="h6" color="text.secondary">
-              Manage your profile and skills to get better mentor matches
-            </Typography>
-          </Box>
-
-          <Button
+             <Button
             variant={isEditing ? "outlined" : "contained"}
             startIcon={isEditing ? <X /> : <Edit />}
             onClick={() => setIsEditing(!isEditing)}
@@ -429,12 +426,30 @@ export default function ProfilePage() {
           >
             {isEditing ? "Cancel" : "Edit Profile"}
           </Button>
+           
+          </Box>
+             <Typography variant="h6" color="text.secondary">
+              Manage your profile and skills to get better mentor matches
+            </Typography>
+         
         </Box>
 
         {/* Profile Picture & Basic Info */}
         <Paper sx={{ p: 4, mb: 4, borderRadius: 3 }}>
           <Box
-            sx={{ display: "flex", alignItems: "flex-start", gap: 4, mb: 4 }}
+            sx={{
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 4,
+              mb: 4,
+              // Stack below avatar on very small screens
+              "@media (max-width: 500px)": {
+                flexDirection: "column",
+                alignItems: "center",
+                textAlign: "center",
+                gap: 2,
+              },
+            }}
           >
             <Box sx={{ position: "relative" }}>
               <Avatar
@@ -485,7 +500,15 @@ export default function ProfilePage() {
               )}
             </Box>
 
-            <Box sx={{ flex: 1 }}>
+            <Box
+              sx={{
+                flex: 1,
+                "@media (max-width: 500px)": {
+                  width: "100%",
+                  mt: 2,
+                },
+              }}
+            >
               <TextField
                 fullWidth
                 label="Full Name"

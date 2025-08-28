@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Avatar,
@@ -11,6 +11,12 @@ import {
   Container,
   Paper,
   Typography,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Divider,
+  Skeleton,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import {
@@ -24,15 +30,52 @@ import {
 import { useAuth } from "../../../contexts/AuthContext";
 import DashboardSkeleton from "./components/DashboardSkeleton";
 
+type ActivityItem = {
+  id: string;
+  type: "enroll" | "quiz" | "quiz_pass" | "complete" | "rating";
+  title: string;
+  subtitle?: string;
+  at: string; // ISO date
+  href?: string;
+};
+
 export default function Dashboard() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const [recentLoading, setRecentLoading] = useState(true);
+  const [activities, setActivities] = useState<ActivityItem[]>([]);
+  const VISIBLE_COUNT = 5;
 
   useEffect(() => {
     if (!isLoading && !user) {
       router.push("/login");
     }
   }, [user, isLoading, router]);
+
+  useEffect(() => {
+    if (!user) return;
+    let ignore = false;
+    setRecentLoading(true);
+    (async () => {
+      try {
+        const res = await fetch("/api/activity/recent?limit=12", {
+          cache: "no-store",
+          credentials: "include",
+        });
+        if (!res.ok) throw new Error("Failed to load recent activity");
+        const data = await res.json();
+        if (!ignore) setActivities(Array.isArray(data.items) ? data.items : []);
+      } catch (e) {
+        if (!ignore) setActivities([]);
+        console.error(e);
+      } finally {
+        if (!ignore) setRecentLoading(false);
+      }
+    })();
+    return () => {
+      ignore = true;
+    };
+  }, [user]);
 
   const handleQuickAction = (action: string) => {
     switch (action) {
@@ -144,13 +187,33 @@ export default function Dashboard() {
                     fontWeight: 600,
                   }}
                 />
+               {/* Mobile-only Edit button (under role) */}
+               <Box
+                 sx={{
+                   display: "none",
+                   "@media (max-width: 640px)": { display: "block", mt: 2 },
+                 }}
+               >
+                 <Button
+                   variant="outlined"
+                   fullWidth
+                   size="medium"
+                   onClick={() => router.push("/profile")}
+                 >
+                   Edit Profile
+                 </Button>
+               </Box>
               </Box>
             </Box>
             <Button
               variant="outlined"
               size="small"
               onClick={() => router.push("/profile")}
-              sx={{ mt: 1 }}
+              sx={{
+                mt: 1,
+                // Hide this button on small screens (< 640px)
+                "@media (max-width: 640px)": { display: "none" },
+              }}
             >
               Edit Profile
             </Button>
@@ -338,44 +401,100 @@ export default function Dashboard() {
         </Box>
 
         {/* Recent Activity */}
-        <Paper
-          sx={{
-            p: 3,
-            borderRadius: 3,
-            border: "1px solid rgba(0, 123, 255, 0.1)",
-          }}
-        >
+        <Paper sx={{ p: 3, borderRadius: 3, border: "1px solid rgba(0, 123, 255, 0.1)" }}>
           <Typography variant="h5" fontWeight="bold" sx={{ mb: 3 }}>
             Recent Activity
           </Typography>
 
-          <Box sx={{ textAlign: "center", py: 4 }}>
-            <TrendingUp size={60} color="#ccc" />
-            <Typography
-              variant="h6"
-              color="text.secondary"
-              sx={{ mt: 2, mb: 1 }}
-            >
-              No recent activity
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              Start connecting with mentors and learners to see your activity
-              here
-            </Typography>
-            <Button
-              variant="contained"
-              onClick={handleGetStarted}
-              sx={{
-                background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
-                "&:hover": {
-                  background:
-                    "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
-                },
-              }}
-            >
-              Get Started
-            </Button>
-          </Box>
+          {recentLoading ? (
+            <Box sx={{ px: 1 }}>
+              {[...Array(4)].map((_, i) => (
+                <Box key={i} sx={{ display: "flex", alignItems: "center", py: 1.5 }}>
+                  <Skeleton variant="circular" width={40} height={40} sx={{ mr: 2 }} />
+                  <Box sx={{ flex: 1 }}>
+                    <Skeleton width="40%" height={20} />
+                    <Skeleton width="60%" height={18} />
+                  </Box>
+                </Box>
+              ))}
+            </Box>
+          ) : activities.length === 0 ? (
+            <Box sx={{ textAlign: "center", py: 4 }}>
+              <TrendingUp size={60} color="#ccc" />
+              <Typography variant="h6" color="text.secondary" sx={{ mt: 2, mb: 1 }}>
+                No recent activity
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                Enroll in courses, take quizzes, and complete lessons to see them here.
+              </Typography>
+              <Button
+                variant="contained"
+                onClick={handleGetStarted}
+                sx={{
+                  background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                  "&:hover": {
+                    background: "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
+                  },
+                }}
+              >
+                Get Started
+              </Button>
+            </Box>
+          ) : (
+            <>
+              <List disablePadding>
+                {(activities.slice(0, VISIBLE_COUNT)).map((a, idx) => {
+                  const dt = new Date(a.at);
+                  const when = dt.toLocaleString();
+                  const iconBg =
+                    a.type === "complete" ? "#e9f7ef"
+                    : a.type === "quiz_pass" ? "#e7f2ff"
+                    : a.type === "quiz" ? "#fff7e8"
+                    : a.type === "rating" ? "#f5e9ff"
+                    : "#eaf2ff";
+                  const icon =
+                    a.type === "complete" ? <Award size={22} color="#28a745" />
+                    : a.type === "quiz_pass" ? <TrendingUp size={22} color="#007BFF" />
+                    : a.type === "quiz" ? <TrendingUp size={22} color="#FF7A00" />
+                    : a.type === "rating" ? <Users size={22} color="#6A0DAD" />
+                    : <BookOpen size={22} color="#007BFF" />;
+                  return (
+                    <Box key={a.id}>
+                      <ListItem
+                        alignItems="flex-start"
+                        sx={{ px: 0, cursor: a.href ? "pointer" : "default" }}
+                        onClick={() => a.href && router.push(a.href)}
+                      >
+                        <ListItemAvatar>
+                          <Box sx={{ width: 40, height: 40, borderRadius: "50%", display: "grid", placeItems: "center", background: iconBg }}>
+                            {icon}
+                          </Box>
+                        </ListItemAvatar>
+                        <ListItemText
+                          primary={a.title}
+                          secondary={<span>{a.subtitle ? `${a.subtitle} • ` : ""}{when}</span>}
+                          primaryTypographyProps={{ fontWeight: 600 }}
+                        />
+                      </ListItem>
+                      {idx < Math.min(VISIBLE_COUNT, activities.length) - 1 && <Divider sx={{ my: 1 }} />}
+                    </Box>
+                  );
+                })}
+              </List>
+
+              {activities.length > VISIBLE_COUNT && (
+                <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => router.push("/dashboard/recent")}
+                  >
+                    View more
+                  </Button>
+                </Box>
+              )}
+            </>
+          )}
         </Paper>
       </motion.div>
     </Container>

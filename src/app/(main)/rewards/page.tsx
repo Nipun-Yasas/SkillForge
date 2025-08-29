@@ -30,6 +30,7 @@ import {
   Groups,
 } from "@mui/icons-material";
 import RewardsSkeleton from "./components/RewardsSkeleton";
+import theme from "@/theme";
 
 interface TeacherReward {
   type:
@@ -54,7 +55,7 @@ interface RewardHistory {
   status: string;
 }
 
-export default function RewardDashboard(){
+export default function RewardDashboard() {
   const [rewards, setRewards] = useState<TeacherReward[]>([]);
   const [rewardHistory, setRewardHistory] = useState<RewardHistory[]>([]);
   const [totalRewardValue, setTotalRewardValue] = useState(0);
@@ -210,7 +211,28 @@ export default function RewardDashboard(){
           mb: 4,
         }}
       >
-        <Card sx={{ textAlign: "center", p: 2 }}>
+        <Card
+          elevation={10}
+          sx={{
+            p: 3,
+            mb: 4,
+            textAlign: "center",
+            position: "relative",
+            zIndex: 1,
+            backdropFilter: "blur(10px) saturate(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+            borderRadius: 3,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 40px rgba(0,0,0,0.45)"
+                : "0 10px 40px rgba(0,0,0,0.12)",
+            transition:
+              "background-color 200ms ease, backdrop-filter 200ms ease",
+            "&:hover": {
+              boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+            },
+          }}
+        >
           <AttachMoney sx={{ fontSize: 40, color: "#4CAF50", mb: 1 }} />
           <Typography variant="h6">Total Reward Value</Typography>
           <Typography
@@ -220,7 +242,28 @@ export default function RewardDashboard(){
             ${totalRewardValue}
           </Typography>
         </Card>
-        <Card sx={{ textAlign: "center", p: 2 }}>
+        <Card
+          elevation={10}
+          sx={{
+            p: 3,
+            mb: 4,
+            textAlign: "center",
+            position: "relative",
+            zIndex: 1,
+            backdropFilter: "blur(10px) saturate(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+            borderRadius: 3,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 40px rgba(0,0,0,0.45)"
+                : "0 10px 40px rgba(0,0,0,0.12)",
+            transition:
+              "background-color 200ms ease, backdrop-filter 200ms ease",
+            "&:hover": {
+              boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+            },
+          }}
+        >
           <EmojiEvents sx={{ fontSize: 40, color: "#FF9800", mb: 1 }} />
           <Typography variant="h6">Available Rewards</Typography>
           <Typography
@@ -230,7 +273,28 @@ export default function RewardDashboard(){
             {rewards.filter((r) => r.eligibilityMet).length}
           </Typography>
         </Card>
-        <Card sx={{ textAlign: "center", p: 2 }}>
+        <Card
+          elevation={10}
+          sx={{
+            p: 3,
+            mb: 4,
+            textAlign: "center",
+            position: "relative",
+            zIndex: 1,
+            backdropFilter: "blur(10px) saturate(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+            borderRadius: 3,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 40px rgba(0,0,0,0.45)"
+                : "0 10px 40px rgba(0,0,0,0.12)",
+            transition:
+              "background-color 200ms ease, backdrop-filter 200ms ease",
+            "&:hover": {
+              boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+            },
+          }}
+        >
           <TrendingUp sx={{ fontSize: 40, color: "#2196F3", mb: 1 }} />
           <Typography variant="h6">Rewards Earned</Typography>
           <Typography
@@ -253,80 +317,152 @@ export default function RewardDashboard(){
           gap: 3,
         }}
       >
-        {rewards.map((reward, index) => (
+        {rewardHistory.length === 0 ? (
           <Card
-            key={index}
+            elavation={10}
             sx={{
-              height: "100%",
-              border: reward.eligibilityMet
-                ? `2px solid ${getRewardColor(reward.type)}`
-                : "1px solid #e0e0e0",
-              opacity: reward.eligibilityMet ? 1 : 0.6,
+              p: 3,
+              mb: 4,
+              textAlign: "center",
+              position: "relative",
+              zIndex: 1,
+              backdropFilter: "blur(10px) saturate(1.08)",
+              WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+              borderRadius: 3,
+              boxShadow:
+                theme.palette.mode === "dark"
+                  ? "0 10px 40px rgba(0,0,0,0.45)"
+                  : "0 10px 40px rgba(0,0,0,0.12)",
+              transition:
+                "background-color 200ms ease, backdrop-filter 200ms ease",
+              "&:hover": {
+                boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+              },
             }}
           >
             <CardContent>
-              <Box
-                sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ textAlign: "center", py: 3 }}
               >
-                {getRewardIcon(reward.type)}
-                <Typography variant="h6" sx={{ flex: 1 }}>
-                  {reward.type
-                    .replace("-", " ")
-                    .replace(/\b\w/g, (l) => l.toUpperCase())}
-                </Typography>
-                <Chip
-                  label={reward.eligibilityMet ? "Available" : "Locked"}
-                  color={reward.eligibilityMet ? "success" : "default"}
-                  size="small"
-                />
-              </Box>
-
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                {reward.description}
+                No available rewards
               </Typography>
+            </CardContent>
+          </Card>
+        ) : (
+          rewards.map((reward, index) => (
+            <Card
+              key={index}
+              elevation={10}
+              sx={{
+                p: 3,
+                mb: 4,
+                textAlign: "center",
+                position: "relative",
+                zIndex: 1,
+                backdropFilter: "blur(10px) saturate(1.08)",
+                WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+                borderRadius: 3,
+                boxShadow:
+                  theme.palette.mode === "dark"
+                    ? "0 10px 40px rgba(0,0,0,0.45)"
+                    : "0 10px 40px rgba(0,0,0,0.12)",
+                transition:
+                  "background-color 200ms ease, backdrop-filter 200ms ease",
+                "&:hover": {
+                  boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+                },
+              }}
+            >
+              <CardContent>
+                <Box
+                  sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}
+                >
+                  {getRewardIcon(reward.type)}
+                  <Typography variant="h6" sx={{ flex: 1 }}>
+                    {reward.type
+                      .replace("-", " ")
+                      .replace(/\b\w/g, (l) => l.toUpperCase())}
+                  </Typography>
+                  <Chip
+                    label={reward.eligibilityMet ? "Available" : "Locked"}
+                    color={reward.eligibilityMet ? "success" : "default"}
+                    size="small"
+                  />
+                </Box>
 
-              {reward.estimatedValue && (
                 <Typography
                   variant="body2"
-                  sx={{
-                    color: getRewardColor(reward.type),
-                    fontWeight: "bold",
-                    mb: 2,
-                  }}
+                  color="text.secondary"
+                  sx={{ mb: 2 }}
                 >
-                  Estimated Value: ${reward.estimatedValue}
+                  {reward.description}
                 </Typography>
-              )}
 
-              <Button
-                variant="contained"
-                fullWidth
-                disabled={!reward.eligibilityMet}
-                onClick={() => handleRewardRedeem(reward)}
-                sx={{
-                  backgroundColor: reward.eligibilityMet
-                    ? getRewardColor(reward.type)
-                    : undefined,
-                  "&:hover": {
+                {reward.estimatedValue && (
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: getRewardColor(reward.type),
+                      fontWeight: "bold",
+                      mb: 2,
+                    }}
+                  >
+                    Estimated Value: ${reward.estimatedValue}
+                  </Typography>
+                )}
+
+                <Button
+                  variant="contained"
+                  fullWidth
+                  disabled={!reward.eligibilityMet}
+                  onClick={() => handleRewardRedeem(reward)}
+                  sx={{
                     backgroundColor: reward.eligibilityMet
                       ? getRewardColor(reward.type)
                       : undefined,
-                    opacity: 0.8,
-                  },
-                }}
-              >
-                Redeem
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
+                    "&:hover": {
+                      backgroundColor: reward.eligibilityMet
+                        ? getRewardColor(reward.type)
+                        : undefined,
+                      opacity: 0.8,
+                    },
+                  }}
+                >
+                  Redeem
+                </Button>
+              </CardContent>
+            </Card>
+          ))
+        )}
       </Box>
 
       {/* Reward History */}
       <Typography variant="h5" gutterBottom sx={{ mt: 6, mb: 2 }}>
         Reward History
       </Typography>
-      <Card>
+      <Card
+        elevation={10}
+        sx={{
+          p: 3,
+          mb: 4,
+          textAlign: "center",
+          position: "relative",
+          zIndex: 1,
+          backdropFilter: "blur(10px) saturate(1.08)",
+          WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+          borderRadius: 3,
+          boxShadow:
+            theme.palette.mode === "dark"
+              ? "0 10px 40px rgba(0,0,0,0.45)"
+              : "0 10px 40px rgba(0,0,0,0.12)",
+          transition: "background-color 200ms ease, backdrop-filter 200ms ease",
+          "&:hover": {
+            boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+          },
+        }}
+      >
         <CardContent>
           {rewardHistory.length === 0 ? (
             <Typography
@@ -487,5 +623,4 @@ export default function RewardDashboard(){
       </Dialog>
     </Box>
   );
-};
-
+}

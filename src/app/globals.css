@@ -25,7 +25,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Smooth transitions for all elements */
 * {
   transition:
     color 0.3s ease,
@@ -34,7 +33,6 @@ body {
     transform 0.3s ease;
 }
 
-/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -52,13 +50,11 @@ body {
   background: linear-gradient(135deg, #0056cc 0%, #4a0080 100%);
 }
 
-/* Link styles */
 a {
   color: inherit;
   text-decoration: none;
 }
 
-/* Focus styles for accessibility */
 :focus-visible {
   outline: 2px solid #007bff;
   outline-offset: 2px;

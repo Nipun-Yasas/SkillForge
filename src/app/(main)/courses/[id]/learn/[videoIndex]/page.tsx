@@ -1,26 +1,27 @@
-'use client';
+"use client";
 
-import { useEffect, useMemo, useRef, useState } from 'react';
-import toast from 'react-hot-toast';
+import { useEffect, useMemo, useRef, useState } from "react";
+import toast from "react-hot-toast";
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter } from "next/navigation";
 
-import  Box  from '@mui/material/Box';
-import  Button  from '@mui/material/Button';
-import  Typography  from '@mui/material/Typography';
-import  Paper  from '@mui/material/Paper';
-import  Stack  from '@mui/material/Stack';
-import  Chip  from '@mui/material/Chip';
-import  Container  from '@mui/material/Container';
-import  Divider  from '@mui/material/Divider';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Radio from '@mui/material/Radio';
-import  CircularProgress  from '@mui/material/CircularProgress';
-import Alert from '@mui/material/Alert';
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
+import Stack from "@mui/material/Stack";
+import Chip from "@mui/material/Chip";
+import Container from "@mui/material/Container";
+import Divider from "@mui/material/Divider";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Radio from "@mui/material/Radio";
+import CircularProgress from "@mui/material/CircularProgress";
+import Alert from "@mui/material/Alert";
 
-import { ArrowLeft, PlayCircle } from 'lucide-react';
-import LearnVideoSkeleton from '@/app/(main)/courses/components/LearnVideoSkeleton';
+import { ArrowLeft, PlayCircle } from "lucide-react";
+import LearnVideoSkeleton from "@/app/(main)/courses/components/LearnVideoSkeleton";
+import theme from "@/theme";
 
 type Quiz = {
   _id: string;
@@ -45,7 +46,7 @@ function toYouTubeEmbedUrl(url?: string) {
 
   // If it's already an embed URL, normalize and return
   if (/youtube\.com\/embed\//i.test(raw)) {
-    return raw.startsWith('http') ? raw : `https:${raw}`;
+    return raw.startsWith("http") ? raw : `https:${raw}`;
   }
 
   // If user stored only the video ID
@@ -53,31 +54,31 @@ function toYouTubeEmbedUrl(url?: string) {
 
   try {
     // Ensure we can parse even if protocol is missing
-    const u = raw.startsWith('http') ? new URL(raw) : new URL(`https://${raw}`);
+    const u = raw.startsWith("http") ? new URL(raw) : new URL(`https://${raw}`);
 
     // youtu.be/<id>
-    if (u.hostname.includes('youtu.be')) {
-      const id = u.pathname.split('/').filter(Boolean)[0];
+    if (u.hostname.includes("youtu.be")) {
+      const id = u.pathname.split("/").filter(Boolean)[0];
       if (id && /^[a-zA-Z0-9_-]{11}$/.test(id)) {
         return `https://www.youtube.com/embed/${id}`;
       }
     }
 
     // youtube.com/watch?v=<id>
-    if (u.pathname === '/watch' && u.searchParams.get('v')) {
-      const id = u.searchParams.get('v')!;
+    if (u.pathname === "/watch" && u.searchParams.get("v")) {
+      const id = u.searchParams.get("v")!;
       return `https://www.youtube.com/embed/${id}`;
     }
 
     // youtube.com/shorts/<id>
-    if (u.pathname.startsWith('/shorts/')) {
-      const id = u.pathname.split('/')[2];
+    if (u.pathname.startsWith("/shorts/")) {
+      const id = u.pathname.split("/")[2];
       if (id) return `https://www.youtube.com/embed/${id}`;
     }
 
     // youtube.com/live/<id>
-    if (u.pathname.startsWith('/live/')) {
-      const id = u.pathname.split('/')[2];
+    if (u.pathname.startsWith("/live/")) {
+      const id = u.pathname.split("/")[2];
       if (id) return `https://www.youtube.com/embed/${id}`;
     }
   } catch {
@@ -94,9 +95,14 @@ function toYouTubeEmbedUrl(url?: string) {
 export default function LearnVideoPage() {
   const params = useParams();
   const router = useRouter();
-  const courseId = (Array.isArray(params?.id) ? params.id[0] : (params?.id as string | undefined)) || '';
-  const indexParam = Array.isArray(params?.videoIndex) ? params.videoIndex[0] : (params?.videoIndex as string | undefined);
-  const videoIndex = Math.max(0, parseInt(indexParam || '0', 10) || 0);
+  const courseId =
+    (Array.isArray(params?.id)
+      ? params.id[0]
+      : (params?.id as string | undefined)) || "";
+  const indexParam = Array.isArray(params?.videoIndex)
+    ? params.videoIndex[0]
+    : (params?.videoIndex as string | undefined);
+  const videoIndex = Math.max(0, parseInt(indexParam || "0", 10) || 0);
 
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
@@ -104,8 +110,14 @@ export default function LearnVideoPage() {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [answers, setAnswers] = useState<Record<string, number[]>>({});
   const [submitting, setSubmitting] = useState(false);
-  const [result, setResult] = useState<{ score: number; passed: boolean } | null>(null);
-  const [prevResult, setPrevResult] = useState<{ score: number; passed: boolean } | null>(null);
+  const [result, setResult] = useState<{
+    score: number;
+    passed: boolean;
+  } | null>(null);
+  const [prevResult, setPrevResult] = useState<{
+    score: number;
+    passed: boolean;
+  } | null>(null);
   const [marking, setMarking] = useState(false);
   const [completed, setCompleted] = useState(false);
   const playerRef = useRef<HTMLDivElement | null>(null);
@@ -115,15 +127,15 @@ export default function LearnVideoPage() {
     (async () => {
       try {
         const res = await fetch(`/api/courses/${courseId}`);
-        if (!res.ok) throw new Error('Failed to load course');
+        if (!res.ok) throw new Error("Failed to load course");
         const data = await res.json();
         if (mounted) setCourse(data.course);
       } catch (e: unknown) {
         console.error(e);
         if (e instanceof Error) {
-          toast.error(e.message || 'Failed to load course');
+          toast.error(e.message || "Failed to load course");
         } else {
-          toast.error('Failed to load course');
+          toast.error("Failed to load course");
         }
       } finally {
         if (mounted) setLoading(false);
@@ -137,10 +149,12 @@ export default function LearnVideoPage() {
   const links = useMemo(() => course?.youtubeLinks || [], [course]);
   const videoUrl = links[videoIndex];
   const embed = toYouTubeEmbedUrl(videoUrl);
-  const hasNext = videoIndex < (links.length - 1);
+  const hasNext = videoIndex < links.length - 1;
   const hasPrev = videoIndex > 0;
   // Enable Next if: current result passed, previous attempt passed, or already completed
-  const canGoNext = hasNext && ((result?.passed ?? false) || (prevResult?.passed ?? false) || completed);
+  const canGoNext =
+    hasNext &&
+    ((result?.passed ?? false) || (prevResult?.passed ?? false) || completed);
 
   // Load quizzes for this video after user clicks "Mark as done"
   useEffect(() => {
@@ -149,10 +163,12 @@ export default function LearnVideoPage() {
     (async () => {
       try {
         const res = await fetch(`/api/courses/${course._id}/quizzes`);
-        if (!res.ok) throw new Error('Failed to load quizzes');
+        if (!res.ok) throw new Error("Failed to load quizzes");
         const data = await res.json();
         if (!abort) {
-          const list: Quiz[] = (data.quizzes || []).filter((q: Quiz) => q.videoUrl === videoUrl);
+          const list: Quiz[] = (data.quizzes || []).filter(
+            (q: Quiz) => q.videoUrl === videoUrl
+          );
           setQuizzes(list);
           setAnswers({});
           setResult(null);
@@ -161,14 +177,16 @@ export default function LearnVideoPage() {
         if (!abort) {
           console.error(e);
           if (e instanceof Error) {
-            toast.error(e.message || 'Failed to load quizzes');
+            toast.error(e.message || "Failed to load quizzes");
           } else {
-            toast.error('Failed to load quizzes');
+            toast.error("Failed to load quizzes");
           }
         }
       }
     })();
-    return () => { abort = true; };
+    return () => {
+      abort = true;
+    };
   }, [showQuiz, course?._id, videoUrl]);
 
   // After course + videoUrl known, fetch progress to decide if quiz should show
@@ -177,11 +195,15 @@ export default function LearnVideoPage() {
     let abort = false;
     (async () => {
       try {
-        const res = await fetch(`/api/courses/${courseId}/progress`, { cache: 'no-store' });
+        const res = await fetch(`/api/courses/${courseId}/progress`, {
+          cache: "no-store",
+        });
         if (!res.ok) return;
         const data = await res.json();
         if (abort) return;
-        const done = Array.isArray(data.completedVideos) && data.completedVideos.includes(videoUrl);
+        const done =
+          Array.isArray(data.completedVideos) &&
+          data.completedVideos.includes(videoUrl);
         setCompleted(done);
         // Show quiz if this video is either completed or was the last unlocked
         const unlocked = data.lastVideoUrl === videoUrl || done;
@@ -203,12 +225,15 @@ export default function LearnVideoPage() {
       try {
         const res = await fetch(
           `/api/courses/${courseId}/quizzes/submission?videoUrl=${encodeURIComponent(videoUrl)}`,
-          { cache: 'no-store' }
+          { cache: "no-store" }
         );
         if (!res.ok) return;
         const data = await res.json();
         if (!abort && data?.submission) {
-          setPrevResult({ score: data.submission.score, passed: data.submission.passed });
+          setPrevResult({
+            score: data.submission.score,
+            passed: data.submission.passed,
+          });
         } else if (!abort) {
           setPrevResult(null);
         }
@@ -234,7 +259,14 @@ export default function LearnVideoPage() {
       if (!res.ok) throw new Error(data.error || "Failed to unlock quiz");
       setShowQuiz(true);
       toast.success("Quiz unlocked for this video");
-      setTimeout(() => playerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+      setTimeout(
+        () =>
+          playerRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          }),
+        50
+      );
     } catch (e: unknown) {
       if (e instanceof Error) {
         toast.error(e.message || "Failed to unlock quiz");
@@ -251,33 +283,35 @@ export default function LearnVideoPage() {
     if (!course?._id || !videoUrl || quizzes.length === 0) return;
     setSubmitting(true);
     try {
-      const responses = quizzes.map(q => ({
+      const responses = quizzes.map((q) => ({
         quizId: q._id,
         selected: answers[q._id] || [],
       }));
       const res = await fetch(`/api/courses/${course._id}/quizzes/submit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ videoUrl, responses }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Submit failed');
+      if (!res.ok) throw new Error(data.error || "Submit failed");
       setResult({ score: data.score, passed: data.passed });
       setPrevResult({ score: data.score, passed: data.passed }); // keep previous-attempt panel in sync
       if (data.passed) {
         setCompleted(true);
-        fetch(`/api/courses/${courseId}/progress`, { cache: 'no-store' }).catch(() => {});
+        fetch(`/api/courses/${courseId}/progress`, { cache: "no-store" }).catch(
+          () => {}
+        );
       }
-      if (!data.passed) toast('Score < 70%. Try again.', { icon: '📝' });
+      if (!data.passed) toast("Score < 70%. Try again.", { icon: "📝" });
       if (data.passed && hasNext) {
         // Optionally auto-advance after a short delay
         // setTimeout(() => router.push(`/courses/${courseId}/learn/${videoIndex + 1}`), 800);
       }
     } catch (e: unknown) {
       if (e instanceof Error) {
-        toast.error(e.message || 'Failed to submit');
+        toast.error(e.message || "Failed to submit");
       } else {
-        toast.error('Failed to submit');
+        toast.error("Failed to submit");
       }
     } finally {
       setSubmitting(false);
@@ -292,7 +326,10 @@ export default function LearnVideoPage() {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Alert severity="error">Video not available.</Alert>
-        <Button sx={{ mt: 2 }} onClick={() => router.push(`/courses/${courseId}`)}>
+        <Button
+          sx={{ mt: 2 }}
+          onClick={() => router.push(`/courses/${courseId}`)}
+        >
           Back to course
         </Button>
       </Container>
@@ -301,41 +338,84 @@ export default function LearnVideoPage() {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Button startIcon={<ArrowLeft />} onClick={() => router.push(`/courses/${courseId}`)} sx={{ mb: 2 }}>
+      <Button
+        startIcon={<ArrowLeft />}
+        onClick={() => router.push(`/courses/${courseId}`)}
+        sx={{ mb: 2 }}
+      >
         Back to course
       </Button>
 
-      <Paper sx={{ p: 3, borderRadius: 3 }}>
+      <Paper
+        elevation={10}
+        sx={{
+          p: 3,
+          mb: 4,
+          position: "relative",
+          zIndex: 1,
+          backdropFilter: "blur(10px) saturate(1.08)",
+          WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+          borderRadius: 3,
+          boxShadow:
+            theme.palette.mode === "dark"
+              ? "0 10px 40px rgba(0,0,0,0.45)"
+              : "0 10px 40px rgba(0,0,0,0.12)",
+          transition: "background-color 200ms ease, backdrop-filter 200ms ease",
+          "&:hover": {
+            boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+          },
+        }}
+      >
         <Typography variant="h5" fontWeight={700} sx={{ mb: 2 }}>
           {course.title}
         </Typography>
-        <Stack direction="row" spacing={1} sx={{ mb: 2, flexWrap: 'wrap' }}>
-          <Chip label={`Video ${videoIndex + 1} / ${links.length}`} size="small" />
+        <Stack direction="row" spacing={1} sx={{ mb: 2, flexWrap: "wrap" }}>
+          <Chip
+            label={`Video ${videoIndex + 1} / ${links.length}`}
+            size="small"
+          />
           <Chip label={course.level} size="small" />
-          {course.tags?.slice(0, 3).map(t => <Chip key={t} label={t} size="small" />)}
+          {course.tags
+            ?.slice(0, 3)
+            .map((t) => <Chip key={t} label={t} size="small" />)}
         </Stack>
 
         {/* Player */}
         {embed ? (
-          <Box ref={playerRef} sx={{ position: 'relative', pb: '56.25%', borderRadius: 2, overflow: 'hidden', mb: 2 }}>
+          <Box
+            ref={playerRef}
+            sx={{
+              position: "relative",
+              pb: "56.25%",
+              borderRadius: 2,
+              overflow: "hidden",
+              mb: 2,
+            }}
+          >
             <Box
               component="iframe"
               src={`${embed}?rel=0&autoplay=1`}
               title={course.title}
               allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
-              sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }}
+              sx={{
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: "100%",
+                border: 0,
+              }}
             />
           </Box>
         ) : (
           <Box
             sx={{
               height: 240,
-              background: 'linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)',
+              background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
               borderRadius: 2,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
               mb: 2,
             }}
           >
@@ -344,32 +424,51 @@ export default function LearnVideoPage() {
         )}
 
         {/* Mark as done -> reveals quiz */}
-        <Stack direction="row" spacing={2} sx={{ mb: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+        <Stack
+          direction="row"
+          spacing={2}
+          sx={{ mb: 2, alignItems: "center", flexWrap: "wrap" }}
+        >
           <Button
             variant="contained"
             onClick={handleMarkAsDone}
             disabled={marking || showQuiz}
           >
-            {marking ? <CircularProgress size={20} color="inherit" /> : (showQuiz ? "Quiz unlocked" : "Mark as done")}
+            {marking ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : showQuiz ? (
+              "Quiz unlocked"
+            ) : (
+              "Mark as done"
+            )}
           </Button>
           <Button
             variant="outlined"
             disabled={!hasPrev}
-            onClick={() => router.push(`/courses/${courseId}/learn/${videoIndex - 1}`)}
+            onClick={() =>
+              router.push(`/courses/${courseId}/learn/${videoIndex - 1}`)
+            }
           >
             Previous
           </Button>
           <Button
             variant="outlined"
             disabled={!canGoNext}
-            onClick={() => router.push(`/courses/${courseId}/learn/${videoIndex + 1}`)}
+            onClick={() =>
+              router.push(`/courses/${courseId}/learn/${videoIndex + 1}`)
+            }
           >
             Next
           </Button>
 
           {prevResult && (
-            <Typography variant="body2" sx={{ ml: { xs: 0, sm: 1 } }} color={prevResult.passed ? 'success.main' : 'warning.main'}>
-              Last attempt: {prevResult.score}% — {prevResult.passed ? 'Passed' : 'Not passed'}
+            <Typography
+              variant="body2"
+              sx={{ ml: { xs: 0, sm: 1 } }}
+              color={prevResult.passed ? "success.main" : "warning.main"}
+            >
+              Last attempt: {prevResult.score}% —{" "}
+              {prevResult.passed ? "Passed" : "Not passed"}
             </Typography>
           )}
         </Stack>
@@ -378,31 +477,56 @@ export default function LearnVideoPage() {
         {showQuiz && (
           <>
             <Divider sx={{ my: 2 }} />
-            <Typography variant="h6" sx={{ mb: 1 }}>Quiz</Typography>
+            <Typography variant="h6" sx={{ mb: 1 }}>
+              Quiz
+            </Typography>
             {quizzes.length === 0 ? (
-              <Typography variant="body2" color="text.secondary">No quiz for this video.</Typography>
+              <Typography variant="body2" color="text.secondary">
+                No quiz for this video.
+              </Typography>
             ) : (
               <Stack spacing={2}>
-                {quizzes.map(q => (
+                {quizzes.map((q) => (
                   <Paper key={q._id} sx={{ p: 2, borderRadius: 2 }}>
-                    <Typography variant="subtitle1" sx={{ mb: 1 }}>{q.question}</Typography>
+                    <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                      {q.question}
+                    </Typography>
                     <RadioGroup
                       value={(answers[q._id]?.[0] ?? -1).toString()}
-                      onChange={(_, v) => setAnswers(prev => ({ ...prev, [q._id]: [Number(v)] }))}
+                      onChange={(_, v) =>
+                        setAnswers((prev) => ({
+                          ...prev,
+                          [q._id]: [Number(v)],
+                        }))
+                      }
                     >
                       {q.answers.map((a, i) => (
-                        <FormControlLabel key={i} value={i.toString()} control={<Radio />} label={a.text} />
+                        <FormControlLabel
+                          key={i}
+                          value={i.toString()}
+                          control={<Radio />}
+                          label={a.text}
+                        />
                       ))}
                     </RadioGroup>
                   </Paper>
                 ))}
                 <Stack direction="row" spacing={2} alignItems="center">
-                  <Button variant="contained" onClick={onSubmit} disabled={submitting}>
-                    {submitting ? <CircularProgress size={20} color="inherit" /> : 'Submit Quiz'}
+                  <Button
+                    variant="contained"
+                    onClick={onSubmit}
+                    disabled={submitting}
+                  >
+                    {submitting ? (
+                      <CircularProgress size={20} color="inherit" />
+                    ) : (
+                      "Submit Quiz"
+                    )}
                   </Button>
                   {result && (
                     <Typography variant="body2">
-                      Score: {result.score}% — {result.passed ? 'Passed' : 'Try again'}
+                      Score: {result.score}% —{" "}
+                      {result.passed ? "Passed" : "Try again"}
                     </Typography>
                   )}
                 </Stack>

@@ -182,39 +182,16 @@ export default function SignupPage() {
         py: 4,
       }}
     >
-      {/* Animated Background Shapes */}
-      <BackgroundShape
-        className="shape1"
-        color="#28A745"
-        opacity="0.1"
-        width={450}
-        height={450}
-        cx={225}
-        cy={225}
-        rx={200}
-        ry={220}
-      />
       <BackgroundShape
         className="shape2"
-        color="#FF6B6B"
+        color="#6A0DAD"
         opacity="0.15"
-        width={350}
-        height={400}
-        cx={175}
-        cy={200}
-        rx={150}
-        ry={180}
-      />
-      <BackgroundShape
-        className="shape3"
-        color="#FFD700"
-        opacity="0.08"
-        width={300}
+        width={600}
         height={300}
-        cx={150}
+        cx={300}
         cy={150}
-        rx={120}
-        ry={140}
+        rx={250}
+        ry={120}
       />
 
       {/* Floating Elements */}
@@ -761,7 +738,7 @@ export default function SignupPage() {
                     </Button>
                   </motion.div>
 
-                  <Divider sx={{ my: 3 }}>
+                  <Divider sx={{ mb:2 }}>
                     <Typography variant="body2" color="text.secondary">
                       Already have an account?
                     </Typography>
@@ -806,34 +783,7 @@ export default function SignupPage() {
         </motion.div>
       </Container>
 
-      {/* Additional floating elements */}
-      <motion.div
-        animate={{
-          rotate: [0, 360],
-        }}
-        transition={{
-          duration: 25,
-          repeat: Infinity,
-          ease: "linear",
-        }}
-        style={{
-          position: "absolute",
-          top: "70%",
-          right: "3%",
-          zIndex: 1,
-        }}
-      >
-        <Box
-          sx={{
-            width: 35,
-            height: 35,
-            borderRadius: "6px",
-            background: "rgba(40, 167, 69, 0.2)",
-            backdropFilter: "blur(10px)",
-            border: "1px solid rgba(40, 167, 69, 0.3)",
-          }}
-        />
-      </motion.div>
+      
 
       {/* CSS for shape animations */}
       <style jsx global>{`

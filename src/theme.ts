@@ -45,6 +45,10 @@ declare module "@mui/material/styles" {
       primary: string;
       secondary: string;
     };
+    layoutbackground: {
+      primary: string;
+      secondary: string;
+    };
     textblack?: {
       main: string;
       contrastText: string;
@@ -119,6 +123,10 @@ const theme = createTheme({
           primary: "#1A1A1A",
           secondary: "#4D4D4D",
         },
+        layoutbackground: {
+          primary: "#f2f3f3ff",
+          secondary: "#4D4D4D",
+        },
         textblack: {
           main: '#ffffff',
           contrastText: '#000000',
@@ -189,6 +197,10 @@ const theme = createTheme({
         backgroundcolor: {
           primary: "#FFFFFF",
           secondary: "#B0B0B0",
+        },
+        layoutbackground: {
+          primary: "#1A1A1A",
+          secondary: "#4D4D4D",
         },
         textblack: {
           main: '#000000',

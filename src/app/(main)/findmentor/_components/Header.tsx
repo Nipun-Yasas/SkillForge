@@ -19,7 +19,7 @@ import {
   AccessTime as AccessTimeIcon,
   Search as SearchIcon,
 } from "@mui/icons-material";
-
+import theme from "@/theme";
 interface HeaderProps {
   onSearch?: (query: string) => void;
   onFilterChange?: (filters: string[]) => void;
@@ -88,13 +88,26 @@ export default function Header({ onSearch, onFilterChange }: HeaderProps) {
 
   return (
     <Paper
-      elevation={6}
-      sx={{
-        mb: 5,
-        borderRadius: 4,
-        p: 4,
-        border: "1px solid rgba(255, 255, 255, 0.2)",
-      }}
+      elevation={10}
+          sx={{
+            textAlign: "center",
+            p: 4,
+            mb: 4,
+            position: "relative",
+            zIndex: 1,
+            backdropFilter: "blur(10px) saturate(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+            borderRadius: 3,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 40px rgba(0,0,0,0.45)"
+                : "0 10px 40px rgba(0,0,0,0.12)",
+            transition:
+              "background-color 200ms ease, backdrop-filter 200ms ease",
+            "&:hover": {
+              boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+            },
+          }}
     >
       {/* Header Title */}
       <Box sx={{ textAlign: "center", mb: 4 }}>

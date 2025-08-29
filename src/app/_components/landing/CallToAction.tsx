@@ -6,6 +6,7 @@ import Image from "next/image";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import { motion } from "framer-motion";
 
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -151,16 +152,24 @@ export default function Hero() {
         }}
       >
         <Box
+          component={motion.div}
+          animate={{ y: [0, -18, 0], rotate: [0, 4, 0] }}
+          transition={{
+            y: { duration: 3.5, repeat: Infinity, ease: "easeInOut" },
+            rotate: { duration: 30, repeat: Infinity, ease: "linear" },
+          }}
           sx={{
             position: "absolute",
             width: { xs: 300, md: 350 },
-            left: { xs: "60%", md: "40%" },
-            top: "60%",
-            backgroundColor: "shapeColor.main",
+            left: { xs: "10%", md: "20%" },
+            top: "20%",
+            backgroundColor: "#d49dfbff",
             borderRadius: "70% 10% 80% 20% / 20% 10% 90% 100%",
             height: { xs: 450, md: 450 },
             transform: "translate(-50%, -50%)",
             zIndex: 1,
+            opacity: 0.9,
+            willChange: "transform",
           }}
         />
 

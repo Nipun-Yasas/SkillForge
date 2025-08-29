@@ -46,7 +46,7 @@ import { motion } from "framer-motion";
 
 import { useAuth } from "@/contexts/AuthContext";
 import ManageCoursesSkeleton from "./components/ManageCoursesSkeleton";
-
+import theme from "@/theme";
 interface Course {
   _id: string;
   title: string;
@@ -138,7 +138,10 @@ export default function CourseManagementPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: string;
+    title: string;
+  } | null>(null);
   const router = useRouter();
 
   // Check if user is authorized
@@ -419,20 +422,25 @@ export default function CourseManagementPage() {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      const response = await fetch(`/api/courses/${deleteTarget.id}`, { method: "DELETE" });
+      const response = await fetch(`/api/courses/${deleteTarget.id}`, {
+        method: "DELETE",
+      });
       const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error || "Failed to delete course");
+      if (!response.ok)
+        throw new Error(data.error || "Failed to delete course");
       toast.success("Course deleted successfully");
       setCourses((prev) => prev.filter((c) => c._id !== deleteTarget.id));
       setDeleteOpen(false);
       setDeleteTarget(null);
     } catch (error: unknown) {
       console.error("Delete course error:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to delete course");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to delete course"
+      );
     } finally {
       setDeleting(false);
     }
-  }
+  };
 
   const handleTogglePublish = async (course: Course) => {
     try {
@@ -471,7 +479,10 @@ export default function CourseManagementPage() {
 
   if (!user || !["mentor", "both", "admin"].includes(user.role)) {
     return (
-      <Container maxWidth="lg" sx={{ py: 8, display: "flex", justifyContent: "center" }}>
+      <Container
+        maxWidth="lg"
+        sx={{ py: 8, display: "flex", justifyContent: "center" }}
+      >
         <Typography variant="h6" color="text.secondary">
           You are not a mentor.
         </Typography>
@@ -495,7 +506,6 @@ export default function CourseManagementPage() {
             mb: 4,
           }}
         >
-          
           <Button
             variant="contained"
             startIcon={<Add />}
@@ -521,15 +531,24 @@ export default function CourseManagementPage() {
             {courses.map((course) => (
               <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={course._id}>
                 <Card
+                  elevation={10}
                   sx={{
                     height: "100%",
                     display: "flex",
                     flexDirection: "column",
+                    position: "relative",
+                    zIndex: 1,
+                    backdropFilter: "blur(10px) saturate(1.08)",
+                    WebkitBackdropFilter: "blur(10px) saturate(1.08)",
                     borderRadius: 3,
-                    boxShadow: "0 4px 20px rgba(0, 123, 255, 0.1)",
-                    transition: "all 0.3s ease",
+                    boxShadow:
+                      theme.palette.mode === "dark"
+                        ? "0 10px 40px rgba(0,0,0,0.45)"
+                        : "0 10px 40px rgba(0,0,0,0.12)",
+                    transition:
+                      "background-color 200ms ease, backdrop-filter 200ms ease",
                     "&:hover": {
-                      boxShadow: "0 8px 30px rgba(0, 123, 255, 0.2)",
+                      boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
                     },
                   }}
                 >

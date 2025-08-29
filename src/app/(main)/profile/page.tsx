@@ -27,6 +27,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { BookOpen, Plus, X, Save, Camera, Edit, Target } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import ProfileSkeleton from "./components/ProfileSkeleton";
+import theme from "../../../theme";
 
 import toast from "react-hot-toast";
 
@@ -154,6 +155,15 @@ const skillCategories = {
     "Presentation Skills",
   ],
 };
+
+// Availability options
+const availabilities = [
+  "Weekdays",
+  "Weekends",
+  "Evenings",
+  "Mornings",
+  "Flexible",
+] as const;
 
 // Flatten all skills for autocomplete
 // const allSkills = Object.values(skillCategories).flat();
@@ -390,12 +400,14 @@ export default function ProfilePage() {
             mb: 4,
           }}
         >
-          <Box sx={{
-            mb: 4,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}>
+          <Box
+            sx={{
+              mb: 4,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
             <Typography
               variant="h3"
               fontWeight="bold"
@@ -409,33 +421,52 @@ export default function ProfilePage() {
             >
               My Profile
             </Typography>
-             <Button
-            variant={isEditing ? "outlined" : "contained"}
-            startIcon={isEditing ? <X /> : <Edit />}
-            onClick={() => setIsEditing(!isEditing)}
-            sx={{
-              background: isEditing
-                ? "transparent"
-                : "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
-              "&:hover": {
+            <Button
+              variant={isEditing ? "outlined" : "contained"}
+              startIcon={isEditing ? <X /> : <Edit />}
+              onClick={() => setIsEditing(!isEditing)}
+              sx={{
                 background: isEditing
-                  ? "rgba(0, 123, 255, 0.1)"
-                  : "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
-              },
-            }}
-          >
-            {isEditing ? "Cancel" : "Edit Profile"}
-          </Button>
-           
+                  ? "transparent"
+                  : "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                "&:hover": {
+                  background: isEditing
+                    ? "rgba(0, 123, 255, 0.1)"
+                    : "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
+                },
+              }}
+            >
+              {isEditing ? "Cancel" : "Edit Profile"}
+            </Button>
           </Box>
-             <Typography variant="h6" color="text.secondary">
-              Manage your profile and skills to get better mentor matches
-            </Typography>
-         
+          <Typography variant="h6" color="text.secondary">
+            Manage your profile and skills to get better mentor matches
+          </Typography>
         </Box>
 
         {/* Profile Picture & Basic Info */}
-        <Paper sx={{ p: 4, mb: 4, borderRadius: 3 }}>
+        <Paper
+          elevation={10}
+          sx={{
+            textAlign: "center",
+            p: 4,
+            mb: 4,
+            position: "relative",
+            zIndex: 1,
+            backdropFilter: "blur(10px) saturate(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+            borderRadius: 3,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 40px rgba(0,0,0,0.45)"
+                : "0 10px 40px rgba(0,0,0,0.12)",
+            transition:
+              "background-color 200ms ease, backdrop-filter 200ms ease",
+            "&:hover": {
+              boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+            },
+          }}
+        >
           <Box
             sx={{
               display: "flex",
@@ -590,7 +621,28 @@ export default function ProfilePage() {
         </Paper>
 
         {/* Skills Section */}
-        <Paper sx={{ p: 4, mb: 4, borderRadius: 3 }}>
+        <Paper
+          elevation={10}
+          sx={{
+            textAlign: "center",
+            p: 4,
+            mb: 4,
+            position: "relative",
+            zIndex: 1,
+            backdropFilter: "blur(10px) saturate(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+            borderRadius: 3,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 40px rgba(0,0,0,0.45)"
+                : "0 10px 40px rgba(0,0,0,0.12)",
+            transition:
+              "background-color 200ms ease, backdrop-filter 200ms ease",
+            "&:hover": {
+              boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+            },
+          }}
+        >
           <Typography
             variant="h5"
             fontWeight="bold"
@@ -749,7 +801,28 @@ export default function ProfilePage() {
         </Paper>
 
         {/* Learning Goals & Availability */}
-        <Paper sx={{ p: 4, mb: 4, borderRadius: 3 }}>
+        <Paper
+          elevation={10}
+          sx={{
+            textAlign: "center",
+            p: 4,
+            mb: 4,
+            position: "relative",
+            zIndex: 1,
+            backdropFilter: "blur(10px) saturate(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+            borderRadius: 3,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 40px rgba(0,0,0,0.45)"
+                : "0 10px 40px rgba(0,0,0,0.12)",
+            transition:
+              "background-color 200ms ease, backdrop-filter 200ms ease",
+            "&:hover": {
+              boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+            },
+          }}
+        >
           <Typography
             variant="h5"
             fontWeight="bold"
@@ -771,14 +844,22 @@ export default function ProfilePage() {
             sx={{ mb: 3 }}
           />
 
-          <TextField
-            fullWidth
-            label="Availability"
-            placeholder="e.g., Weekday evenings, Weekend mornings, Flexible"
-            value={formData.availability}
-            onChange={(e) => handleInputChange("availability", e.target.value)}
-            disabled={!isEditing}
-          />
+          <FormControl fullWidth disabled={!isEditing}>
+            <InputLabel>Availability</InputLabel>
+            <Select
+              value={formData.availability || ""}
+              label="Availability"
+              onChange={(e) =>
+                handleInputChange("availability", e.target.value as string)
+              }
+            >
+              {availabilities.map((opt) => (
+                <MenuItem key={opt} value={opt}>
+                  {opt}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Paper>
 
         {/* Save Button */}

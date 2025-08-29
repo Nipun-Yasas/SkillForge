@@ -136,18 +136,6 @@ export default function LoginPage() {
         py: 4,
       }}
     >
-      {/* Animated Background Shapes */}
-      <BackgroundShape
-        className="shape1"
-        color="#007BFF"
-        opacity="0.1"
-        width={400}
-        height={400}
-        cx={200}
-        cy={200}
-        rx={180}
-        ry={200}
-      />
       <BackgroundShape
         className="shape2"
         color="#6A0DAD"
@@ -159,18 +147,7 @@ export default function LoginPage() {
         rx={250}
         ry={120}
       />
-      <BackgroundShape
-        className="shape3"
-        color="#FF6B6B"
-        opacity="0.08"
-        width={350}
-        height={350}
-        cx={175}
-        cy={175}
-        rx={150}
-        ry={170}
-      />
-
+      
       {/* Floating Elements */}
       <motion.div
         animate={{
@@ -633,7 +610,7 @@ export default function LoginPage() {
                     </Button>
                   </motion.div>
 
-                  <Divider sx={{ my: 3 }}>
+                  <Divider sx={{ mb: 2 }}>
                     <Typography variant="body2" color="text.secondary">
                       New to SkillForge?
                     </Typography>
@@ -677,35 +654,6 @@ export default function LoginPage() {
           </Box>
         </motion.div>
       </Container>
-
-      {/* Additional floating elements */}
-      <motion.div
-        animate={{
-          rotate: [0, 360],
-        }}
-        transition={{
-          duration: 20,
-          repeat: Infinity,
-          ease: "linear",
-        }}
-        style={{
-          position: "absolute",
-          top: "60%",
-          right: "5%",
-          zIndex: 1,
-        }}
-      >
-        <Box
-          sx={{
-            width: 40,
-            height: 40,
-            borderRadius: "8px",
-            background: "rgba(255, 215, 0, 0.2)",
-            backdropFilter: "blur(10px)",
-            border: "1px solid rgba(255, 215, 0, 0.3)",
-          }}
-        />
-      </motion.div>
 
       {/* CSS for shape animations */}
       <style jsx global>{`

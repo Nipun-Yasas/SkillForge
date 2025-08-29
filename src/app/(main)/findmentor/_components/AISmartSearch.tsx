@@ -14,19 +14,19 @@ import {
   Stack,
   Rating,
   CircularProgress,
-  Alert,
   Fade,
-  InputAdornment
+  InputAdornment,
 } from '@mui/material';
 import {
   AutoAwesome as AIIcon,
   Send as SendIcon,
   Person as PersonIcon,
   School as SchoolIcon,
-  AttachMoney as MoneyIcon
+  AttachMoney as MoneyIcon,
+  SearchOff as SearchOffIcon
 } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
-
+import theme from '@/theme';
 interface Mentor {
   id: string;
   name: string;
@@ -39,7 +39,6 @@ interface Mentor {
   hourlyRate: string;
   availability: string;
 }
-
 interface AIRecommendationResponse {
   recommendations: Mentor[];
   query: string;
@@ -52,8 +51,9 @@ export default function AISmartSearch() {
   const [prompt, setPrompt] = useState("");
   const [recommendations, setRecommendations] = useState<Mentor[]>([]);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
   const [aiGenerated, setAiGenerated] = useState(false);
+  const [message, setMessage] = useState<string>("");
+  const [searched, setSearched] = useState(false);
   const router = useRouter();
 
   const samplePrompts = [
@@ -70,8 +70,8 @@ export default function AISmartSearch() {
     setLoading(true);
     setRecommendations([]);
     setMessage("");
-
-    console.log('🔍 Starting AI search with prompt:', prompt);
+    setAiGenerated(false);
+    setSearched(true);
 
     try {
       const response = await fetch('/api/recommend', {
@@ -86,27 +86,24 @@ export default function AISmartSearch() {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('❌ API Error:', errorText);
+        console.error('API Error:', errorText);
         throw new Error(`Failed to get recommendations: ${response.status}`);
       }
 
       const data: AIRecommendationResponse = await response.json();
-      console.log('✅ API Response data:', data);
+      console.log('API Response data:', data);
       
       setRecommendations(data.recommendations);
-      setMessage(data.message);
+     if (Array.isArray(data.recommendations) && data.recommendations.length === 0) {
+       setMessage(`No match found for "${data.query || prompt}".`);
+     } else {
+       setMessage(data.message || "");
+     }
       setAiGenerated(data.aiGenerated);
 
-      // Success toast for debugging
-      if (data.aiGenerated) {
-        console.log('🤖 AI-powered recommendations received!');
-      } else {
-        console.log('🔧 Fallback recommendations received');
-      }
-
     } catch (err) {
-      console.error('❌ AI search error:', err);
-      setMessage('Unable to get recommendations right now. Please try again later.');
+      console.error('AI search error:', err);
+     setMessage('Unable to get recommendations right now. Please try again later.');
       setAiGenerated(false);
     } finally {
       setLoading(false);
@@ -160,25 +157,32 @@ export default function AISmartSearch() {
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Example: 'I want to learn Figma and React basics to build modern web applications...'"
-            variant="outlined"
+            placeholder="Example: 'I want to learn Figma and React basics ..."
             disabled={loading}
             sx={{
-              color: "textblack.main",
               mb: 2,
               '& .MuiOutlinedInput-root': {
                 borderRadius: 2,
+                color: 'textblack.main',
                 '&.Mui-focused': {
                   '& .MuiOutlinedInput-notchedOutline': {
                     borderWidth: 2
                   }
                 }
-              }
+              },
+              '& .MuiInputBase-input::placeholder': {
+               color: 'textblack.main',
+               opacity: 1,
+             },
+             '& .MuiInputBase-input.MuiInputBase-inputMultiline::placeholder': {
+               color: 'textblack.main',
+               opacity: 1,
+             },
             }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <AIIcon color="action" />
+                  <AIIcon  sx={{ color: 'textblack.main' }} />
                 </InputAdornment>
               )
             }}
@@ -192,6 +196,7 @@ export default function AISmartSearch() {
             disabled={loading || !prompt.trim()}
             startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <SendIcon />}
             sx={{
+              color: 'textblack.main',
               background:
                     "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
                   borderRadius: 2,
@@ -231,56 +236,73 @@ export default function AISmartSearch() {
         </Box>
       </Paper>
 
-      {/* Results Section */}
-      {message && (
-        <Fade in={true}>
-          <Box sx={{ mb: 3 }}>
-            <Alert 
-              severity={aiGenerated ? "success" : "info"} 
-              sx={{ mb: 2, borderRadius: 2 }}
-              icon={aiGenerated ? <AIIcon /> : undefined}
-            >
-              <Box>
-                {message}
-                {aiGenerated && (
-                  <Typography variant="caption" display="block" sx={{ mt: 0.5, fontStyle: 'italic' }}>
-                    ✨ Powered by Gemini AI
-                  </Typography>
-                )}
-                {!aiGenerated && (
-                  <Typography variant="caption" display="block" sx={{ mt: 0.5, fontStyle: 'italic' }}>
-                    🔧 Smart keyword matching
-                  </Typography>
-                )}
-              </Box>
-            </Alert>
-          </Box>
-        </Fade>
-      )}
+      {/* No results state */}
+     {!loading && searched && aiGenerated && recommendations.length === 0 && (
+       <Paper elevation={10}
+          sx={{
+            textAlign: "center",
+            p: 3,
+            mb: 4,
+            position: "relative",
+            zIndex: 1,
+            backdropFilter: "blur(10px) saturate(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+            borderRadius: 3,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 40px rgba(0,0,0,0.45)"
+                : "0 10px 40px rgba(0,0,0,0.12)",
+            transition:
+              "background-color 200ms ease, backdrop-filter 200ms ease",
+            "&:hover": {
+              boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+            },
+          }}>
+         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+           <SearchOffIcon color="action" sx={{ fontSize: 48, mb: 1 }} />
+           <Typography variant="h6" fontWeight={600}>No match found</Typography>
+           {message && (
+             <Typography variant="body2" color="text.secondary">
+               {message}
+             </Typography>
+           )}
+           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+             Try different keywords or fewer skills. Example: “React mentor for beginners”
+           </Typography>
+         </Box>
+       </Paper>
+     )}
 
-      {/* AI Recommendations */}
       {recommendations.length > 0 && (
         <Fade in={true}>
           <Box>
             <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
-              🎯 AI Recommended Mentors for You
+               AI Recommended Mentors for You
             </Typography>
             
             <Stack spacing={2}>
               {recommendations.map((mentor, index) => (
                 <Card
                   key={mentor.id}
-                  sx={{
-                    borderRadius: 3,
-                    transition: 'all 0.3s ease-in-out',
-                    cursor: 'pointer',
-                    border: aiGenerated ? '2px solid' : '1px solid',
-                    borderColor: aiGenerated ? 'primary.main' : 'divider',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: '0 8px 16px rgba(0, 123, 255, 0.15)',
-                    }
-                  }}
+                 elevation={10}
+          sx={{
+            p: 3,
+            mb: 4,
+            position: "relative",
+            zIndex: 1,
+            backdropFilter: "blur(10px) saturate(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+            borderRadius: 3,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 40px rgba(0,0,0,0.45)"
+                : "0 10px 40px rgba(0,0,0,0.12)",
+            transition:
+              "background-color 200ms ease, backdrop-filter 200ms ease",
+            "&:hover": {
+              boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+            },
+          }}
                   onClick={() => handleViewProfile(mentor.id)}
                 >
                   <CardContent sx={{ p: 3 }}>

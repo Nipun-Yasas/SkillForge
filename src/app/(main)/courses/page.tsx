@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import toast from "react-hot-toast";
 
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
@@ -34,9 +35,8 @@ import {
   TrendingUp,
   Award,
 } from "lucide-react";
-
 import CourseCardSkeleton from "./components/CourseCardSkeleton";
-
+import theme from "@/theme";
 interface Course {
   _id: string;
   title: string;
@@ -59,8 +59,8 @@ interface Course {
   progress?: number;
   isEnrolled?: boolean;
   enrollmentId?: string;
-  youtubeLinks?: string[];           
-  totalDuration?: number | string;  
+  youtubeLinks?: string[];
+  totalDuration?: number | string;
 }
 
 interface CoursesResponse {
@@ -72,6 +72,10 @@ interface CoursesResponse {
 
 export default function CoursesPage() {
   const router = useRouter();
+  const { user } = useAuth();
+  const currentUserId =
+    (user as any)?._id || (user as any)?.id || (user as any)?.uid || "";
+
   const [courses, setCourses] = useState<Course[]>([]);
   const [categories, setCategories] = useState<string[]>(["All Categories"]);
   const [loading, setLoading] = useState(true);
@@ -109,19 +113,38 @@ export default function CoursesPage() {
       try {
         const params = new URLSearchParams();
         if (searchTerm) params.append("search", searchTerm);
-        if (selectedCategory !== "All Categories") params.append("category", selectedCategory);
-        if (selectedLevel !== "All Levels") params.append("level", selectedLevel);
+        if (selectedCategory !== "All Categories")
+          params.append("category", selectedCategory);
+        if (selectedLevel !== "All Levels")
+          params.append("level", selectedLevel);
         params.append("page", currentPage.toString());
         params.append("limit", "12");
         // Ask API to exclude current user's own courses
         params.append("excludeOwn", "1");
 
-        const response = await fetch(`/api/courses?${params}`);
+        const response = await fetch(`/api/courses?${params}`, {
+          credentials: "include",
+        });
         if (response.ok) {
           const data: CoursesResponse = await response.json();
-          setCourses(data.courses);
-          setTotalPages(data.totalPages);
-          setTotalCount(data.totalCount);
+          const original = data.courses || [];
+          const filtered = currentUserId
+            ? original.filter(
+                (c) => String(c?.instructor?.id) !== String(currentUserId)
+              )
+            : original;
+          setCourses(filtered);
+          // Adjust totals only if we filtered anything locally (API may already exclude)
+          const removed = original.length - filtered.length;
+          if (removed > 0) {
+            const perPage = 12;
+            const newTotal = Math.max(0, (data.totalCount || 0) - removed);
+            setTotalCount(newTotal);
+            setTotalPages(Math.max(1, Math.ceil(newTotal / perPage)));
+          } else {
+            setTotalPages(data.totalPages);
+            setTotalCount(data.totalCount);
+          }
         } else {
           toast.error("Failed to load courses");
         }
@@ -133,13 +156,15 @@ export default function CoursesPage() {
       }
     };
     fetchCourses();
-  }, [searchTerm, selectedCategory, selectedLevel, currentPage]);
+  }, [searchTerm, selectedCategory, selectedLevel, currentPage, currentUserId]);
 
   // Fetch unique active students (distinct enrolled users)
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("/api/courses/active-students", { cache: "no-store" });
+        const res = await fetch("/api/courses/active-students", {
+          cache: "no-store",
+        });
         if (!res.ok) return;
         const data = await res.json();
         setActiveStudents(Number(data.activeStudents) || 0);
@@ -173,22 +198,22 @@ export default function CoursesPage() {
     if (h) return `${h}h`;
     return `${m}m`;
   };
-  
+
   // Safely parse totalDuration (number | string) to minutes number
   const toMinutes = (v?: number | string) => {
     const n =
-      typeof v === "number"
-        ? v
-        : typeof v === "string"
-        ? parseFloat(v)
-        : NaN;
+      typeof v === "number" ? v : typeof v === "string" ? parseFloat(v) : NaN;
     return Number.isFinite(n) ? Math.round(n as number) : 0;
   };
 
   // Average progress across courses that have a numeric progress
   const completionRate = useMemo(() => {
     const nums = courses
-      .map((c) => (typeof c.progress === "number" ? Math.min(100, Math.max(0, Number(c.progress))) : null))
+      .map((c) =>
+        typeof c.progress === "number"
+          ? Math.min(100, Math.max(0, Number(c.progress)))
+          : null
+      )
       .filter((v): v is number => v !== null);
     if (!nums.length) return 0;
     const avg = nums.reduce((a, b) => a + b, 0) / nums.length;
@@ -210,7 +235,27 @@ export default function CoursesPage() {
         </Box>
 
         {/* Search and Filters */}
-        <Paper sx={{ p: 3, mb: 4, borderRadius: 3 }}>
+        <Paper
+          elevation={10}
+          sx={{
+            p: 3,
+            mb: 4,
+            position: "relative",
+            zIndex: 1,
+            backdropFilter: "blur(10px) saturate(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+            borderRadius: 3,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 40px rgba(0,0,0,0.45)"
+                : "0 10px 40px rgba(0,0,0,0.12)",
+            transition:
+              "background-color 200ms ease, backdrop-filter 200ms ease",
+            "&:hover": {
+              boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+            },
+          }}
+        >
           <Box
             sx={{
               display: "grid",
@@ -273,7 +318,29 @@ export default function CoursesPage() {
             gap: 2,
           }}
         >
-          <Paper sx={{ p: 2, textAlign: "center", borderRadius: 2 }}>
+          <Paper
+            elevation={10}
+            sx={{
+              p: 3,
+              textAlign: "center",
+              background: "linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)",
+              mb: 4,
+              position: "relative",
+              zIndex: 1,
+              backdropFilter: "blur(10px) saturate(1.08)",
+              WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+              borderRadius: 3,
+              boxShadow:
+                theme.palette.mode === "dark"
+                  ? "0 10px 40px rgba(0,0,0,0.45)"
+                  : "0 10px 40px rgba(0,0,0,0.12)",
+              transition:
+                "background-color 200ms ease, backdrop-filter 200ms ease",
+              "&:hover": {
+                boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+              },
+            }}
+          >
             <BookOpen size={24} color="#007BFF" />
             <Typography variant="h6" fontWeight="bold" sx={{ mt: 1 }}>
               {totalCount}
@@ -282,7 +349,29 @@ export default function CoursesPage() {
               Total Courses
             </Typography>
           </Paper>
-          <Paper sx={{ p: 2, textAlign: "center", borderRadius: 2 }}>
+          <Paper
+            elevation={10}
+            sx={{
+              p: 3,
+              textAlign: "center",
+              background: "linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%)",
+              mb: 4,
+              position: "relative",
+              zIndex: 1,
+              backdropFilter: "blur(10px) saturate(1.08)",
+              WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+              borderRadius: 3,
+              boxShadow:
+                theme.palette.mode === "dark"
+                  ? "0 10px 40px rgba(0,0,0,0.45)"
+                  : "0 10px 40px rgba(0,0,0,0.12)",
+              transition:
+                "background-color 200ms ease, backdrop-filter 200ms ease",
+              "&:hover": {
+                boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+              },
+            }}
+          >
             <Users size={24} color="#6A0DAD" />
             <Typography variant="h6" fontWeight="bold" sx={{ mt: 1 }}>
               {activeStudents.toLocaleString()}
@@ -291,7 +380,29 @@ export default function CoursesPage() {
               Active Students
             </Typography>
           </Paper>
-          <Paper sx={{ p: 2, textAlign: "center", borderRadius: 2 }}>
+          <Paper
+            elevation={10}
+            sx={{
+              p: 3,
+              textAlign: "center",
+              background: "linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)",
+              mb: 4,
+              position: "relative",
+              zIndex: 1,
+              backdropFilter: "blur(10px) saturate(1.08)",
+              WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+              borderRadius: 3,
+              boxShadow:
+                theme.palette.mode === "dark"
+                  ? "0 10px 40px rgba(0,0,0,0.45)"
+                  : "0 10px 40px rgba(0,0,0,0.12)",
+              transition:
+                "background-color 200ms ease, backdrop-filter 200ms ease",
+              "&:hover": {
+                boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+              },
+            }}
+          >
             <TrendingUp size={24} color="#FF7A00" />
             <Typography variant="h6" fontWeight="bold" sx={{ mt: 1 }}>
               {completionRate}%
@@ -300,7 +411,30 @@ export default function CoursesPage() {
               Completion Rate
             </Typography>
           </Paper>
-          <Paper sx={{ p: 2, textAlign: "center", borderRadius: 2 }}>
+          <Paper
+            elevation={10}
+            sx={{
+              p: 3,
+              textAlign: "center",
+
+              background: "linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%)",
+              mb: 4,
+              position: "relative",
+              zIndex: 1,
+              backdropFilter: "blur(10px) saturate(1.08)",
+              WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+              borderRadius: 3,
+              boxShadow:
+                theme.palette.mode === "dark"
+                  ? "0 10px 40px rgba(0,0,0,0.45)"
+                  : "0 10px 40px rgba(0,0,0,0.12)",
+              transition:
+                "background-color 200ms ease, backdrop-filter 200ms ease",
+              "&:hover": {
+                boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+              },
+            }}
+          >
             <Award size={24} color="#28a745" />
             <Typography variant="h6" fontWeight="bold" sx={{ mt: 1 }}>
               1,245
@@ -350,8 +484,13 @@ export default function CoursesPage() {
                     }}
                   >
                     <Box sx={{ position: "relative" }}>
-                      <CardMedia component="img" image={course.image || "/images/course-placeholder.jpg"} alt={course.title} sx={{ height: 200, objectFit: 'cover' }} />
-                  
+                      <CardMedia
+                        component="img"
+                        image={course.image || "/images/course-placeholder.jpg"}
+                        alt={course.title}
+                        sx={{ height: 200, objectFit: "cover" }}
+                      />
+
                       <Chip
                         label={course.level}
                         color={getLevelColor(course.level)}
@@ -484,28 +623,48 @@ export default function CoursesPage() {
                           mt: "auto",
                         }}
                       >
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 2 }}
+                        >
                           {/* Videos count */}
-                          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 0.5,
+                            }}
+                          >
                             <PlayCircle size={16} color="#666" />
                             <Typography variant="body2" color="text.secondary">
-                              {(course.youtubeLinks?.length ?? 0)} videos
+                              {course.youtubeLinks?.length ?? 0} videos
                             </Typography>
                           </Box>
                           {/* Students enrolled */}
-                          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 0.5,
+                            }}
+                          >
                             <Users size={16} color="#666" />
                             <Typography variant="body2" color="text.secondary">
                               {course.enrolledStudents?.toLocaleString?.() ?? 0}
                             </Typography>
                           </Box>
                           {/* Total duration */}
-                          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 0.5,
+                            }}
+                          >
                             <Clock size={16} color="#666" />
                             <Typography variant="body2" color="text.secondary">
                               {toMinutes(course.totalDuration)
                                 ? formatMinutes(toMinutes(course.totalDuration))
-                                : (course.duration || "—")}
+                                : course.duration || "—"}
                             </Typography>
                           </Box>
                         </Box>
@@ -514,11 +673,13 @@ export default function CoursesPage() {
                           size="small"
                           onClick={() => router.push(`/courses/${course._id}`)}
                           sx={{
-                            background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                            background:
+                              "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
                             "&:hover": {
-                              background: "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
+                              background:
+                                "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
                             },
-                        }}
+                          }}
                         >
                           View
                         </Button>

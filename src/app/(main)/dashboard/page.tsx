@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import theme from "../../../theme";
 
 import {
   Avatar,
@@ -115,20 +116,19 @@ export default function Dashboard() {
       >
         {/* Welcome Section */}
         <Box sx={{ mb: 4 }}>
-          
-            <Typography
-              variant="h3"
-              fontWeight="bold"
-              sx={{ background: "none", mb: 1 }}
-            >
-              <Box component="span" sx={{ color: "#007BFF" }}>
-                Welcome back,
-              </Box>{" "}
-              <Box component="span" sx={{ color: "#222" }}>
-                {user.name.split(" ")[0]}
-              </Box>{" "}
-              👋
-            </Typography>
+          <Typography
+            variant="h3"
+            fontWeight="bold"
+            sx={{ background: "none", mb: 1 }}
+          >
+            <Box component="span" sx={{ color: "#007BFF" }}>
+              Welcome back,
+            </Box>{" "}
+            <Box component="span" sx={{ color: "text.primary" }}>
+              {user.name.split(" ")[0]}
+            </Box>{" "}
+            👋
+          </Typography>
           <Typography variant="h6" color="text.secondary">
             Ready to continue your learning journey?
           </Typography>
@@ -136,11 +136,21 @@ export default function Dashboard() {
 
         {/* Profile Summary */}
         <Paper
+          elevation={10}
           sx={{
             p: 3,
             mb: 4,
+            position: "relative",
+            zIndex: 1,
+            backdropFilter: "blur(10px) saturate(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(1.08)",
             borderRadius: 3,
-            border: "1px solid rgba(0, 123, 255, 0.1)",
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 40px rgba(0,0,0,0.45)"
+                : "0 10px 40px rgba(0,0,0,0.12)",
+            transition:
+              "background-color 200ms ease, backdrop-filter 200ms ease",
           }}
         >
           <Box
@@ -187,22 +197,22 @@ export default function Dashboard() {
                     fontWeight: 600,
                   }}
                 />
-               {/* Mobile-only Edit button (under role) */}
-               <Box
-                 sx={{
-                   display: "none",
-                   "@media (max-width: 640px)": { display: "block", mt: 2 },
-                 }}
-               >
-                 <Button
-                   variant="outlined"
-                   fullWidth
-                   size="medium"
-                   onClick={() => router.push("/profile")}
-                 >
-                   Edit Profile
-                 </Button>
-               </Box>
+                {/* Mobile-only Edit button (under role) */}
+                <Box
+                  sx={{
+                    display: "none",
+                    "@media (max-width: 640px)": { display: "block", mt: 2 },
+                  }}
+                >
+                  <Button
+                    variant="outlined"
+                    fullWidth
+                    size="medium"
+                    onClick={() => router.push("/profile")}
+                  >
+                    Edit Profile
+                  </Button>
+                </Box>
               </Box>
             </Box>
             <Button
@@ -260,7 +270,7 @@ export default function Dashboard() {
                       key={index}
                       label={skill}
                       variant="outlined"
-                      color="secondary"
+                      color="primary"
                       size="small"
                     />
                   ))
@@ -290,15 +300,26 @@ export default function Dashboard() {
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Paper
               onClick={() => handleQuickAction("courses")}
+              elevation={10}
               sx={{
-                p: 3,
                 textAlign: "center",
                 cursor: "pointer",
+                p: 3,
+                mb: 4,
+                position: "relative",
+                zIndex: 1,
+                backdropFilter: "blur(10px) saturate(1.08)",
+                WebkitBackdropFilter: "blur(10px) saturate(1.08)",
                 borderRadius: 3,
+                boxShadow:
+                  theme.palette.mode === "dark"
+                    ? "0 10px 40px rgba(0,0,0,0.45)"
+                    : "0 10px 40px rgba(0,0,0,0.12)",
+                transition:
+                  "background-color 200ms ease, backdrop-filter 200ms ease",
                 "&:hover": {
                   boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
                 },
-                transition: "all 0.3s ease",
               }}
             >
               <BookOpen size={40} color="#007BFF" />
@@ -318,15 +339,26 @@ export default function Dashboard() {
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Paper
               onClick={() => handleQuickAction("mentors")}
+              elevation={10}
               sx={{
-                p: 3,
                 textAlign: "center",
                 cursor: "pointer",
+                p: 3,
+                mb: 4,
+                position: "relative",
+                zIndex: 1,
+                backdropFilter: "blur(10px) saturate(1.08)",
+                WebkitBackdropFilter: "blur(10px) saturate(1.08)",
                 borderRadius: 3,
+                boxShadow:
+                  theme.palette.mode === "dark"
+                    ? "0 10px 40px rgba(0,0,0,0.45)"
+                    : "0 10px 40px rgba(0,0,0,0.12)",
+                transition:
+                  "background-color 200ms ease, backdrop-filter 200ms ease",
                 "&:hover": {
-                  boxShadow: "0 8px 25px rgba(106, 13, 173, 0.2)",
+                  boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
                 },
-                transition: "all 0.3s ease",
               }}
             >
               <Users size={40} color="#6A0DAD" />
@@ -346,15 +378,26 @@ export default function Dashboard() {
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Paper
               onClick={() => handleQuickAction("messages")}
+              elevation={10}
               sx={{
-                p: 3,
                 textAlign: "center",
                 cursor: "pointer",
+                p: 3,
+                mb: 4,
+                position: "relative",
+                zIndex: 1,
+                backdropFilter: "blur(10px) saturate(1.08)",
+                WebkitBackdropFilter: "blur(10px) saturate(1.08)",
                 borderRadius: 3,
+                boxShadow:
+                  theme.palette.mode === "dark"
+                    ? "0 10px 40px rgba(0,0,0,0.45)"
+                    : "0 10px 40px rgba(0,0,0,0.12)",
+                transition:
+                  "background-color 200ms ease, backdrop-filter 200ms ease",
                 "&:hover": {
-                  boxShadow: "0 8px 25px rgba(255, 122, 0, 0.2)",
+                  boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
                 },
-                transition: "all 0.3s ease",
               }}
             >
               <MessageCircle size={40} color="#FF7A00" />
@@ -374,15 +417,26 @@ export default function Dashboard() {
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Paper
               onClick={() => handleQuickAction("progress")}
+              elevation={10}
               sx={{
-                p: 3,
                 textAlign: "center",
                 cursor: "pointer",
+                p: 3,
+                mb: 4,
+                position: "relative",
+                zIndex: 1,
+                backdropFilter: "blur(10px) saturate(1.08)",
+                WebkitBackdropFilter: "blur(10px) saturate(1.08)",
                 borderRadius: 3,
+                boxShadow:
+                  theme.palette.mode === "dark"
+                    ? "0 10px 40px rgba(0,0,0,0.45)"
+                    : "0 10px 40px rgba(0,0,0,0.12)",
+                transition:
+                  "background-color 200ms ease, backdrop-filter 200ms ease",
                 "&:hover": {
-                  boxShadow: "0 8px 25px rgba(40, 167, 69, 0.2)",
+                  boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
                 },
-                transition: "all 0.3s ease",
               }}
             >
               <Award size={40} color="#28a745" />
@@ -401,7 +455,28 @@ export default function Dashboard() {
         </Box>
 
         {/* Recent Activity */}
-        <Paper sx={{ p: 3, borderRadius: 3, border: "1px solid rgba(0, 123, 255, 0.1)" }}>
+        <Paper
+          elevation={10}
+          sx={{
+            textAlign: "center",
+            p: 3,
+            mb: 4,
+            position: "relative",
+            zIndex: 1,
+            backdropFilter: "blur(10px) saturate(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+            borderRadius: 3,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 40px rgba(0,0,0,0.45)"
+                : "0 10px 40px rgba(0,0,0,0.12)",
+            transition:
+              "background-color 200ms ease, backdrop-filter 200ms ease",
+            "&:hover": {
+              boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+            },
+          }}
+        >
           <Typography variant="h5" fontWeight="bold" sx={{ mb: 3 }}>
             Recent Activity
           </Typography>
@@ -409,8 +484,16 @@ export default function Dashboard() {
           {recentLoading ? (
             <Box sx={{ px: 1 }}>
               {[...Array(4)].map((_, i) => (
-                <Box key={i} sx={{ display: "flex", alignItems: "center", py: 1.5 }}>
-                  <Skeleton variant="circular" width={40} height={40} sx={{ mr: 2 }} />
+                <Box
+                  key={i}
+                  sx={{ display: "flex", alignItems: "center", py: 1.5 }}
+                >
+                  <Skeleton
+                    variant="circular"
+                    width={40}
+                    height={40}
+                    sx={{ mr: 2 }}
+                  />
                   <Box sx={{ flex: 1 }}>
                     <Skeleton width="40%" height={20} />
                     <Skeleton width="60%" height={18} />
@@ -421,19 +504,26 @@ export default function Dashboard() {
           ) : activities.length === 0 ? (
             <Box sx={{ textAlign: "center", py: 4 }}>
               <TrendingUp size={60} color="#ccc" />
-              <Typography variant="h6" color="text.secondary" sx={{ mt: 2, mb: 1 }}>
+              <Typography
+                variant="h6"
+                color="text.secondary"
+                sx={{ mt: 2, mb: 1 }}
+              >
                 No recent activity
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                Enroll in courses, take quizzes, and complete lessons to see them here.
+                Enroll in courses, take quizzes, and complete lessons to see
+                them here.
               </Typography>
               <Button
                 variant="contained"
                 onClick={handleGetStarted}
                 sx={{
-                  background: "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
+                  background:
+                    "linear-gradient(135deg, #007BFF 0%, #6A0DAD 100%)",
                   "&:hover": {
-                    background: "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
+                    background:
+                      "linear-gradient(135deg, #0056CC 0%, #4A0080 100%)",
                   },
                 }}
               >
@@ -443,21 +533,31 @@ export default function Dashboard() {
           ) : (
             <>
               <List disablePadding>
-                {(activities.slice(0, VISIBLE_COUNT)).map((a, idx) => {
+                {activities.slice(0, VISIBLE_COUNT).map((a, idx) => {
                   const dt = new Date(a.at);
                   const when = dt.toLocaleString();
                   const iconBg =
-                    a.type === "complete" ? "#e9f7ef"
-                    : a.type === "quiz_pass" ? "#e7f2ff"
-                    : a.type === "quiz" ? "#fff7e8"
-                    : a.type === "rating" ? "#f5e9ff"
-                    : "#eaf2ff";
+                    a.type === "complete"
+                      ? "#e9f7ef"
+                      : a.type === "quiz_pass"
+                        ? "#e7f2ff"
+                        : a.type === "quiz"
+                          ? "#fff7e8"
+                          : a.type === "rating"
+                            ? "#f5e9ff"
+                            : "#eaf2ff";
                   const icon =
-                    a.type === "complete" ? <Award size={22} color="#28a745" />
-                    : a.type === "quiz_pass" ? <TrendingUp size={22} color="#007BFF" />
-                    : a.type === "quiz" ? <TrendingUp size={22} color="#FF7A00" />
-                    : a.type === "rating" ? <Users size={22} color="#6A0DAD" />
-                    : <BookOpen size={22} color="#007BFF" />;
+                    a.type === "complete" ? (
+                      <Award size={22} color="#28a745" />
+                    ) : a.type === "quiz_pass" ? (
+                      <TrendingUp size={22} color="#007BFF" />
+                    ) : a.type === "quiz" ? (
+                      <TrendingUp size={22} color="#FF7A00" />
+                    ) : a.type === "rating" ? (
+                      <Users size={22} color="#6A0DAD" />
+                    ) : (
+                      <BookOpen size={22} color="#007BFF" />
+                    );
                   return (
                     <Box key={a.id}>
                       <ListItem
@@ -466,24 +566,42 @@ export default function Dashboard() {
                         onClick={() => a.href && router.push(a.href)}
                       >
                         <ListItemAvatar>
-                          <Box sx={{ width: 40, height: 40, borderRadius: "50%", display: "grid", placeItems: "center", background: iconBg }}>
+                          <Box
+                            sx={{
+                              width: 40,
+                              height: 40,
+                              borderRadius: "50%",
+                              display: "grid",
+                              placeItems: "center",
+                              background: iconBg,
+                            }}
+                          >
                             {icon}
                           </Box>
                         </ListItemAvatar>
                         <ListItemText
                           primary={a.title}
-                          secondary={<span>{a.subtitle ? `${a.subtitle} • ` : ""}{when}</span>}
+                          secondary={
+                            <span>
+                              {a.subtitle ? `${a.subtitle} • ` : ""}
+                              {when}
+                            </span>
+                          }
                           primaryTypographyProps={{ fontWeight: 600 }}
                         />
                       </ListItem>
-                      {idx < Math.min(VISIBLE_COUNT, activities.length) - 1 && <Divider sx={{ my: 1 }} />}
+                      {idx < Math.min(VISIBLE_COUNT, activities.length) - 1 && (
+                        <Divider sx={{ my: 1 }} />
+                      )}
                     </Box>
                   );
                 })}
               </List>
 
               {activities.length > VISIBLE_COUNT && (
-                <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
+                <Box
+                  sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}
+                >
                   <Button
                     variant="outlined"
                     size="small"

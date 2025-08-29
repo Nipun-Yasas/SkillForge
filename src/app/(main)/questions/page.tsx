@@ -39,7 +39,7 @@ import {
   ThumbDown as ThumbDownIcon
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-
+import theme from '@/theme';
 interface FAQ {
   id: string;
   question: string;
@@ -240,7 +240,25 @@ export default function QuestionsPage() {
         </Box>
 
         {/* Tabs */}
-        <Paper sx={{ mb: 4, borderRadius: 3 }}>
+        <Paper elevation={10}
+          sx={{
+            p: 3,
+            mb: 4,
+            position: "relative",
+            zIndex: 1,
+            backdropFilter: "blur(10px) saturate(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+            borderRadius: 3,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 40px rgba(0,0,0,0.45)"
+                : "0 10px 40px rgba(0,0,0,0.12)",
+            transition:
+              "background-color 200ms ease, backdrop-filter 200ms ease",
+            "&:hover": {
+              boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+            },
+          }}>
           <Tabs
             value={activeTab}
             onChange={handleTabChange}
@@ -269,7 +287,25 @@ export default function QuestionsPage() {
         {activeTab === 0 && (
           <>
             {/* Search and Categories */}
-            <Paper sx={{ p: 3, mb: 4, borderRadius: 3 }}>
+            <Paper elevation={10}
+          sx={{
+            p:3,
+            mb: 4,
+            position: "relative",
+            zIndex: 1,
+            backdropFilter: "blur(10px) saturate(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+            borderRadius: 3,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 40px rgba(0,0,0,0.45)"
+                : "0 10px 40px rgba(0,0,0,0.12)",
+            transition:
+              "background-color 200ms ease, backdrop-filter 200ms ease",
+            "&:hover": {
+              boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+            },
+          }}>
               <TextField
                 fullWidth
                 placeholder="Search frequently asked questions..."
@@ -401,7 +437,25 @@ export default function QuestionsPage() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
               >
-                <Card sx={{ mb: 3, borderRadius: 3 }}>
+                <Card elevation={10}
+          sx={{
+            p:3,
+            mb: 4,
+            position: "relative",
+            zIndex: 1,
+            backdropFilter: "blur(10px) saturate(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+            borderRadius: 3,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 40px rgba(0,0,0,0.45)"
+                : "0 10px 40px rgba(0,0,0,0.12)",
+            transition:
+              "background-color 200ms ease, backdrop-filter 200ms ease",
+            "&:hover": {
+              boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+            },
+          }}>
                   <CardContent>
                     <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
                       <Avatar src={question.avatar} sx={{ width: 40, height: 40 }}>
@@ -467,7 +521,25 @@ export default function QuestionsPage() {
               mb: 4 
             }}
           >
-            <Card sx={{ p: 3, borderRadius: 3, height: '100%' }}>
+            <Card elevation={10}
+          sx={{
+            p:3,
+            mb: 4,
+            position: "relative",
+            zIndex: 1,
+            backdropFilter: "blur(10px) saturate(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+            borderRadius: 3,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 40px rgba(0,0,0,0.45)"
+                : "0 10px 40px rgba(0,0,0,0.12)",
+            transition:
+              "background-color 200ms ease, backdrop-filter 200ms ease",
+            "&:hover": {
+              boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+            },
+          }}>
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
                   <Avatar sx={{ bgcolor: 'primary.main', width: 56, height: 56 }}>
@@ -512,7 +584,25 @@ export default function QuestionsPage() {
               </CardContent>
             </Card>
             
-            <Card sx={{ p: 3, borderRadius: 3, height: '100%' }}>
+            <Card elevation={10}
+          sx={{
+            p: 3,
+            mb: 4,
+            position: "relative",
+            zIndex: 1,
+            backdropFilter: "blur(10px) saturate(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+            borderRadius: 3,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 40px rgba(0,0,0,0.45)"
+                : "0 10px 40px rgba(0,0,0,0.12)",
+            transition:
+              "background-color 200ms ease, backdrop-filter 200ms ease",
+            "&:hover": {
+              boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+            },
+          }}>
               <CardContent>
                 <Typography variant="h6" fontWeight="bold" sx={{ mb: 3 }}>
                   💬 Quick Help

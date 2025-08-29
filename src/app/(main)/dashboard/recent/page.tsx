@@ -15,6 +15,8 @@ import Divider from "@mui/material/Divider";
 import Skeleton from "@mui/material/Skeleton";
 import { Award, BookOpen, TrendingUp, Users } from "lucide-react";
 
+import theme from "@/theme";
+
 type ActivityItem = {
   id: string;
   type: "enroll" | "quiz" | "quiz_pass" | "complete" | "rating";
@@ -58,7 +60,26 @@ export default function RecentActivityPage() {
         </Button>
       </Box>
 
-      <Paper sx={{ p: 3, borderRadius: 3, border: "1px solid rgba(0, 123, 255, 0.1)" }}>
+      <Paper elevation={10}
+              sx={{
+                textAlign: "center",
+                p: 4,
+                mb: 4,
+                position: "relative",
+                zIndex: 1,
+                backdropFilter: "blur(10px) saturate(1.08)",
+                WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+                borderRadius: 3,
+                boxShadow:
+                  theme.palette.mode === "dark"
+                    ? "0 10px 40px rgba(0,0,0,0.45)"
+                    : "0 10px 40px rgba(0,0,0,0.12)",
+                transition:
+                  "background-color 200ms ease, backdrop-filter 200ms ease",
+                "&:hover": {
+                  boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+                },
+              }}>
         {loading ? (
           <Box sx={{ px: 1 }}>
             {[...Array(6)].map((_, i) => (

@@ -40,6 +40,7 @@ import {
   CheckCircle as CheckCircleIcon,
   Info as InfoIcon
 } from '@mui/icons-material';
+import theme from '@/theme';
 
 interface Mentor {
   id: string;
@@ -229,7 +230,24 @@ export default function MentorProfile() {
         {/* Main Content */}
         <Box sx={{ flex: 2 }}>
           {/* Skills Section */}
-          <Card sx={{ mb: 3, borderRadius: 2 }}>
+          <Card elevation={10}
+          sx={{
+            mb: 4,
+            position: "relative",
+            zIndex: 1,
+            backdropFilter: "blur(10px) saturate(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+            borderRadius: 3,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 40px rgba(0,0,0,0.45)"
+                : "0 10px 40px rgba(0,0,0,0.12)",
+            transition:
+              "background-color 200ms ease, backdrop-filter 200ms ease",
+            "&:hover": {
+              boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+            },
+          }}>
             <CardContent>
               <Typography variant="h5" fontWeight="bold" gutterBottom>
                 🎯 Expertise &amp; Skills
@@ -255,7 +273,24 @@ export default function MentorProfile() {
           </Card>
 
           {/* About Section */}
-          <Card sx={{ mb: 3, borderRadius: 2 }}>
+          <Card elevation={10}
+          sx={{
+            mb: 4,
+            position: "relative",
+            zIndex: 1,
+            backdropFilter: "blur(10px) saturate(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+            borderRadius: 3,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 40px rgba(0,0,0,0.45)"
+                : "0 10px 40px rgba(0,0,0,0.12)",
+            transition:
+              "background-color 200ms ease, backdrop-filter 200ms ease",
+            "&:hover": {
+              boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+            },
+          }}>
             <CardContent>
               <Typography variant="h5" fontWeight="bold" gutterBottom>
                 📖 About {mentor.name}
@@ -299,7 +334,24 @@ export default function MentorProfile() {
         {/* Sidebar */}
         <Box sx={{ flex: 1 }}>
           {/* Quick Stats */}
-          <Card sx={{ mb: 3, borderRadius: 2 }}>
+          <Card elevation={10}
+          sx={{
+            mb: 4,
+            position: "relative",
+            zIndex: 1,
+            backdropFilter: "blur(10px) saturate(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+            borderRadius: 3,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 40px rgba(0,0,0,0.45)"
+                : "0 10px 40px rgba(0,0,0,0.12)",
+            transition:
+              "background-color 200ms ease, backdrop-filter 200ms ease",
+            "&:hover": {
+              boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+            },
+          }}>
             <CardContent>
               <Typography variant="h6" fontWeight="bold" gutterBottom>
                 📊 Quick Stats
@@ -345,7 +397,24 @@ export default function MentorProfile() {
           </Card>
 
           {/* Availability */}
-          <Card sx={{ mb: 3, borderRadius: 2 }}>
+          <Card elevation={10}
+          sx={{
+            mb: 4,
+            position: "relative",
+            zIndex: 1,
+            backdropFilter: "blur(10px) saturate(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+            borderRadius: 3,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 40px rgba(0,0,0,0.45)"
+                : "0 10px 40px rgba(0,0,0,0.12)",
+            transition:
+              "background-color 200ms ease, backdrop-filter 200ms ease",
+            "&:hover": {
+              boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+            },
+          }}>
             <CardContent>
               <Typography variant="h6" fontWeight="bold" gutterBottom>
                 📅 Availability
@@ -363,7 +432,24 @@ export default function MentorProfile() {
           </Card>
 
           {/* Contact Card */}
-          <Card sx={{ borderRadius: 2 }}>
+          <Card elevation={10}
+          sx={{
+            mb: 4,
+            position: "relative",
+            zIndex: 1,
+            backdropFilter: "blur(10px) saturate(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+            borderRadius: 3,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 40px rgba(0,0,0,0.45)"
+                : "0 10px 40px rgba(0,0,0,0.12)",
+            transition:
+              "background-color 200ms ease, backdrop-filter 200ms ease",
+            "&:hover": {
+              boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+            },
+          }}>
             <CardContent>
               <Typography variant="h6" fontWeight="bold" gutterBottom>
                 🤝 Start Learning

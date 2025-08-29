@@ -28,6 +28,7 @@ import {
   Remove,
 } from "@mui/icons-material";
 import CreditsSkeleton from "./components/CreditsSkeleton";
+import theme from "@/theme";
 
 interface CreditInfo {
   teachingCredits: number;
@@ -172,9 +173,7 @@ const CreditDashboard = () => {
   };
 
   if (loading) {
-    return (
-      <CreditsSkeleton />
-    );
+    return <CreditsSkeleton />;
   }
 
   if (!creditInfo) {
@@ -206,7 +205,28 @@ const CreditDashboard = () => {
           mb: 4,
         }}
       >
-        <Card sx={{ textAlign: "center", p: 2 }}>
+        <Card
+          elevation={10}
+          sx={{
+            p: 3,
+            textAlign: "center",
+            mb: 4,
+            position: "relative",
+            zIndex: 1,
+            backdropFilter: "blur(10px) saturate(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+            borderRadius: 3,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 40px rgba(0,0,0,0.45)"
+                : "0 10px 40px rgba(0,0,0,0.12)",
+            transition:
+              "background-color 200ms ease, backdrop-filter 200ms ease",
+            "&:hover": {
+              boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+            },
+          }}
+        >
           <School sx={{ fontSize: 40, color: "#4CAF50", mb: 1 }} />
           <Typography variant="h6">Teaching Credits</Typography>
           <Typography
@@ -220,7 +240,28 @@ const CreditDashboard = () => {
           </Typography>
         </Card>
 
-        <Card sx={{ textAlign: "center", p: 2 }}>
+        <Card
+          elevation={10}
+          sx={{
+            p: 3,
+            textAlign: "center",
+            mb: 4,
+            position: "relative",
+            zIndex: 1,
+            backdropFilter: "blur(10px) saturate(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+            borderRadius: 3,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 40px rgba(0,0,0,0.45)"
+                : "0 10px 40px rgba(0,0,0,0.12)",
+            transition:
+              "background-color 200ms ease, backdrop-filter 200ms ease",
+            "&:hover": {
+              boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+            },
+          }}
+        >
           <EmojiEvents sx={{ fontSize: 40, color: "#2196F3", mb: 1 }} />
           <Typography variant="h6">Learning Credits</Typography>
           <Typography
@@ -234,7 +275,28 @@ const CreditDashboard = () => {
           </Typography>
         </Card>
 
-        <Card sx={{ textAlign: "center", p: 2 }}>
+        <Card
+          elevation={10}
+          sx={{
+            p: 3,
+            textAlign: "center",
+            mb: 4,
+            position: "relative",
+            zIndex: 1,
+            backdropFilter: "blur(10px) saturate(1.08)",
+            WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+            borderRadius: 3,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 40px rgba(0,0,0,0.45)"
+                : "0 10px 40px rgba(0,0,0,0.12)",
+            transition:
+              "background-color 200ms ease, backdrop-filter 200ms ease",
+            "&:hover": {
+              boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+            },
+          }}
+        >
           <Star sx={{ fontSize: 40, color: "#FF9800", mb: 1 }} />
           <Typography variant="h6">Bonus Credits</Typography>
           <Typography
@@ -250,7 +312,25 @@ const CreditDashboard = () => {
       </Box>
 
       {/* Level & Reputation */}
-      <Card sx={{ mb: 4 }}>
+      <Card
+        elevation={10}
+        sx={{
+          mb: 4,
+          position: "relative",
+          zIndex: 1,
+          backdropFilter: "blur(10px) saturate(1.08)",
+          WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+          borderRadius: 3,
+          boxShadow:
+            theme.palette.mode === "dark"
+              ? "0 10px 40px rgba(0,0,0,0.45)"
+              : "0 10px 40px rgba(0,0,0,0.12)",
+          transition: "background-color 200ms ease, backdrop-filter 200ms ease",
+          "&:hover": {
+            boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+          },
+        }}
+      >
         <CardContent>
           <Typography
             variant="h6"
@@ -307,7 +387,25 @@ const CreditDashboard = () => {
       </Card>
 
       {/* Actions */}
-      <Card sx={{ mb: 4 }}>
+      <Card
+        elevation={10}
+        sx={{
+          mb: 4,
+          position: "relative",
+          zIndex: 1,
+          backdropFilter: "blur(10px) saturate(1.08)",
+          WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+          borderRadius: 3,
+          boxShadow:
+            theme.palette.mode === "dark"
+              ? "0 10px 40px rgba(0,0,0,0.45)"
+              : "0 10px 40px rgba(0,0,0,0.12)",
+          transition: "background-color 200ms ease, backdrop-filter 200ms ease",
+          "&:hover": {
+            boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+          },
+        }}
+      >
         <CardContent>
           <Typography variant="h6" gutterBottom>
             Quick Actions
@@ -324,7 +422,7 @@ const CreditDashboard = () => {
             <Button
               variant="outlined"
               startIcon={<EmojiEvents />}
-              href="/dashboard/rewards"
+              href="/rewards"
             >
               View Rewards
             </Button>
@@ -340,7 +438,24 @@ const CreditDashboard = () => {
       </Card>
 
       {/* Recent Transactions */}
-      <Card>
+      <Card
+        elevation={10}
+        sx={{
+          position: "relative",
+          zIndex: 1,
+          backdropFilter: "blur(10px) saturate(1.08)",
+          WebkitBackdropFilter: "blur(10px) saturate(1.08)",
+          borderRadius: 3,
+          boxShadow:
+            theme.palette.mode === "dark"
+              ? "0 10px 40px rgba(0,0,0,0.45)"
+              : "0 10px 40px rgba(0,0,0,0.12)",
+          transition: "background-color 200ms ease, backdrop-filter 200ms ease",
+          "&:hover": {
+            boxShadow: "0 8px 25px rgba(0, 123, 255, 0.2)",
+          },
+        }}
+      >
         <CardContent>
           <Typography variant="h6" gutterBottom>
             Recent Transactions

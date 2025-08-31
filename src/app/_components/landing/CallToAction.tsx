@@ -97,7 +97,7 @@ export default function Hero() {
           textAlign: { xs: "center", md: "left" },
           position: "relative",
           zIndex: 2,
-          p: 2.5,
+          p: { xs: 2, md: 8},
         }}
       >
         <Typography

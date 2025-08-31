@@ -34,6 +34,7 @@ import DataObjectIcon from "@mui/icons-material/DataObject";
 import { useAuth } from "@/contexts/AuthContext";
 import CustomToolbarActions from "../_components/main/CustomToolbarActions";
 import CustomAppTitle from "../_components/main/CustomAppTitle";
+import Chatbot from "../_components/chatbot/Chatbot"
 interface LayoutProps {
   children: ReactNode;
 }
@@ -151,6 +152,7 @@ export default function Layout({ children }: LayoutProps) {
         
       >
         {children}
+        <Chatbot />
       </PageContainer>
     </DashboardLayout>
   );

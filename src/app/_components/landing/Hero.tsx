@@ -23,20 +23,7 @@ export default function Hero() {
         mt: 3,
       }}
     >
-      <Box
-        sx={{
-          position: "absolute",
-          backgroundColor: "shapeColor.main",
-          borderRadius: "50%",
-          height: 300,
-          width: 300,
-          top: { xs: "70%", md: 120 },
-          left: { xs: "-15%", md: -87 },
-          zIndex: 0,
-          opacity: 0.5,
-        }}
-        aria-hidden="true"
-      />
+      
       {/* Text content*/}
       <Box
         sx={{
@@ -45,7 +32,7 @@ export default function Hero() {
           position: "relative",
           justifyContent: "center",
           zIndex: 2,
-          p: 2.5,
+          p: { xs: 2, md: 8 },
         }}
       >
         <motion.div
@@ -93,7 +80,6 @@ export default function Hero() {
           <Box
             sx={{
               display: "flex",
-              justifyContent: "center",
               gap: 3,
               mb: 4,
               flexWrap: "wrap",
@@ -124,7 +110,6 @@ export default function Hero() {
               display: "flex",
               gap: 2,
               flexDirection: { xs: "column", sm: "row" },
-              justifyContent: "center",
             }}
           >
             <Link href="/signup" passHref>
@@ -183,7 +168,7 @@ export default function Hero() {
           alignItems: "center",
           position: "relative",
           zIndex: 1,
-          mt: { xs: 4, md: 0 },
+          mt: { xs: 4, md: 5 },
           height: { xs: "auto", md: "100%" },
         }}
       >

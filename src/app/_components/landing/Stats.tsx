@@ -82,7 +82,14 @@ const StatItem: React.FC<StatItemProps> = ({
           mb: 1,
         }}
       >
-        <CountUp end={number} duration={2.5} separator="," />
+        <CountUp
+          end={number}
+          duration={2.5}
+          separator=","
+          decimals={Number.isInteger(number) ? 0 : String(number).split(".")[1]?.length ?? 1}
+          enableScrollSpy
+          scrollSpyOnce
+        />
         {suffix}
       </Typography>
       <Typography

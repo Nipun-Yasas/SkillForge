@@ -18,7 +18,7 @@ export default function Home() {
   const isReady = pageLoaded && minDelayPassed;
 
   useEffect(() => {
-    const t = window.setTimeout(() => setMinDelayPassed(true), 4000);
+    const t = window.setTimeout(() => setMinDelayPassed(true), 2500);
     return () => window.clearTimeout(t);
   }, []);
 

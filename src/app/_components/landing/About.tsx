@@ -200,7 +200,7 @@ export default function About() {
             left: { xs: "50%", md: "50%" },
             transform: "translate(-50%, 0)",
             zIndex: 0,
-            opacity: 0.5,
+            opacity: 0.1,
           }}
           aria-hidden="true"
         />
